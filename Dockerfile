@@ -106,7 +106,7 @@ CMD set -e && \
     echo "=== Checking Database File ===" && \
     ls -la database/database.sqlite && \
     echo "=== Running Migrations ===" && \
-    php artisan migrate --force && \
+    php artisan migrate:fresh --force && \
     echo "=== Seeding Database ===" && \
     (php artisan db:seed --force || echo "Database seeding failed, continuing...") && \
     echo "=== Clearing Caches ===" && \
@@ -117,6 +117,9 @@ CMD set -e && \
     php artisan optimize && \
     echo "=== Running Custom Commands ===" && \
     php artisan receipts:migrate-to-base64 || true && \
+    echo "=== Testing Application Health ===" && \
+    php artisan --version && \
+    php -r "echo 'PHP is working: ' . PHP_VERSION . PHP_EOL;" && \
     echo "=== Starting Web Server ===" && \
     echo "Application ready! Starting server on port 10000..." && \
     php -S 0.0.0.0:10000 server.php
