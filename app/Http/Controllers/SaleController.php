@@ -121,14 +121,14 @@ class SaleController extends Controller
             'payment_date' => 'required|date',
             'payment_receipt' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
             
-            // Delivery address - REQUIRED
-            'delivery_address' => 'required|string|max:255',
+            // Delivery address - OPTIONAL (customer fills later)
+            'delivery_address' => 'nullable|string|max:255',
             'delivery_number' => 'nullable|string|max:20',
             'delivery_complement' => 'nullable|string|max:100',
             'delivery_neighborhood' => 'nullable|string|max:100',
-            'delivery_city' => 'required|string|max:100',
-            'delivery_state' => 'required|string|size:2',
-            'delivery_zipcode' => 'required|string|regex:/^\d{5}-?\d{3}$/',
+            'delivery_city' => 'nullable|string|max:100',
+            'delivery_state' => 'nullable|string|size:2',
+            'delivery_zipcode' => 'nullable|string|regex:/^\d{5}-?\d{3}$/',
             
             // Optional
             'notes' => 'nullable|string',
@@ -232,14 +232,14 @@ class SaleController extends Controller
             'payment_date' => 'required|date',
             'payment_receipt' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
             
-            // Delivery address - REQUIRED
-            'delivery_address' => 'required|string|max:255',
+            // Delivery address - OPTIONAL (customer fills later)
+            'delivery_address' => 'nullable|string|max:255',
             'delivery_number' => 'nullable|string|max:20',
             'delivery_complement' => 'nullable|string|max:100',
             'delivery_neighborhood' => 'nullable|string|max:100',
-            'delivery_city' => 'required|string|max:100',
-            'delivery_state' => 'required|string|size:2',
-            'delivery_zipcode' => 'required|string|regex:/^\d{5}-?\d{3}$/',
+            'delivery_city' => 'nullable|string|max:100',
+            'delivery_state' => 'nullable|string|size:2',
+            'delivery_zipcode' => 'nullable|string|regex:/^\d{5}-?\d{3}$/',
             
             // Optional
             'notes' => 'nullable|string',

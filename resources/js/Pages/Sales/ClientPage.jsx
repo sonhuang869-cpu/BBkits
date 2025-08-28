@@ -35,6 +35,16 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, remain
 
     const submitAddress = (e) => {
         e.preventDefault();
+        
+        // Validate required address fields
+        const requiredFields = ['delivery_address', 'delivery_number', 'delivery_neighborhood', 'delivery_city', 'delivery_state', 'delivery_zipcode'];
+        const missingFields = requiredFields.filter(field => !data[field] || data[field].toString().trim() === '');
+        
+        if (missingFields.length > 0) {
+            toast.error('Por favor, preencha todos os campos obrigatórios do endereço');
+            return;
+        }
+        
         post(route('sales.client.update-address', { token: sale.unique_token }), {
             onSuccess: () => {
                 toast.success('Endereço atualizado com sucesso!');
@@ -356,7 +366,20 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, remain
                                 <p>{sale.delivery_city}/{sale.delivery_state} - CEP: {sale.delivery_zipcode}</p>
                             </div>
                         ) : (
-                            <form onSubmit={submitAddress} className="space-y-4">
+                            <>
+                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-amber-500 text-lg">⚠️</span>
+                                        <div>
+                                            <h4 className="text-amber-800 font-medium">Endereço Obrigatório</h4>
+                                            <p className="text-amber-700 text-sm">
+                                                Para finalizar seu pedido, precisamos do seu endereço de entrega completo.
+                                                Preencha todos os campos abaixo.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form onSubmit={submitAddress} className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -473,6 +496,7 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, remain
                                     </button>
                                 </div>
                             </form>
+                            </>
                         )}
                     </div>
 

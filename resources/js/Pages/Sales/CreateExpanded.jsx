@@ -125,9 +125,7 @@ export default function CreateExpanded() {
         const requiredFields = [
             'client_name', 'client_email', 'client_phone',
             'child_name', 'total_amount', 'shipping_amount',
-            'received_amount', 'payment_date', 'payment_method',
-            'delivery_address', 'delivery_number', 'delivery_neighborhood',
-            'delivery_city', 'delivery_state', 'delivery_zipcode'
+            'received_amount', 'payment_date', 'payment_method'
         ];
 
         const missingFields = requiredFields.filter(field => !data[field]);
@@ -631,20 +629,20 @@ export default function CreateExpanded() {
                                         📦
                                     </span>
                                     Endereço de Entrega
+                                    <span className="text-sm font-normal text-gray-500">(Opcional - Cliente pode preencher depois)</span>
                                 </h3>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Endereço *
+                                            Endereço
                                         </label>
                                         <input
                                             type="text"
                                             value={data.delivery_address}
                                             onChange={e => setData('delivery_address', e.target.value)}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                                            placeholder="Rua das Flores"
-                                            required
+                                            placeholder="Rua das Flores (Cliente preencherá depois)"
                                         />
                                         {errors.delivery_address && (
                                             <p className="text-red-500 text-sm mt-1">{errors.delivery_address}</p>
@@ -653,7 +651,7 @@ export default function CreateExpanded() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Número *
+                                            Número
                                         </label>
                                         <input
                                             type="text"
@@ -661,7 +659,6 @@ export default function CreateExpanded() {
                                             onChange={e => setData('delivery_number', e.target.value)}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                                             placeholder="123"
-                                            required
                                         />
                                         {errors.delivery_number && (
                                             <p className="text-red-500 text-sm mt-1">{errors.delivery_number}</p>
@@ -683,7 +680,7 @@ export default function CreateExpanded() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Bairro *
+                                            Bairro
                                         </label>
                                         <input
                                             type="text"
@@ -691,7 +688,6 @@ export default function CreateExpanded() {
                                             onChange={e => setData('delivery_neighborhood', e.target.value)}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                                             placeholder="Jardim Primavera"
-                                            required
                                         />
                                         {errors.delivery_neighborhood && (
                                             <p className="text-red-500 text-sm mt-1">{errors.delivery_neighborhood}</p>
@@ -700,7 +696,7 @@ export default function CreateExpanded() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Cidade *
+                                            Cidade
                                         </label>
                                         <input
                                             type="text"
@@ -708,7 +704,6 @@ export default function CreateExpanded() {
                                             onChange={e => setData('delivery_city', e.target.value)}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                                             placeholder="São Paulo"
-                                            required
                                         />
                                         {errors.delivery_city && (
                                             <p className="text-red-500 text-sm mt-1">{errors.delivery_city}</p>
@@ -717,13 +712,12 @@ export default function CreateExpanded() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Estado *
+                                            Estado
                                         </label>
                                         <select
                                             value={data.delivery_state}
                                             onChange={e => setData('delivery_state', e.target.value)}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                                            required
                                         >
                                             <option value="">Selecione...</option>
                                             {states.map(state => (
@@ -737,7 +731,7 @@ export default function CreateExpanded() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            CEP *
+                                            CEP
                                         </label>
                                         <input
                                             type="text"
@@ -745,7 +739,6 @@ export default function CreateExpanded() {
                                             onChange={e => setData('delivery_zipcode', formatCEP(e.target.value))}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
                                             placeholder="01234-567"
-                                            required
                                         />
                                         {errors.delivery_zipcode && (
                                             <p className="text-red-500 text-sm mt-1">{errors.delivery_zipcode}</p>
