@@ -42,7 +42,8 @@ class SaleController extends Controller
 
     public function create()
     {
-        return Inertia::render('Sales/Create');
+        // Redirect to expanded form since we need delivery fields
+        return redirect()->route('sales.create-expanded');
     }
 
     public function createExpanded()
