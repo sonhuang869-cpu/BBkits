@@ -1,7 +1,94 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
+import Modal from '@/Components/Modal';
+import TextInput from '@/Components/TextInput';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Index({ auth, products, categories, filters }) {
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    
+    const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
+        name: '',
+        description: '',
+        price: '',
+        category: 'camiseta',
+        sizes: ['P', 'M', 'G'],
+        colors: ['Branco', 'Preto'],
+        allows_embroidery: true,
+        is_active: true,
+        stock_quantity: 0,
+    });
+    
+    const openAddModal = () => {
+        reset();
+        setShowAddModal(true);
+    };
+    
+    const openEditModal = (product) => {
+        setSelectedProduct(product);
+        setData({
+            name: product.name,
+            description: product.description || '',
+            price: product.price,
+            category: product.category,
+            sizes: Array.isArray(product.sizes) ? product.sizes : JSON.parse(product.sizes || '[]'),
+            colors: Array.isArray(product.colors) ? product.colors : JSON.parse(product.colors || '[]'),
+            allows_embroidery: product.allows_embroidery,
+            is_active: product.is_active,
+            stock_quantity: product.stock_quantity || 0,
+        });
+        setShowEditModal(true);
+    };
+    
+    const openDeleteModal = (product) => {
+        setSelectedProduct(product);
+        setShowDeleteModal(true);
+    };
+    
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        post('/admin/products', {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowAddModal(false);
+                reset();
+            },
+        });
+    };
+    
+    const handleUpdate = (e) => {
+        e.preventDefault();
+        put(`/admin/products/${selectedProduct.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowEditModal(false);
+                reset();
+            },
+        });
+    };
+    
+    const handleDelete = () => {
+        destroy(`/admin/products/${selectedProduct.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowDeleteModal(false);
+                setSelectedProduct(null);
+            },
+        });
+    };
+
+    const handleArrayInput = (field, value) => {
+        const array = value.split(',').map(item => item.trim()).filter(item => item.length > 0);
+        setData(field, array);
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -24,19 +111,353 @@ export default function Index({ auth, products, categories, filters }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
                             <div className="mb-4">
-                                <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
+                                <button 
+                                    onClick={openAddModal}
+                                    className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded"
+                                >
                                     + Adicionar Novo Produto
                                 </button>
                             </div>
 
-                            <div className="text-center py-8">
-                                <p className="text-gray-500">Página em desenvolvimento.</p>
-                                <p className="text-sm text-gray-400 mt-2">Em breve você poderá gerenciar produtos aqui.</p>
-                            </div>
+                            {products && products.data && products.data.length > 0 ? (
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Nome
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Categoria
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Preço
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Bordado
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Ações
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {products.data.map((product) => (
+                                                <tr key={product.id}>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        {product.name}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {product.category}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        R$ {parseFloat(product.price).toFixed(2)}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                                            product.allows_embroidery 
+                                                                ? 'bg-green-100 text-green-800' 
+                                                                : 'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                            {product.allows_embroidery ? 'Sim' : 'Não'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                                            product.is_active 
+                                                                ? 'bg-green-100 text-green-800' 
+                                                                : 'bg-red-100 text-red-800'
+                                                        }`}>
+                                                            {product.is_active ? 'Ativo' : 'Inativo'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                        <button 
+                                                            onClick={() => openEditModal(product)}
+                                                            className="text-indigo-600 hover:text-indigo-900 mr-2"
+                                                        >
+                                                            Editar
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => openDeleteModal(product)}
+                                                            className="text-red-600 hover:text-red-900"
+                                                        >
+                                                            Excluir
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <div className="text-center py-8">
+                                    <p className="text-gray-500">Nenhum produto encontrado.</p>
+                                    <p className="text-sm text-gray-400 mt-2">Adicione seu primeiro produto clicando no botão acima.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Add Product Modal */}
+            <Modal show={showAddModal} onClose={() => setShowAddModal(false)}>
+                <form onSubmit={handleSubmit} className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900 mb-6">Adicionar Novo Produto</h2>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <InputLabel value="Nome do Produto" />
+                            <TextInput
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                className="mt-1 block w-full"
+                                placeholder="Camiseta Básica"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <InputLabel value="Categoria" />
+                            <select
+                                value={data.category}
+                                onChange={(e) => setData('category', e.target.value)}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                            >
+                                <option value="camiseta">Camiseta</option>
+                                <option value="polo">Polo</option>
+                                <option value="moletom">Moletom</option>
+                                <option value="jaqueta">Jaqueta</option>
+                                <option value="bone">Boné</option>
+                                <option value="acessorio">Acessório</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                        <InputLabel value="Descrição" />
+                        <textarea
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            rows="3"
+                            placeholder="Descrição do produto..."
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <InputLabel value="Preço (R$)" />
+                            <TextInput
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={data.price}
+                                onChange={(e) => setData('price', e.target.value)}
+                                className="mt-1 block w-full"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <InputLabel value="Tamanhos (separados por vírgula)" />
+                            <TextInput
+                                value={data.sizes.join(', ')}
+                                onChange={(e) => handleArrayInput('sizes', e.target.value)}
+                                className="mt-1 block w-full"
+                                placeholder="P, M, G, GG"
+                            />
+                        </div>
+                        <div>
+                            <InputLabel value="Estoque" />
+                            <TextInput
+                                type="number"
+                                min="0"
+                                value={data.stock_quantity}
+                                onChange={(e) => setData('stock_quantity', parseInt(e.target.value) || 0)}
+                                className="mt-1 block w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <InputLabel value="Cores Disponíveis (separadas por vírgula)" />
+                        <TextInput
+                            value={data.colors.join(', ')}
+                            onChange={(e) => handleArrayInput('colors', e.target.value)}
+                            className="mt-1 block w-full"
+                            placeholder="Branco, Preto, Azul, Vermelho"
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    checked={data.allows_embroidery}
+                                    onChange={(e) => setData('allows_embroidery', e.target.checked)}
+                                    className="rounded"
+                                />
+                                <span className="ml-2">Permite Bordado</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    checked={data.is_active}
+                                    onChange={(e) => setData('is_active', e.target.checked)}
+                                    className="rounded"
+                                />
+                                <span className="ml-2">Produto Ativo</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end space-x-2">
+                        <SecondaryButton onClick={() => setShowAddModal(false)}>Cancelar</SecondaryButton>
+                        <PrimaryButton type="submit" disabled={processing}>Salvar</PrimaryButton>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Edit Product Modal */}
+            <Modal show={showEditModal} onClose={() => setShowEditModal(false)}>
+                <form onSubmit={handleUpdate} className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900 mb-6">Editar Produto</h2>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <InputLabel value="Nome do Produto" />
+                            <TextInput
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                className="mt-1 block w-full"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <InputLabel value="Categoria" />
+                            <select
+                                value={data.category}
+                                onChange={(e) => setData('category', e.target.value)}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                            >
+                                <option value="camiseta">Camiseta</option>
+                                <option value="polo">Polo</option>
+                                <option value="moletom">Moletom</option>
+                                <option value="jaqueta">Jaqueta</option>
+                                <option value="bone">Boné</option>
+                                <option value="acessorio">Acessório</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                        <InputLabel value="Descrição" />
+                        <textarea
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            rows="3"
+                            placeholder="Descrição do produto..."
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <InputLabel value="Preço (R$)" />
+                            <TextInput
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={data.price}
+                                onChange={(e) => setData('price', e.target.value)}
+                                className="mt-1 block w-full"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <InputLabel value="Tamanhos (separados por vírgula)" />
+                            <TextInput
+                                value={data.sizes.join(', ')}
+                                onChange={(e) => handleArrayInput('sizes', e.target.value)}
+                                className="mt-1 block w-full"
+                                placeholder="P, M, G, GG"
+                            />
+                        </div>
+                        <div>
+                            <InputLabel value="Estoque" />
+                            <TextInput
+                                type="number"
+                                min="0"
+                                value={data.stock_quantity}
+                                onChange={(e) => setData('stock_quantity', parseInt(e.target.value) || 0)}
+                                className="mt-1 block w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <InputLabel value="Cores Disponíveis (separadas por vírgula)" />
+                        <TextInput
+                            value={data.colors.join(', ')}
+                            onChange={(e) => handleArrayInput('colors', e.target.value)}
+                            className="mt-1 block w-full"
+                            placeholder="Branco, Preto, Azul, Vermelho"
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    checked={data.allows_embroidery}
+                                    onChange={(e) => setData('allows_embroidery', e.target.checked)}
+                                    className="rounded"
+                                />
+                                <span className="ml-2">Permite Bordado</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    checked={data.is_active}
+                                    onChange={(e) => setData('is_active', e.target.checked)}
+                                    className="rounded"
+                                />
+                                <span className="ml-2">Produto Ativo</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end space-x-2">
+                        <SecondaryButton onClick={() => setShowEditModal(false)}>Cancelar</SecondaryButton>
+                        <PrimaryButton type="submit" disabled={processing}>Atualizar</PrimaryButton>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Delete Product Modal */}
+            <Modal show={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900 mb-4">Excluir Produto</h2>
+                    <p className="text-sm text-gray-600 mb-6">
+                        Tem certeza de que deseja excluir o produto "{selectedProduct?.name}"?
+                    </p>
+                    <div className="flex justify-end space-x-2">
+                        <SecondaryButton onClick={() => setShowDeleteModal(false)}>Cancelar</SecondaryButton>
+                        <DangerButton onClick={handleDelete} disabled={processing}>Excluir</DangerButton>
+                    </div>
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }

@@ -153,7 +153,7 @@ class EmbroideryController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'hex_code' => 'required|string|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/|unique:embroidery_colors,hex_code',
+            'hex_code' => 'required|string|regex:#^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$#|unique:embroidery_colors,hex_code',
             'thread_code' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'additional_cost' => 'required|numeric|min:0',
@@ -174,7 +174,7 @@ class EmbroideryController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'hex_code' => 'required|string|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/|unique:embroidery_colors,hex_code,' . $color->id,
+            'hex_code' => 'required|string|regex:#^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$#|unique:embroidery_colors,hex_code,' . $color->id,
             'thread_code' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'additional_cost' => 'required|numeric|min:0',
