@@ -153,13 +153,18 @@ class EmbroideryController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'hex_code' => 'required|string|regex:/^#[A-Fa-f0-9]{6}$|^#[A-Fa-f0-9]{3}$/|unique:embroidery_colors,hex_code',
+            'hex_code' => 'required|string|size:7|starts_with:#|unique:embroidery_colors,hex_code',
             'thread_code' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'additional_cost' => 'required|numeric|min:0',
             'is_active' => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
+
+        // Additional validation for hex code format
+        if (!ctype_xdigit(substr($validated['hex_code'], 1))) {
+            return back()->withErrors(['hex_code' => 'The hex code must be a valid hexadecimal color.']);
+        }
 
         $color = EmbroideryColor::create($validated);
 
@@ -174,13 +179,18 @@ class EmbroideryController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'hex_code' => 'required|string|regex:/^#[A-Fa-f0-9]{6}$|^#[A-Fa-f0-9]{3}$/|unique:embroidery_colors,hex_code,' . $color->id,
+            'hex_code' => 'required|string|size:7|starts_with:#|unique:embroidery_colors,hex_code,' . $color->id,
             'thread_code' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'additional_cost' => 'required|numeric|min:0',
             'is_active' => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
+
+        // Additional validation for hex code format
+        if (!ctype_xdigit(substr($validated['hex_code'], 1))) {
+            return back()->withErrors(['hex_code' => 'The hex code must be a valid hexadecimal color.']);
+        }
 
         $color->update($validated);
 
