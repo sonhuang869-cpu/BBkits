@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 export default function CreateExpanded() {
     const { data, setData, post, processing, errors } = useForm({
@@ -39,6 +40,72 @@ export default function CreateExpanded() {
 
     const [showPreview, setShowPreview] = useState(false);
     const [receiptPreview, setReceiptPreview] = useState(null);
+    
+    // Dynamic embroidery options from API
+    const [embroideryFonts, setEmbroideryFonts] = useState([]);
+    const [embroideryColors, setEmbroideryColors] = useState([]);
+    const [embroideryPositions, setEmbroideryPositions] = useState([]);
+    const [loadingOptions, setLoadingOptions] = useState(true);
+    const [totalWithEmbroidery, setTotalWithEmbroidery] = useState(0);
+
+    // Fetch embroidery options from API on component mount
+    useEffect(() => {
+        const fetchEmbroideryOptions = async () => {
+            try {
+                setLoadingOptions(true);
+                
+                const [fontsRes, colorsRes, positionsRes] = await Promise.all([
+                    axios.get('/api/embroidery/fonts'),
+                    axios.get('/api/embroidery/colors'),
+                    axios.get('/api/embroidery/positions')
+                ]);
+                
+                setEmbroideryFonts(fontsRes.data);
+                setEmbroideryColors(colorsRes.data);
+                setEmbroideryPositions(positionsRes.data);
+                
+                // Set default values if available
+                if (fontsRes.data.length > 0 && !data.embroidery_font) {
+                    setData('embroidery_font', fontsRes.data[0].id);
+                }
+                if (colorsRes.data.length > 0 && !data.embroidery_color) {
+                    setData('embroidery_color', colorsRes.data[0].id);
+                }
+                if (positionsRes.data.length > 0 && !data.embroidery_position) {
+                    setData('embroidery_position', positionsRes.data[0].id);
+                }
+                
+                setLoadingOptions(false);
+            } catch (error) {
+                console.error('Error fetching embroidery options:', error);
+                toast.error('Erro ao carregar opções de bordado');
+                setLoadingOptions(false);
+            }
+        };
+        
+        fetchEmbroideryOptions();
+    }, []);
+    
+    // Calculate total with embroidery costs whenever options change
+    useEffect(() => {
+        const calculateTotal = () => {
+            let embroideryCost = 0;
+            
+            // Find selected options and add their costs
+            const selectedFont = embroideryFonts.find(f => f.id == data.embroidery_font);
+            const selectedColor = embroideryColors.find(c => c.id == data.embroidery_color);
+            const selectedPosition = embroideryPositions.find(p => p.id == data.embroidery_position);
+            
+            if (selectedFont) embroideryCost += parseFloat(selectedFont.additional_cost || 0);
+            if (selectedColor) embroideryCost += parseFloat(selectedColor.additional_cost || 0);
+            if (selectedPosition) embroideryCost += parseFloat(selectedPosition.additional_cost || 0);
+            
+            const baseAmount = parseFloat(data.total_amount || 0);
+            setTotalWithEmbroidery(baseAmount + embroideryCost);
+        };
+        
+        calculateTotal();
+    }, [data.embroidery_font, data.embroidery_color, data.embroidery_position, data.total_amount, embroideryFonts, embroideryColors, embroideryPositions]);
 
     const handleReceiptChange = (e) => {
         const file = e.target.files[0];
@@ -152,29 +219,7 @@ export default function CreateExpanded() {
         return value;
     };
 
-    const embroideryPositions = {
-        top: 'Topo',
-        bottom: 'Base',
-        left: 'Esquerda',
-        right: 'Direita',
-        center: 'Centro'
-    };
-
-    const embroideryColors = {
-        pink: 'Rosa',
-        blue: 'Azul',
-        gold: 'Dourado',
-        silver: 'Prata',
-        white: 'Branco',
-        black: 'Preto'
-    };
-
-    const embroideryFonts = {
-        cursive: 'Cursiva',
-        bold: 'Negrito',
-        elegant: 'Elegante',
-        playful: 'Divertida'
-    };
+    // Removed hardcoded options - now fetched from API
 
     const paymentMethods = {
         pix: 'PIX',
@@ -322,10 +367,18 @@ export default function CreateExpanded() {
                                             value={data.embroidery_position}
                                             onChange={e => setData('embroidery_position', e.target.value)}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            disabled={loadingOptions}
                                         >
-                                            {Object.entries(embroideryPositions).map(([value, label]) => (
-                                                <option key={value} value={value}>{label}</option>
-                                            ))}
+                                            {loadingOptions ? (
+                                                <option>Carregando...</option>
+                                            ) : (
+                                                embroideryPositions.map((position) => (
+                                                    <option key={position.id} value={position.id}>
+                                                        {position.display_name || position.name}
+                                                        {position.additional_cost > 0 && ` (+R$ ${parseFloat(position.additional_cost).toFixed(2)})`}
+                                                    </option>
+                                                ))
+                                            )}
                                         </select>
                                     </div>
 
@@ -337,10 +390,18 @@ export default function CreateExpanded() {
                                             value={data.embroidery_color}
                                             onChange={e => setData('embroidery_color', e.target.value)}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            disabled={loadingOptions}
                                         >
-                                            {Object.entries(embroideryColors).map(([value, label]) => (
-                                                <option key={value} value={value}>{label}</option>
-                                            ))}
+                                            {loadingOptions ? (
+                                                <option>Carregando...</option>
+                                            ) : (
+                                                embroideryColors.map((color) => (
+                                                    <option key={color.id} value={color.id}>
+                                                        {color.name}
+                                                        {color.additional_cost > 0 && ` (+R$ ${parseFloat(color.additional_cost).toFixed(2)})`}
+                                                    </option>
+                                                ))
+                                            )}
                                         </select>
                                     </div>
 
@@ -352,10 +413,18 @@ export default function CreateExpanded() {
                                             value={data.embroidery_font}
                                             onChange={e => setData('embroidery_font', e.target.value)}
                                             className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            disabled={loadingOptions}
                                         >
-                                            {Object.entries(embroideryFonts).map(([value, label]) => (
-                                                <option key={value} value={value}>{label}</option>
-                                            ))}
+                                            {loadingOptions ? (
+                                                <option>Carregando...</option>
+                                            ) : (
+                                                embroideryFonts.map((font) => (
+                                                    <option key={font.id} value={font.id}>
+                                                        {font.display_name || font.name}
+                                                        {font.additional_cost > 0 && ` (+R$ ${parseFloat(font.additional_cost).toFixed(2)})`}
+                                                    </option>
+                                                ))
+                                            )}
                                         </select>
                                     </div>
                                 </div>
@@ -365,14 +434,34 @@ export default function CreateExpanded() {
                                     <p className="text-sm font-medium text-gray-700 mb-2">Prévia:</p>
                                     <div className="text-center p-4 bg-white rounded border-2 border-dashed border-gray-300">
                                         <p 
-                                            className={`text-2xl font-${data.embroidery_font === 'bold' ? 'bold' : data.embroidery_font === 'cursive' ? 'script' : 'serif'}`}
-                                            style={{ color: data.embroidery_color === 'gold' ? '#FFD700' : data.embroidery_color === 'silver' ? '#C0C0C0' : data.embroidery_color }}
+                                            className="text-2xl font-serif"
+                                            style={{ 
+                                                color: embroideryColors.find(c => c.id == data.embroidery_color)?.hex_code || '#000000'
+                                            }}
                                         >
                                             {data.child_name || 'Nome da Criança'}
                                         </p>
-                                        <p className="text-xs text-gray-500 mt-2">
-                                            Posição: {embroideryPositions[data.embroidery_position]}
-                                        </p>
+                                        <div className="text-xs text-gray-500 mt-2 space-y-1">
+                                            <p>Posição: {embroideryPositions.find(p => p.id == data.embroidery_position)?.display_name || 'Não selecionado'}</p>
+                                            <p>Fonte: {embroideryFonts.find(f => f.id == data.embroidery_font)?.display_name || 'Não selecionado'}</p>
+                                            <p>Cor: {embroideryColors.find(c => c.id == data.embroidery_color)?.name || 'Não selecionado'}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Show total with embroidery cost */}
+                                    <div className="mt-4 p-3 bg-purple-50 rounded-lg">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm font-medium text-purple-700">Custo adicional do bordado:</span>
+                                            <span className="text-sm font-bold text-purple-900">
+                                                R$ {(totalWithEmbroidery - parseFloat(data.total_amount || 0)).toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-purple-200">
+                                            <span className="font-medium text-purple-700">Total com bordado:</span>
+                                            <span className="text-lg font-bold text-purple-900">
+                                                R$ {totalWithEmbroidery.toFixed(2)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -706,7 +795,11 @@ export default function CreateExpanded() {
                                         <p><strong>Cliente:</strong> {data.client_name} ({data.client_email})</p>
                                         <p><strong>Telefone:</strong> {data.client_phone}</p>
                                         <p><strong>Criança:</strong> {data.child_name}</p>
-                                        <p><strong>Bordado:</strong> {embroideryColors[data.embroidery_color]}, {embroideryFonts[data.embroidery_font]}, {embroideryPositions[data.embroidery_position]}</p>
+                                        <p><strong>Bordado:</strong> 
+                                            {embroideryColors.find(c => c.id == data.embroidery_color)?.name}, 
+                                            {embroideryFonts.find(f => f.id == data.embroidery_font)?.display_name}, 
+                                            {embroideryPositions.find(p => p.id == data.embroidery_position)?.display_name}
+                                        </p>
                                         <p><strong>Valor Total:</strong> R$ {parseFloat(data.total_amount || 0).toFixed(2)}</p>
                                         <p><strong>Valor Recebido:</strong> R$ {parseFloat(data.received_amount || 0).toFixed(2)}</p>
                                         <p><strong>Forma de Pagamento:</strong> {paymentMethods[data.payment_method]}</p>

@@ -109,9 +109,9 @@ class SaleController extends Controller
             
             // Child & embroidery - REQUIRED
             'child_name' => 'required|string|max:255',
-            'embroidery_position' => 'required|in:top,bottom,left,right,center',
-            'embroidery_color' => 'required|string|max:50',
-            'embroidery_font' => 'nullable|string|max:50',
+            'embroidery_position' => 'required|string|max:255', // Now accepts ID or name
+            'embroidery_color' => 'required|string|max:255',    // Now accepts ID or name
+            'embroidery_font' => 'nullable|string|max:255',     // Now accepts ID or name
             
             // Payment - REQUIRED
             'total_amount' => 'required|numeric|min:0',
