@@ -709,6 +709,12 @@ export default function EnhancedDashboard({
                                         >
                                             📊 Relatórios
                                         </a>
+                                        <a 
+                                            href="/admin/embroidery" 
+                                            className="bg-white/20 backdrop-blur-lg px-6 py-3 text-sm font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 hover:bg-white/30"
+                                        >
+                                            🧵 Bordados
+                                        </a>
                                         <div className="relative group">
                                             <button className="bg-white/20 backdrop-blur-lg px-6 py-3 text-sm font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 hover:bg-white/30">
                                                 💾 Exportar

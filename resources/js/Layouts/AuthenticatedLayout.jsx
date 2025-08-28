@@ -694,6 +694,35 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 </svg>
                                                 <span className="nav-text">💰 Financeiro</span>
                                             </NavLink>
+
+                                            <NavLink
+                                                href="/admin/embroidery"
+                                                active={route().current(
+                                                    "admin.embroidery.*"
+                                                )}
+                                                className={`nav-link flex items-center gap-0.5 lg:gap-1 xl:gap-2 ${
+                                                    route().current(
+                                                        "admin.embroidery.*"
+                                                    )
+                                                        ? "active"
+                                                        : ""
+                                                }`}
+                                            >
+                                                <svg
+                                                    className="nav-icon icon-hover"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
+                                                    />
+                                                </svg>
+                                                <span className="nav-text">🧵 Bordados</span>
+                                            </NavLink>
                                         </>
                                     )}
                                 </div>
@@ -1017,6 +1046,29 @@ export default function AuthenticatedLayout({ header, children }) {
                                             />
                                         </svg>
                                         💰 Painel Financeiro
+                                    </ResponsiveNavLink>
+
+                                    <ResponsiveNavLink
+                                        href="/admin/embroidery"
+                                        active={route().current(
+                                            "admin.embroidery.*"
+                                        )}
+                                        className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
+                                    >
+                                        <svg
+                                            className="w-4 h-4 icon-hover"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
+                                            />
+                                        </svg>
+                                        🧵 Gerenciar Bordados
                                     </ResponsiveNavLink>
                                 </>
                             )}
