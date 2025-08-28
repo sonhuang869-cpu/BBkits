@@ -97,6 +97,12 @@ CMD set -e && \
     echo "=== Checking PHP Extensions ===" && \
     php -r "if (!extension_loaded('pdo_sqlite')) { echo 'ERROR: PDO SQLite not loaded'; exit(1); }" && \
     echo "PDO SQLite is loaded ✓" && \
+    echo "=== Checking Composer Dependencies ===" && \
+    if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then \
+        echo "Composer dependencies missing, installing..." && \
+        composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader; \
+    fi && \
+    echo "Vendor directory exists ✓" && \
     echo "=== Checking Database File ===" && \
     ls -la database/database.sqlite && \
     echo "=== Running Migrations ===" && \
