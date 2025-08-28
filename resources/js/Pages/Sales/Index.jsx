@@ -328,22 +328,10 @@ export default function Index({ sales }) {
                                 </div>
                             </div>
                             <div className="flex gap-2">
-                                <Link href={route('sales.create')}>
-                                    <button className="btn-gradient text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-300">
-                                        <i className="fas fa-plus mr-2"></i>
-                                        Nova Venda
-                                    </button>
-                                </Link>
                                 <Link href={route('sales.create-expanded')}>
-                                    <button className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-300 border-2 border-white/50 hover:bg-white/30">
+                                    <button className="btn-gradient text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-300">
                                         <i className="fas fa-plus-circle mr-2"></i>
                                         Nova Venda Completa
-                                    </button>
-                                </Link>
-                                <Link href="/sales/create-products">
-                                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition duration-300 border-2 border-white/50 hover:from-purple-600 hover:to-pink-600">
-                                        <i className="fas fa-shopping-bag mr-2"></i>
-                                        Nova Venda com Produtos
                                     </button>
                                 </Link>
                             </div>
@@ -369,7 +357,7 @@ export default function Index({ sales }) {
                                                 Cada grande vendedora começou com uma única venda! 💪
                                             </p>
                                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                                <Link href={route('sales.create')}>
+                                                <Link href={route('sales.create-expanded')}>
                                                     <button className="btn-gradient text-white px-10 py-4 rounded-full text-lg font-bold shadow-xl hover:shadow-2xl">
                                                         <i className="fas fa-rocket mr-3"></i>
                                                         Registrar Primeira Venda
