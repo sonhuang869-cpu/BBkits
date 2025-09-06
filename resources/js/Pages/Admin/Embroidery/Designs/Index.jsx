@@ -119,7 +119,7 @@ export default function Index({ auth, designs, categories, filters }) {
                         Gerenciar Designs de Bordado
                     </h2>
                     <Link
-                        href="/admin/embroidery"
+                        href={route('admin.embroidery.dashboard')}
                         className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                     >
                         Voltar ao Dashboard
