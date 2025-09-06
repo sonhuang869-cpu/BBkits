@@ -42,6 +42,9 @@ WORKDIR /var/www
 # Copy backend files
 COPY . .
 
+# Verify composer files exist
+RUN ls -la composer.json composer.lock || echo "WARNING: Composer files missing"
+
 # Copy built frontend assets only (not entire public directory)
 COPY --from=frontend /app/public/build ./public/build
 
@@ -75,9 +78,8 @@ RUN if [ -f .env.example ] && [ ! -f .env ]; then cp .env.example .env; fi && \
     php artisan key:generate --force || true
 
 # Clear composer cache and install PHP dependencies
-RUN rm -rf vendor && \
-    composer clear-cache && \
-    composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+RUN composer clear-cache && \
+    composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --verbose
 
 # Ensure Laravel cache/storage folders exist
 RUN mkdir -p bootstrap/cache storage/framework/{views,cache,sessions} storage/logs \
@@ -97,12 +99,15 @@ CMD set -e && \
     echo "=== Checking PHP Extensions ===" && \
     php -r "if (!extension_loaded('pdo_sqlite')) { echo 'ERROR: PDO SQLite not loaded'; exit(1); }" && \
     echo "PDO SQLite is loaded ✓" && \
-    echo "=== Checking Composer Dependencies ===" && \
+    echo "=== Ensuring Composer Dependencies ===" && \
     if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then \
-        echo "Composer dependencies missing, installing..." && \
-        composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader; \
+        echo "ERROR: Vendor directory missing! Installing composer dependencies..." && \
+        composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --verbose || exit 1; \
+        echo "Composer install completed" && \
     fi && \
-    echo "Vendor directory exists ✓" && \
+    echo "Vendor directory verified ✓" && \
+    ls -la vendor/ && \
+    echo "Autoload file exists: $(ls -la vendor/autoload.php)" && \
     echo "=== Checking Database File ===" && \
     ls -la database/database.sqlite && \
     echo "=== Running Migrations ===" && \
