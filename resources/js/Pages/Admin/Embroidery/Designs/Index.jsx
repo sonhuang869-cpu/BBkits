@@ -161,7 +161,7 @@ export default function Index({ auth, designs, categories, filters }) {
                                     className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="all">Todas as Categorias</option>
-                                    {categories.map((cat) => (
+                                    {categories && categories.map((cat) => (
                                         <option key={cat} value={cat}>
                                             {cat}
                                         </option>
@@ -186,7 +186,7 @@ export default function Index({ auth, designs, categories, filters }) {
 
                             {/* Designs Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {designs.data.map((design) => (
+                                {designs && designs.data && designs.data.map((design) => (
                                     <div key={design.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                                         {design.image_url && (
                                             <img
@@ -228,10 +228,25 @@ export default function Index({ auth, designs, categories, filters }) {
                                         </div>
                                     </div>
                                 ))}
+                                
+                                {/* No designs message */}
+                                {(!designs || !designs.data || designs.data.length === 0) && (
+                                    <div className="col-span-full text-center py-12">
+                                        <div className="text-gray-500">
+                                            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                            </svg>
+                                            <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum design encontrado</h3>
+                                            <p className="mt-1 text-sm text-gray-500">
+                                                Comece criando um novo design de bordado.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Pagination */}
-                            {designs.links && (
+                            {designs && designs.links && (
                                 <div className="mt-6 flex justify-center">
                                     <div className="flex space-x-1">
                                         {designs.links.map((link, index) => (
