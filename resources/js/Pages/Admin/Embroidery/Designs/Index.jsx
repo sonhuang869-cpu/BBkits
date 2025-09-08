@@ -38,7 +38,7 @@ export default function Index({ auth, designs, categories, filters }) {
         compatible_colors: []
     });
 
-    const { delete: destroy } = useForm();
+    const { delete: destroy } = useForm({});
 
     const handleSearch = (e) => {
         e.preventDefault();
