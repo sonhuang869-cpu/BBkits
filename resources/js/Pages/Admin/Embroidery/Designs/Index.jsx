@@ -38,7 +38,7 @@ export default function Index({ auth, designs, categories, filters }) {
         compatible_colors: []
     });
 
-    const { delete: destroy } = useForm({});
+    const deleteForm = useForm();
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -77,7 +77,7 @@ export default function Index({ auth, designs, categories, filters }) {
     const handleDelete = (design) => {
         if (!design || !design.id) return;
         if (confirm(`Tem certeza que deseja excluir o design "${design.name}"?`)) {
-            destroy(route('admin.embroidery.designs.destroy', design.id));
+            deleteForm.delete(route('admin.embroidery.designs.destroy', design.id));
         }
     };
 
