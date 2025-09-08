@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -64,6 +65,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:product_categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'image_url' => 'nullable|url|max:500',
             'allows_embroidery' => 'boolean',
             'available_sizes' => 'nullable|array',
@@ -71,6 +73,15 @@ class ProductController extends Controller
             'is_active' => 'boolean',
             'stock_quantity' => 'integer|min:0',
         ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $validated['image_url'] = '/storage/' . $imagePath;
+        }
+
+        // Remove the image field from validated data since it's not in the database
+        unset($validated['image']);
 
         $product = Product::create($validated);
 
@@ -88,6 +99,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:product_categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'image_url' => 'nullable|url|max:500',
             'allows_embroidery' => 'boolean',
             'available_sizes' => 'nullable|array',
@@ -95,6 +107,21 @@ class ProductController extends Controller
             'is_active' => 'boolean',
             'stock_quantity' => 'integer|min:0',
         ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if it exists
+            if ($product->image_url && str_contains($product->image_url, '/storage/')) {
+                $oldImagePath = str_replace('/storage/', '', $product->image_url);
+                Storage::disk('public')->delete($oldImagePath);
+            }
+            
+            $imagePath = $request->file('image')->store('products', 'public');
+            $validated['image_url'] = '/storage/' . $imagePath;
+        }
+
+        // Remove the image field from validated data since it's not in the database
+        unset($validated['image']);
 
         $product->update($validated);
 

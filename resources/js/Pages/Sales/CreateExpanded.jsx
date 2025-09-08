@@ -51,9 +51,7 @@ export default function CreateExpanded() {
     const [embroideryColors, setEmbroideryColors] = useState([]);
     const [embroideryPositions, setEmbroideryPositions] = useState([]);
     const [availableProducts, setAvailableProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
     const [loadingOptions, setLoadingOptions] = useState(true);
-    const [totalWithEmbroidery, setTotalWithEmbroidery] = useState(0);
     
     // Current product being added to cart
     const [currentProduct, setCurrentProduct] = useState({
@@ -166,7 +164,7 @@ export default function CreateExpanded() {
                 unit_price: parseFloat(selectedProd.price || 0),
                 embroidery_text: data.child_name || '' // Auto-fill child name
             }));
-            setSelectedProduct(selectedProd);
+            // Product selected for customization
         }
     };
     
@@ -251,7 +249,6 @@ export default function CreateExpanded() {
             const productsTotal = data.products.reduce((sum, product) => sum + parseFloat(product.total_price || 0), 0);
             const shippingAmount = parseFloat(data.shipping_amount || 0);
             const totalAmount = productsTotal + shippingAmount;
-            setTotalWithEmbroidery(totalAmount);
             setData('total_amount', totalAmount.toFixed(2));
             
             console.log('💰 Total Calculation:', {
@@ -515,19 +512,7 @@ export default function CreateExpanded() {
         return value;
     };
 
-    const handleProductSelect = (product) => {
-        setSelectedProduct(product);
-        
-        // Auto-populate form fields with validation
-        const newData = {
-            ...data,
-            product_category: product.category_id || product.product_category?.id,
-            product_price: product.price ? product.price.toString() : '0',
-            product_size: product.available_sizes?.[0] || 'P' // Default to first available size
-        };
-        
-        setData(newData);
-    };
+    // Removed old handleProductSelect function - replaced by cart system
 
     const paymentMethods = {
         pix: 'PIX',
@@ -725,10 +710,6 @@ export default function CreateExpanded() {
                                                                 e.target.src = 'https://via.placeholder.com/300x200/E5E7EB/9CA3AF?text=Sem+Imagem';
                                                             }
                                                         }}
-                                                        onLoad={(e) => {
-                                                            e.target.style.opacity = '1';
-                                                        }}
-                                                        style={{ opacity: '0.8' }}
                                                     />
                                                 </div>
                                                 

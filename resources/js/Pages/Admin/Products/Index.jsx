@@ -13,6 +13,7 @@ export default function Index({ auth, products, categories, filters }) {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         name: '',
@@ -24,6 +25,8 @@ export default function Index({ auth, products, categories, filters }) {
         allows_embroidery: true,
         is_active: true,
         stock_quantity: 0,
+        image: null,
+        image_url: '',
     });
     
     const openAddModal = () => {
@@ -43,7 +46,15 @@ export default function Index({ auth, products, categories, filters }) {
             allows_embroidery: product.allows_embroidery,
             is_active: product.is_active,
             stock_quantity: product.stock_quantity || 0,
+            image: null,
+            image_url: product.image_url || '',
         });
+        // Set preview to existing image if it exists and isn't a placeholder
+        if (product.image_url && !product.image_url.includes('placeholder')) {
+            setImagePreview(product.image_url);
+        } else {
+            setImagePreview(null);
+        }
         setShowEditModal(true);
     };
     
@@ -87,6 +98,30 @@ export default function Index({ auth, products, categories, filters }) {
     const handleArrayInput = (field, value) => {
         const array = value.split(',').map(item => item.trim()).filter(item => item.length > 0);
         setData(field, array);
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('image', file);
+            
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const clearImage = () => {
+        setData('image', null);
+        setImagePreview(null);
+        // Reset file input
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) {
+            fileInput.value = '';
+        }
     };
 
     return (
@@ -318,6 +353,37 @@ export default function Index({ auth, products, categories, filters }) {
                         </div>
                     </div>
                     
+                    {/* Image Upload Section */}
+                    <div className="mb-4">
+                        <InputLabel value="Imagem do Produto" />
+                        <div className="mt-1">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            {imagePreview && (
+                                <div className="mt-3">
+                                    <div className="flex items-start space-x-3">
+                                        <img 
+                                            src={imagePreview} 
+                                            alt="Preview" 
+                                            className="w-20 h-20 object-cover rounded-lg border border-gray-300" 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={clearImage}
+                                            className="text-red-600 hover:text-red-800 text-sm"
+                                        >
+                                            Remover imagem
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
                     <div className="flex justify-end space-x-2">
                         <SecondaryButton onClick={() => setShowAddModal(false)}>Cancelar</SecondaryButton>
                         <PrimaryButton type="submit" disabled={processing}>Salvar</PrimaryButton>
@@ -435,6 +501,37 @@ export default function Index({ auth, products, categories, filters }) {
                                 />
                                 <span className="ml-2">Produto Ativo</span>
                             </label>
+                        </div>
+                    </div>
+                    
+                    {/* Image Upload Section */}
+                    <div className="mb-4">
+                        <InputLabel value="Imagem do Produto" />
+                        <div className="mt-1">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            {imagePreview && (
+                                <div className="mt-3">
+                                    <div className="flex items-start space-x-3">
+                                        <img 
+                                            src={imagePreview} 
+                                            alt="Preview" 
+                                            className="w-20 h-20 object-cover rounded-lg border border-gray-300" 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={clearImage}
+                                            className="text-red-600 hover:text-red-800 text-sm"
+                                        >
+                                            Remover imagem
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                     
