@@ -20,7 +20,8 @@
       "Bash(sudo apt-get:*)",
       "Bash(sudo apt-get install:*)",
       "Bash(sed:*)",
-      "WebFetch(domain:127.0.0.1)"
+      "WebFetch(domain:127.0.0.1)",
+      "Bash(sqlite3:*)"
     ],
     "deny": [],
     "additionalDirectories": [

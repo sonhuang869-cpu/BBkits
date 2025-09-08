@@ -65,7 +65,14 @@ export default function Index({ auth, products, categories, filters }) {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        post('/admin/products', {
+        
+        const formData = {
+            ...data,
+            sizes: JSON.stringify(data.sizes),
+            colors: JSON.stringify(data.colors)
+        };
+        
+        post('/admin/products', formData, {
             preserveScroll: true,
             forceFormData: true,
             onSuccess: () => {
@@ -78,8 +85,14 @@ export default function Index({ auth, products, categories, filters }) {
     
     const handleUpdate = (e) => {
         e.preventDefault();
-        post(`/admin/products/${selectedProduct.id}`, {
-            _method: 'PUT',
+        
+        // Always use POST with _method=PUT for consistency
+        post(`/admin/products/${selectedProduct.id}/update`, {
+            ...data,
+            sizes: JSON.stringify(data.sizes),
+            colors: JSON.stringify(data.colors),
+            _method: 'PUT'
+        }, {
             preserveScroll: true,
             forceFormData: true,
             onSuccess: () => {

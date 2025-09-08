@@ -66,13 +66,23 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:product_categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'image_url' => 'nullable|url|max:500',
+            'image_url' => 'nullable|string|max:500',
             'allows_embroidery' => 'boolean',
-            'available_sizes' => 'nullable|array',
-            'available_colors' => 'nullable|array',
+            'sizes' => 'nullable|string',
+            'colors' => 'nullable|string',
             'is_active' => 'boolean',
             'stock_quantity' => 'integer|min:0',
         ]);
+        
+        // Parse JSON strings for sizes and colors
+        if (isset($validated['sizes'])) {
+            $validated['available_sizes'] = json_decode($validated['sizes'], true);
+            unset($validated['sizes']);
+        }
+        if (isset($validated['colors'])) {
+            $validated['available_colors'] = json_decode($validated['colors'], true);
+            unset($validated['colors']);
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -100,13 +110,23 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:product_categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'image_url' => 'nullable|url|max:500',
+            'image_url' => 'nullable|string|max:500',
             'allows_embroidery' => 'boolean',
-            'available_sizes' => 'nullable|array',
-            'available_colors' => 'nullable|array',
+            'sizes' => 'nullable|string',
+            'colors' => 'nullable|string',
             'is_active' => 'boolean',
             'stock_quantity' => 'integer|min:0',
         ]);
+        
+        // Parse JSON strings for sizes and colors
+        if (isset($validated['sizes'])) {
+            $validated['available_sizes'] = json_decode($validated['sizes'], true);
+            unset($validated['sizes']);
+        }
+        if (isset($validated['colors'])) {
+            $validated['available_colors'] = json_decode($validated['colors'], true);
+            unset($validated['colors']);
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {
