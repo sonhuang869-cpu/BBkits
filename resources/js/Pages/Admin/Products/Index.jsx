@@ -75,7 +75,7 @@ export default function Index({ auth, products, categories, filters }) {
         
         post('/admin/products', formData, {
             preserveScroll: true,
-            forceFormData: true,
+            forceFormData: !!data.image,
             onSuccess: () => {
                 setShowAddModal(false);
                 reset();
