@@ -43,7 +43,11 @@ export default function OrdersIndex({ orders, statusFilter }) {
                 if (errors.error) {
                     toast.error(errors.error);
                 } else if (errors.validation) {
-                    toast.error('Erro de validação: ' + errors.validation.join(', '));
+                    // Handle both array and string validation errors
+                    const validationMessage = Array.isArray(errors.validation) 
+                        ? errors.validation.join(', ')
+                        : errors.validation;
+                    toast.error('Erro de validação: ' + validationMessage);
                 } else if (errors.message) {
                     toast.error(errors.message);
                 } else {

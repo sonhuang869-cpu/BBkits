@@ -276,12 +276,10 @@ class ProductionController extends Controller
             $errors[] = 'CEP de entrega é obrigatório';
         }
 
-        // Payment validation
-        if (!$sale->hasInitialPaymentProof()) {
-            $errors[] = 'Comprovante de pagamento é obrigatório';
-        }
+        // Payment validation - Skip this as it's already validated at finance approval stage
+        // Payment proof is checked during finance approval, not production start
 
-        // Finance approval validation
+        // Finance approval validation - This ensures payment was already validated
         if (empty($sale->finance_admin_id)) {
             $errors[] = 'Pagamento deve ser aprovado pelo financeiro antes da produção';
         }
