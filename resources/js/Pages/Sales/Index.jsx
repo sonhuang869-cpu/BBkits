@@ -20,10 +20,9 @@ export default function Index({ sales, auth }) {
     const handleCancelConfirm = ({ password, explanation }) => {
         if (saleToCancel) {
             post(route('sales.cancel', saleToCancel.id), {
-                data: {
-                    admin_password: password,
-                    explanation: explanation
-                },
+                admin_password: password,
+                explanation: explanation
+            }, {
                 onSuccess: () => {
                     toast.success('Venda cancelada com sucesso!');
                     setShowCancelModal(false);
