@@ -546,19 +546,250 @@ export default function Show({ sale }) {
                                     </div>
                                 </div>
 
-                                {/* Product Information */}
-                                {sale.product_category && (
+                                {/* Child Information */}
+                                {sale.child_name && (
                                     <div className="detail-card animate-fade-in">
                                         <div className="section-title">
                                             <div className="section-icon">
-                                                🛍️
+                                                👶
                                             </div>
                                             <h3 className="text-lg font-bold text-gray-800">
-                                                Informações do Produto
+                                                Dados da Criança
                                             </h3>
                                         </div>
                                         
+                                        <div className="bg-pink-50 border border-pink-200 rounded-xl p-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center text-white text-2xl">
+                                                    👶
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-2xl font-bold text-pink-800 mb-1">
+                                                        "{sale.child_name}"
+                                                    </h4>
+                                                    <p className="text-pink-700 text-sm">
+                                                        Nome usado para personalização dos bordados
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Products Information */}
+                                <div className="detail-card animate-fade-in">
+                                    <div className="section-title">
+                                        <div className="section-icon">
+                                            🛍️
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-800">
+                                            Produtos do Pedido
+                                        </h3>
+                                    </div>
+                                    
+                                    {sale.products && sale.products.length > 0 ? (
                                         <div className="space-y-4">
+                                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-blue-600 text-xl">📦</span>
+                                                        <span className="font-bold text-blue-800">
+                                                            {sale.products.length} {sale.products.length === 1 ? 'produto' : 'produtos'} no pedido
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-sm text-blue-600 font-medium">
+                                                        {sale.products.reduce((sum, product) => sum + parseInt(product.quantity || 1), 0)} unidades no total
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {sale.products.map((product, index) => (
+                                                <div key={index} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
+                                                    <div className="flex items-start gap-4">
+                                                        {/* Embroidery Design Image */}
+                                                        <div className="flex-shrink-0">
+                                                            <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200">
+                                                                {product.embroidery_design?.image_url ? (
+                                                                    <img
+                                                                        src={product.embroidery_design.image_url}
+                                                                        alt={product.embroidery_design.name}
+                                                                        className="w-full h-full object-cover"
+                                                                        onError={(e) => {
+                                                                            e.target.src = '/images/placeholder-embroidery.svg';
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                                                                        </svg>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Product Details */}
+                                                        <div className="flex-1">
+                                                            <div className="flex justify-between items-start mb-3">
+                                                                <div>
+                                                                    <h4 className="text-xl font-bold text-gray-900 mb-1">
+                                                                        {product.product_name || 'Produto'}
+                                                                    </h4>
+                                                                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                                                                        <span className="flex items-center gap-1">
+                                                                            📏 <strong>Tamanho:</strong> {product.size || 'N/A'}
+                                                                        </span>
+                                                                        <span className="flex items-center gap-1">
+                                                                            🔢 <strong>Qtd:</strong> {product.quantity || 1}
+                                                                        </span>
+                                                                        {product.product_category && (
+                                                                            <span className="flex items-center gap-1">
+                                                                                📂 <strong>Categoria:</strong> {product.product_category}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <div className="text-2xl font-bold text-green-600">
+                                                                        {formatCurrency(product.total_price || 0)}
+                                                                    </div>
+                                                                    <div className="text-sm text-gray-500">
+                                                                        {formatCurrency(product.unit_total || 0)} × {product.quantity || 1}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Personalization Details */}
+                                                            <div className="bg-pink-50 border border-pink-200 rounded-lg p-4 mb-4">
+                                                                <h5 className="font-bold text-pink-800 mb-2 flex items-center gap-2">
+                                                                    👶 Personalização do Bordado
+                                                                </h5>
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                                                    <div>
+                                                                        <strong className="text-pink-700">Nome:</strong> 
+                                                                        <span className="ml-2 font-bold text-pink-900">
+                                                                            "{product.embroidery_text || sale.child_name || 'N/A'}"
+                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <strong className="text-pink-700">Design:</strong> 
+                                                                        <span className="ml-2 text-pink-900">
+                                                                            {product.embroidery_design?.name || 'N/A'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <strong className="text-pink-700">Fonte:</strong> 
+                                                                        <span className="ml-2 text-pink-900">
+                                                                            {product.embroidery_font?.display_name || product.embroidery_font?.name || 'N/A'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <strong className="text-pink-700">Cor:</strong> 
+                                                                        <span className="ml-2 text-pink-900">
+                                                                            {product.embroidery_color?.name || 'N/A'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <strong className="text-pink-700">Posição:</strong> 
+                                                                        <span className="ml-2 text-pink-900">
+                                                                            {product.embroidery_position?.display_name || product.embroidery_position?.name || 'N/A'}
+                                                                        </span>
+                                                                    </div>
+                                                                    {product.embroidery_design?.category && (
+                                                                        <div>
+                                                                            <strong className="text-pink-700">Categoria:</strong> 
+                                                                            <span className="ml-2 text-pink-900">
+                                                                                {product.embroidery_design.category}
+                                                                            </span>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Price Breakdown */}
+                                                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                                                <h5 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                                                    💰 Detalhamento do Preço
+                                                                </h5>
+                                                                <div className="space-y-2 text-sm">
+                                                                    <div className="flex justify-between">
+                                                                        <span className="text-gray-600">Preço base:</span>
+                                                                        <span className="font-medium">{formatCurrency(product.unit_price || 0)}</span>
+                                                                    </div>
+                                                                    {product.size_price > 0 && (
+                                                                        <div className="flex justify-between">
+                                                                            <span className="text-gray-600">Acréscimo tamanho ({product.size}):</span>
+                                                                            <span className="font-medium">+{formatCurrency(product.size_price || 0)}</span>
+                                                                        </div>
+                                                                    )}
+                                                                    {product.embroidery_cost > 0 && (
+                                                                        <div className="flex justify-between">
+                                                                            <span className="text-gray-600">Custo bordado:</span>
+                                                                            <span className="font-medium">+{formatCurrency(product.embroidery_cost || 0)}</span>
+                                                                        </div>
+                                                                    )}
+                                                                    <div className="border-t border-gray-300 pt-2 flex justify-between font-bold">
+                                                                        <span className="text-gray-800">Valor unitário:</span>
+                                                                        <span className="text-green-600">{formatCurrency(product.unit_total || 0)}</span>
+                                                                    </div>
+                                                                    <div className="flex justify-between font-bold text-lg">
+                                                                        <span className="text-gray-800">Total (× {product.quantity}):</span>
+                                                                        <span className="text-green-600">{formatCurrency(product.total_price || 0)}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+
+                                            {/* Products Summary */}
+                                            <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+                                                <h4 className="font-bold text-green-800 mb-4 flex items-center gap-2">
+                                                    📊 Resumo dos Produtos
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div className="text-center">
+                                                        <div className="text-2xl font-bold text-green-600">
+                                                            {sale.products.length}
+                                                        </div>
+                                                        <div className="text-sm text-green-700">
+                                                            {sale.products.length === 1 ? 'Produto' : 'Produtos'} diferentes
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <div className="text-2xl font-bold text-green-600">
+                                                            {sale.products.reduce((sum, product) => sum + parseInt(product.quantity || 1), 0)}
+                                                        </div>
+                                                        <div className="text-sm text-green-700">
+                                                            Unidades no total
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <div className="text-2xl font-bold text-green-600">
+                                                            {formatCurrency(sale.products.reduce((sum, product) => sum + parseFloat(product.total_price || 0), 0))}
+                                                        </div>
+                                                        <div className="text-sm text-green-700">
+                                                            Subtotal produtos
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // Fallback for older sales without detailed product data
+                                        <div className="space-y-4">
+                                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <span className="text-amber-500 text-2xl">ℹ️</span>
+                                                    <h4 className="font-bold text-amber-800">Informações Básicas do Produto</h4>
+                                                </div>
+                                                <p className="text-amber-700 text-sm mb-4">
+                                                    Esta venda foi registrada antes da implementação do sistema detalhado de produtos. 
+                                                    Apenas informações básicas estão disponíveis.
+                                                </p>
+                                            </div>
+
                                             {sale.product_category && (
                                                 <div className="detail-item">
                                                     <div className="flex items-center gap-3">
@@ -607,8 +838,8 @@ export default function Show({ sale }) {
                                                 </div>
                                             )}
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
 
                                 {/* Delivery Address */}
                                 <div className="detail-card animate-fade-in">

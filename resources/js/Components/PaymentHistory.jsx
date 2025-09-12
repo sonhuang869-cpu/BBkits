@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, CreditCard, Check, Clock, X, Eye, Trash2 } from 'lucide-react';
 import { useForm, router } from '@inertiajs/react';
 
-export default function PaymentHistory({ sale, payments, onAddPayment }) {
+export default function PaymentHistory({ sale, payments, onAddPayment, paymentSummary }) {
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedPayment, setSelectedPayment] = useState(null);
 
@@ -45,10 +45,12 @@ export default function PaymentHistory({ sale, payments, onAddPayment }) {
         }
     };
 
-    const totalPaid = payments.filter(p => p.status === 'approved').reduce((sum, p) => sum + parseFloat(p.amount), 0);
-    const totalPending = payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + parseFloat(p.amount), 0);
-    const remaining = sale.total_amount - totalPaid;
-    const progress = (totalPaid / sale.total_amount) * 100;
+    // Use paymentSummary values from backend (already calculated correctly with shipping)
+    const totalAmount = paymentSummary ? paymentSummary.total_amount : (sale.total_amount + (sale.shipping_amount || 0));
+    const totalPaid = paymentSummary ? paymentSummary.paid_amount : payments.filter(p => p.status === 'approved').reduce((sum, p) => sum + parseFloat(p.amount), 0);
+    const totalPending = paymentSummary ? paymentSummary.pending_amount : payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + parseFloat(p.amount), 0);
+    const remaining = paymentSummary ? paymentSummary.remaining_amount : Math.max(0, totalAmount - totalPaid);
+    const progress = paymentSummary ? paymentSummary.progress : ((totalPaid / totalAmount) * 100);
 
     return (
         <div className="bg-white rounded-lg shadow-sm border">
@@ -85,27 +87,42 @@ export default function PaymentHistory({ sale, payments, onAddPayment }) {
 
                 <div className="grid grid-cols-4 gap-4 text-center">
                     <div>
-                        <p className="text-sm text-gray-600">Total da Venda</p>
+                        <p className="text-sm text-gray-600">Total com Frete</p>
                         <p className="text-lg font-bold text-gray-800">
-                            R$ {sale.total_amount?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {totalAmount?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Produtos: R$ {sale.total_amount?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                            Frete: R$ {(sale.shipping_amount || 0)?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-600">Pago</p>
                         <p className="text-lg font-bold text-green-600">
-                            R$ {totalPaid.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {totalPaid?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            {totalAmount > 0 ? ((totalPaid / totalAmount) * 100).toFixed(1) : 0}% do total
                         </p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-600">Pendente</p>
                         <p className="text-lg font-bold text-yellow-600">
-                            R$ {totalPending.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {totalPending?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Aguardando aprovação
                         </p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-600">Restante</p>
                         <p className="text-lg font-bold text-red-600">
-                            R$ {remaining.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {remaining?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            {remaining > 0 ? 'A pagar' : 'Quitado'}
                         </p>
                     </div>
                 </div>

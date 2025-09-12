@@ -162,6 +162,7 @@ export default function PaymentIndex() {
                             sale={sale}
                             payments={payments}
                             onAddPayment={handleAddPayment}
+                            paymentSummary={paymentSummary}
                         />
 
                         {/* Payment Modal */}

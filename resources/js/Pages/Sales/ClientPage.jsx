@@ -193,29 +193,150 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, paidAm
                         {/* Products Section */}
                         <div className="mb-6">
                             <h4 className="text-md font-semibold text-gray-800 mb-4">Produtos Comprados:</h4>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {sale.sale_products && sale.sale_products.length > 0 ? (
                                     sale.sale_products.map((saleProduct, index) => (
-                                        <div key={index} className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                                            <div className="flex justify-between items-start">
-                                                <div className="flex-1">
-                                                    <div className="font-semibold text-blue-900">
-                                                        {saleProduct.product?.name || 'Produto'}
+                                        <div key={index} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+                                            {/* Product Header */}
+                                            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 text-white">
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex-1">
+                                                        <h5 className="font-bold text-lg flex items-center gap-2">
+                                                            🛍️ {saleProduct.product?.name || 'Produto Personalizado'}
+                                                        </h5>
+                                                        <div className="text-blue-100 text-sm mt-1 flex flex-wrap gap-4">
+                                                            <span className="flex items-center gap-1">
+                                                                📏 <strong>Tamanho:</strong> {saleProduct.size || 'N/A'}
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                📦 <strong>Quantidade:</strong> {saleProduct.quantity || 1}
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                💰 <strong>Unitário:</strong> {formatBRL(saleProduct.unit_price || 0)}
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <div className="text-sm text-blue-700 mt-1">
-                                                        <span className="inline-block mr-4">📏 Tamanho: <strong>{saleProduct.size || 'N/A'}</strong></span>
-                                                        <span className="inline-block">📦 Quantidade: <strong>{saleProduct.quantity || 1}</strong></span>
+                                                    <div className="text-right ml-4">
+                                                        <div className="text-blue-100 text-sm">Total deste item</div>
+                                                        <div className="font-bold text-xl">
+                                                            {formatBRL((saleProduct.unit_price || 0) * (saleProduct.quantity || 1))}
+                                                        </div>
                                                     </div>
-                                                    {saleProduct.product?.description && (
-                                                        <p className="text-xs text-blue-600 mt-2">{saleProduct.product.description}</p>
-                                                    )}
                                                 </div>
-                                                <div className="text-right ml-4">
-                                                    <div className="text-sm text-gray-600">Preço unitário</div>
-                                                    <div className="font-bold text-blue-900">{formatBRL(saleProduct.unit_price || 0)}</div>
-                                                    {saleProduct.quantity > 1 && (
-                                                        <div className="text-xs text-blue-700 mt-1">
-                                                            Total: {formatBRL((saleProduct.unit_price || 0) * (saleProduct.quantity || 1))}
+                                            </div>
+
+                                            {/* Product Details */}
+                                            <div className="p-4 space-y-4">
+                                                {/* Product Description */}
+                                                {saleProduct.product?.description && (
+                                                    <div className="bg-gray-50 rounded-lg p-3">
+                                                        <div className="text-sm text-gray-600 mb-1">📝 Descrição do Produto</div>
+                                                        <p className="text-gray-800">{saleProduct.product.description}</p>
+                                                    </div>
+                                                )}
+
+                                                {/* Embroidery Customization for this Product */}
+                                                <div className="bg-pink-50 rounded-lg p-4 border border-pink-200">
+                                                    <h6 className="font-semibold text-pink-800 mb-3 flex items-center gap-2">
+                                                        🎨 Personalização deste Produto
+                                                    </h6>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                                        <div className="bg-white/70 rounded-md p-2">
+                                                            <div className="text-pink-600">👶 Nome Bordado</div>
+                                                            <div className="font-bold text-pink-900">
+                                                                "{saleProduct.embroidery_text || sale.child_name || 'N/A'}"
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-white/70 rounded-md p-2">
+                                                            <div className="text-pink-600">🎭 Design Escolhido</div>
+                                                            <div className="font-semibold text-pink-900">
+                                                                {saleProduct.embroidery_design?.name || sale.embroidery_design?.name || 'Design Personalizado'}
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-white/70 rounded-md p-2">
+                                                            <div className="text-pink-600">🔤 Fonte</div>
+                                                            <div className="font-semibold text-pink-900">
+                                                                {saleProduct.embroidery_font?.display_name || 
+                                                                 saleProduct.embroidery_font?.name || 
+                                                                 sale.embroidery_font || 'Padrão'}
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-white/70 rounded-md p-2">
+                                                            <div className="text-pink-600">🌈 Cor do Bordado</div>
+                                                            <div className="font-semibold text-pink-900">
+                                                                {saleProduct.embroidery_color?.name || 
+                                                                 sale.embroidery_color || 'Padrão'}
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-white/70 rounded-md p-2">
+                                                            <div className="text-pink-600">📍 Posição</div>
+                                                            <div className="font-semibold text-pink-900">
+                                                                {saleProduct.embroidery_position?.display_name || 
+                                                                 saleProduct.embroidery_position?.name ||
+                                                                 sale.embroidery_position || 'Centro'}
+                                                            </div>
+                                                        </div>
+                                                        {saleProduct.embroidery_design?.category && (
+                                                            <div className="bg-white/70 rounded-md p-2">
+                                                                <div className="text-pink-600">📂 Categoria</div>
+                                                                <div className="font-semibold text-pink-900">
+                                                                    {saleProduct.embroidery_design.category}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Embroidery Design Preview */}
+                                                    {saleProduct.embroidery_design?.image_url && (
+                                                        <div className="mt-3 p-3 bg-white rounded-lg border border-pink-200">
+                                                            <div className="text-sm text-pink-600 mb-2">🖼️ Preview do Design</div>
+                                                            <div className="flex items-center gap-3">
+                                                                <img
+                                                                    src={saleProduct.embroidery_design.image_url}
+                                                                    alt={saleProduct.embroidery_design.name}
+                                                                    className="w-16 h-16 rounded-lg object-cover border border-pink-200"
+                                                                    onError={(e) => {
+                                                                        e.target.style.display = 'none';
+                                                                    }}
+                                                                />
+                                                                <div>
+                                                                    <div className="font-medium text-pink-900">{saleProduct.embroidery_design.name}</div>
+                                                                    {saleProduct.embroidery_design.description && (
+                                                                        <div className="text-xs text-pink-700 mt-1">
+                                                                            {saleProduct.embroidery_design.description}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Price Breakdown for Embroidery */}
+                                                    {(saleProduct.embroidery_cost > 0 || saleProduct.size_price > 0) && (
+                                                        <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                                            <div className="text-sm text-green-600 mb-2">💰 Detalhamento de Preços</div>
+                                                            <div className="space-y-1 text-sm">
+                                                                <div className="flex justify-between">
+                                                                    <span className="text-green-700">Produto base:</span>
+                                                                    <span className="font-medium">{formatBRL((saleProduct.unit_price || 0) - (saleProduct.size_price || 0) - (saleProduct.embroidery_cost || 0))}</span>
+                                                                </div>
+                                                                {saleProduct.size_price > 0 && (
+                                                                    <div className="flex justify-between">
+                                                                        <span className="text-green-700">Acréscimo tamanho ({saleProduct.size}):</span>
+                                                                        <span className="font-medium">+{formatBRL(saleProduct.size_price)}</span>
+                                                                    </div>
+                                                                )}
+                                                                {saleProduct.embroidery_cost > 0 && (
+                                                                    <div className="flex justify-between">
+                                                                        <span className="text-green-700">Custo do bordado:</span>
+                                                                        <span className="font-medium">+{formatBRL(saleProduct.embroidery_cost)}</span>
+                                                                    </div>
+                                                                )}
+                                                                <div className="border-t border-green-300 pt-1 flex justify-between font-bold">
+                                                                    <span className="text-green-800">Total unitário:</span>
+                                                                    <span className="text-green-600">{formatBRL(saleProduct.unit_price || 0)}</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </div>
@@ -267,34 +388,27 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, paidAm
                             </div>
                         </div>
 
-                        {/* Embroidery Details Section */}
+                        {/* Order Summary */}
                         <div className="mb-6">
-                            <h4 className="text-md font-semibold text-gray-800 mb-4">🎨 Personalização do Bordado:</h4>
+                            <h4 className="text-md font-semibold text-gray-800 mb-4">📋 Resumo do Pedido:</h4>
                             <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                                    <div className="bg-white/70 rounded-lg p-3">
                                         <div className="text-sm text-purple-600">👶 Nome da Criança</div>
-                                        <div className="font-semibold text-purple-900">{sale.child_name || 'N/A'}</div>
+                                        <div className="font-bold text-purple-900 text-lg">"{sale.child_name || 'N/A'}"</div>
                                     </div>
-                                    <div>
-                                        <div className="text-sm text-purple-600">✍️ Texto do Bordado</div>
-                                        <div className="font-semibold text-purple-900">"{sale.embroidery_text || sale.child_name || 'N/A'}"</div>
+                                    <div className="bg-white/70 rounded-lg p-3">
+                                        <div className="text-sm text-purple-600">🛍️ Total de Produtos</div>
+                                        <div className="font-bold text-purple-900 text-lg">
+                                            {sale.sale_products ? sale.sale_products.reduce((sum, p) => sum + (p.quantity || 1), 0) : 1} 
+                                            {' '}unidade{sale.sale_products && sale.sale_products.reduce((sum, p) => sum + (p.quantity || 1), 0) !== 1 ? 's' : ''}
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div className="text-sm text-purple-600">🎭 Design Escolhido</div>
-                                        <div className="font-semibold text-purple-900">{sale.embroidery_design?.name || 'Design Personalizado'}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-sm text-purple-600">🔤 Fonte</div>
-                                        <div className="font-semibold text-purple-900">{sale.embroidery_font || 'N/A'}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-sm text-purple-600">🎨 Cor do Bordado</div>
-                                        <div className="font-semibold text-purple-900">{sale.embroidery_color || 'N/A'}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-sm text-purple-600">📍 Posição</div>
-                                        <div className="font-semibold text-purple-900">{sale.embroidery_position || 'N/A'}</div>
+                                    <div className="bg-white/70 rounded-lg p-3">
+                                        <div className="text-sm text-purple-600">💰 Valor Total</div>
+                                        <div className="font-bold text-purple-900 text-lg">
+                                            {formatBRL(parseFloat(sale.total_amount || 0) + parseFloat(sale.shipping_amount || 0))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

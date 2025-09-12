@@ -122,9 +122,11 @@ class AdminReportsController extends Controller
                 $approvedSaleValue = $approvedSales->sum('total_amount');
                 $pendingSaleValue = $pendingSales->sum('total_amount');
                 
-                // Commission base: Only from approved payments minus shipping
-                // This ensures consistency with the payment system - commission only from verified payments
-                $commissionBase = max(0, $totalReceivedAmount - $totalShipping);
+                // Commission base: Only from approved sales minus shipping (consistent with actual commission calculation)
+                // Use the same logic as calculateCommissionForSeller() for consistency
+                $commissionBase = $approvedSales->sum(function ($sale) {
+                    return max(0, ($sale->received_amount ?: 0) - ($sale->shipping_amount ?: 0));
+                });
                 
                 $commission = $this->calculateCommissionForSeller($seller->id, $month, $year);
                 
