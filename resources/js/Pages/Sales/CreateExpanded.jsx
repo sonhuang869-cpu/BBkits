@@ -38,6 +38,20 @@ export default function CreateExpanded() {
         delivery_city: '',
         delivery_state: '',
         delivery_zipcode: '',
+        estimated_delivery_date: '',
+        delivery_days: '',
+        
+        // Product specifications - required by backend
+        mesa_livre_details: '',
+        chaveiros: '',
+        kit_main_color: '',
+        alcas: '',
+        faixa: '',
+        friso: '',
+        vies: '',
+        ziper: '',
+        production_estimate: '',
+        delivery_estimate: '',
         
         notes: ''
     });
@@ -320,9 +334,11 @@ export default function CreateExpanded() {
                 toast.success('Venda registrada com sucesso! Cliente receberá o link personalizado. 🎉');
             },
             onError: (errors) => {
-                Object.keys(errors).forEach(key => {
-                    toast.error(errors[key]);
-                });
+                // Only show the first server-side validation error to avoid duplication
+                const firstError = Object.values(errors)[0];
+                if (firstError) {
+                    toast.error(firstError);
+                }
             },
         });
     };
@@ -414,6 +430,18 @@ export default function CreateExpanded() {
                                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
                                         <span className="ml-3 text-gray-600">Carregando produtos...</span>
                                     </div>
+                                ) : availableProducts.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7h16" />
+                                            </svg>
+                                        </div>
+                                        <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum produto encontrado</h3>
+                                        <p className="text-gray-500 mb-4">
+                                            Não há produtos disponíveis no momento. Entre em contato com o administrador para adicionar produtos ao catálogo.
+                                        </p>
+                                    </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {availableProducts.map((product) => (
@@ -433,6 +461,21 @@ export default function CreateExpanded() {
                                                         </svg>
                                                     </div>
                                                 )}
+                                                
+                                                <div className="aspect-w-3 aspect-h-2 mb-4">
+                                                    <img
+                                                        src={product.image_url && product.image_url.trim() !== '' 
+                                                            ? product.image_url 
+                                                            : 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=200&fit=crop'}
+                                                        alt={product.name}
+                                                        className="w-full h-32 object-cover rounded-md transition-opacity duration-200"
+                                                        onError={(e) => {
+                                                            if (e.target.src !== 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=200&fit=crop') {
+                                                                e.target.src = 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=200&fit=crop';
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
                                                 
                                                 <h4 className="font-semibold text-gray-900 mb-2">{product.name}</h4>
                                                 <p className="text-sm text-gray-600 mb-3">{product.description}</p>
@@ -573,7 +616,7 @@ export default function CreateExpanded() {
                                                                                     }`}
                                                                                 >
                                                                                     <div className="aspect-square rounded-md overflow-hidden bg-gray-100 mb-2">
-                                                                                        {design.image_url ? (
+                                                                                        {design.image_url && design.image_url.trim() !== '' ? (
                                                                                             <img
                                                                                                 src={design.image_url}
                                                                                                 alt={design.name}
@@ -582,6 +625,7 @@ export default function CreateExpanded() {
                                                                                                 onError={(e) => {
                                                                                                     console.warn('Image failed to load:', design.image_url);
                                                                                                     e.target.src = '/images/placeholder-embroidery.svg';
+                                                                                                    e.target.onerror = null; // Prevent infinite error loops
                                                                                                 }}
                                                                                             />
                                                                                         ) : (
@@ -798,13 +842,14 @@ export default function CreateExpanded() {
                                                         <div key={product.id || index} className="flex items-center gap-3 p-3 bg-white rounded-lg border">
                                                             <div className="flex-shrink-0">
                                                                 <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-100 border">
-                                                                    {selectedDesign?.image_url ? (
+                                                                    {selectedDesign?.image_url && selectedDesign.image_url.trim() !== '' ? (
                                                                         <img
                                                                             src={selectedDesign.image_url}
                                                                             alt={selectedDesign.name}
                                                                             className="w-full h-full object-cover"
                                                                             onError={(e) => {
                                                                                 e.target.src = '/images/placeholder-embroidery.svg';
+                                                                                e.target.onerror = null; // Prevent infinite error loops
                                                                             }}
                                                                         />
                                                                     ) : (
@@ -1102,6 +1147,32 @@ export default function CreateExpanded() {
                                             placeholder="01234-567"
                                         />
                                     </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Data Prevista de Entrega
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={data.estimated_delivery_date}
+                                            onChange={e => setData('estimated_delivery_date', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Prazo de Entrega (dias)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={data.delivery_days}
+                                            onChange={e => setData('delivery_days', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="7"
+                                            min="1"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -1112,6 +1183,168 @@ export default function CreateExpanded() {
                                             <p className="text-blue-700 text-sm">
                                                 O endereço pode ser preenchido agora ou depois pelo cliente através do link personalizado.
                                                 Se deixar em branco, o cliente receberá um formulário para completar os dados de entrega.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Product Specifications Section */}
+                            <div className="bg-white rounded-xl shadow-md p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                                    <span className="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center">🎨</span>
+                                    Especificações do Kit
+                                </h3>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Mesa Livre (Detalhes) *
+                                        </label>
+                                        <textarea
+                                            value={data.mesa_livre_details}
+                                            onChange={e => setData('mesa_livre_details', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="Descreva os detalhes da mesa livre/trabalho personalizado..."
+                                            rows="3"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Chaveiros *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.chaveiros}
+                                            onChange={e => setData('chaveiros', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="Ex: 2 chaveiros personalizados"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Cor Principal do Kit *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.kit_main_color}
+                                            onChange={e => setData('kit_main_color', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="Ex: Rosa, Azul, Amarelo..."
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Alças *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.alcas}
+                                            onChange={e => setData('alcas', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="Ex: Alças em tecido rosa"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Faixa *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.faixa}
+                                            onChange={e => setData('faixa', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="Ex: Faixa decorativa floral"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Friso *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.friso}
+                                            onChange={e => setData('friso', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="Ex: Friso em tecido coordenado"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Viés *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.vies}
+                                            onChange={e => setData('vies', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="Ex: Viés em cor contrastante"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Zíper *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.ziper}
+                                            onChange={e => setData('ziper', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            placeholder="Ex: Zíper invisível rosa"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Previsão de Produção *
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={data.production_estimate}
+                                            onChange={e => setData('production_estimate', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            min={new Date(Date.now() + 86400000).toISOString().split('T')[0]} // Tomorrow
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Previsão de Entrega *
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={data.delivery_estimate}
+                                            onChange={e => setData('delivery_estimate', e.target.value)}
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            min={data.production_estimate || new Date(Date.now() + 172800000).toISOString().split('T')[0]} // After production or day after tomorrow
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-orange-500 text-lg">ℹ️</span>
+                                        <div>
+                                            <h4 className="text-orange-800 font-medium">Especificações Obrigatórias</h4>
+                                            <p className="text-orange-700 text-sm">
+                                                Todas estas especificações são necessárias para o controle de produção e inventário do kit personalizado.
                                             </p>
                                         </div>
                                     </div>
