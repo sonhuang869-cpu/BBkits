@@ -83,11 +83,11 @@ class AdminReportsController extends Controller
             ->map(function ($seller) use ($month, $year) {
                 $commissionService = new CommissionService();
                 
-                // Get all sales for calculations with payment relationships (exclude cancelled sales)
+                // Get all sales for calculations with payment relationships (exclude cancelled and rejected sales)
                 $allSales = Sale::where('user_id', $seller->id)
                     ->whereYear('payment_date', $year)
                     ->whereMonth('payment_date', $month)
-                    ->where('status', '!=', 'cancelado')
+                    ->whereNotIn('status', ['cancelado', 'recusado'])
                     ->with('payments')
                     ->get();
                 
@@ -100,12 +100,17 @@ class AdminReportsController extends Controller
                 // Total sale value: Expected amount including shipping
                 $totalSaleValue = $allSales->sum('total_amount') + $totalShipping;
                 
-                // Calculate total received amount using ONLY approved payment records
+                // Calculate total received amount with backward compatibility
                 $totalReceivedAmount = 0;
                 foreach ($allSales as $sale) {
-                    // Only consider approved payment records for commission calculations
-                    $approvedPayments = $sale->payments ? $sale->payments->where('status', 'approved') : collect();
-                    $receivedAmount = $approvedPayments->sum('amount');
+                    if ($sale->hasPartialPayments()) {
+                        // Use approved payment records for sales with payment system
+                        $approvedPayments = $sale->payments->where('status', 'approved');
+                        $receivedAmount = $approvedPayments->sum('amount');
+                    } else {
+                        // Use legacy received_amount for backward compatibility
+                        $receivedAmount = $sale->received_amount ?: 0;
+                    }
                     $totalReceivedAmount += $receivedAmount;
                 }
                 
@@ -222,10 +227,10 @@ class AdminReportsController extends Controller
     {
         $totalSellers = User::where('role', 'vendedora')->count();
         
-        // Get all non-cancelled sales for the period
+        // Get all valid sales for the period (exclude cancelled and rejected)
         $allSales = Sale::whereYear('payment_date', $year)
             ->whereMonth('payment_date', $month)
-            ->where('status', '!=', 'cancelado')
+            ->whereNotIn('status', ['cancelado', 'recusado'])
             ->with('payments')
             ->get();
             
@@ -233,12 +238,17 @@ class AdminReportsController extends Controller
         $totalShipping = $allSales->sum('shipping_amount');
         $totalSaleValue = $allSales->sum('total_amount') + $totalShipping;
             
-        // Total received amounts using ONLY approved payment records
+        // Total received amounts with backward compatibility
         $totalReceivedAmount = 0;
         foreach ($allSales as $sale) {
-            // Only consider approved payment records for consistency
-            $approvedPayments = $sale->payments ? $sale->payments->where('status', 'approved') : collect();
-            $receivedAmount = $approvedPayments->sum('amount');
+            if ($sale->hasPartialPayments()) {
+                // Use approved payment records for sales with payment system
+                $approvedPayments = $sale->payments->where('status', 'approved');
+                $receivedAmount = $approvedPayments->sum('amount');
+            } else {
+                // Use legacy received_amount for backward compatibility  
+                $receivedAmount = $sale->received_amount ?: 0;
+            }
             $totalReceivedAmount += $receivedAmount;
         }
         

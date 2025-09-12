@@ -13,10 +13,16 @@ class EnsureUserIsApproved
         $user = auth()->user();
 
         if (!$user) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
             return redirect()->route('login');
         }
 
         if ($user->isVendedora() && !$user->isApproved()) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Usuário aguardando aprovação.'], 403);
+            }
             return redirect()->route('pending-approval');
         }
 

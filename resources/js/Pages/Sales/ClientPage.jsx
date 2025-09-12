@@ -223,19 +223,43 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, paidAm
                                         </div>
                                     ))
                                 ) : (
-                                    // Fallback for old sales without sale_products
-                                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <div className="font-semibold text-blue-900">
-                                                    {sale.product_category || 'Kit Personalizado'}
+                                    // Enhanced fallback for sales without detailed product data
+                                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+                                        <div className="text-center">
+                                            <div className="text-4xl mb-4">🎁</div>
+                                            <div className="font-bold text-xl text-gray-800 mb-3">
+                                                {sale.product_category || 'Kit Personalizado BBKits'}
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                                                <div className="bg-white/70 rounded-lg p-3">
+                                                    <div className="text-gray-600">📏 Tamanho</div>
+                                                    <div className="font-semibold text-gray-900">{sale.product_size || 'Padrão'}</div>
                                                 </div>
-                                                <div className="text-sm text-blue-700">
-                                                    📏 Tamanho: <strong>{sale.product_size || 'N/A'}</strong>
+                                                <div className="bg-white/70 rounded-lg p-3">
+                                                    <div className="text-gray-600">💰 Valor Total</div>
+                                                    <div className="font-bold text-green-700">{formatBRL(sale.total_amount || 0)}</div>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <div className="font-bold text-blue-900">{formatBRL(sale.total_amount || 0)}</div>
+                                            
+                                            {sale.child_name && (
+                                                <div className="bg-pink-50 rounded-lg p-3 mb-4 border border-pink-200">
+                                                    <div className="text-sm text-pink-600 mb-1">✨ Personalização</div>
+                                                    <div className="font-semibold text-pink-800">Nome: "{sale.child_name}"</div>
+                                                </div>
+                                            )}
+                                            
+                                            {sale.description && (
+                                                <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-700">
+                                                    <strong>Observações:</strong> {sale.description}
+                                                </div>
+                                            )}
+                                            
+                                            <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                                                <div className="text-sm text-yellow-700">
+                                                    💡 <strong>Seu kit personalizado inclui:</strong> Kit com bordado personalizado, 
+                                                    conforme especificações acordadas na venda.
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

@@ -70,7 +70,24 @@ Route::get('/dashboard', function () {
 
         if ($user->role === 'vendedora') {
             $commissionService = app(\App\Services\CommissionService::class);
-            $allMonthlySales = $user->sales()->whereYear('payment_date', $currentYear)->whereMonth('payment_date', $currentMonth)->where('status', '!=', 'cancelado')->get();
+            
+            // First try current month, then fallback to most recent month with sales
+            $allMonthlySales = $user->sales()->whereYear('payment_date', $currentYear)->whereMonth('payment_date', $currentMonth)->whereNotIn('status', ['cancelado', 'recusado'])->get();
+            
+            // If no sales in current month, find most recent month with sales
+            if ($allMonthlySales->isEmpty()) {
+                $lastSaleDate = $user->sales()
+                    ->whereNotNull('payment_date')
+                    ->whereNotIn('status', ['cancelado', 'recusado'])
+                    ->orderBy('payment_date', 'desc')
+                    ->first()?->payment_date;
+                    
+                if ($lastSaleDate) {
+                    $currentMonth = $lastSaleDate->month;
+                    $currentYear = $lastSaleDate->year;
+                    $allMonthlySales = $user->sales()->whereYear('payment_date', $currentYear)->whereMonth('payment_date', $currentMonth)->whereNotIn('status', ['cancelado', 'recusado'])->get();
+                }
+            }
 
             $approvedSales = $allMonthlySales->where('status', 'aprovado');
             $pendingSales = $allMonthlySales->where('status', 'pendente');
@@ -154,7 +171,10 @@ Route::get('/dashboard', function () {
                     'nextBracket' => $monthlyProgress['next_bracket'],
                     'potentialEarnings' => $monthlyProgress['potential_earnings'],
                     'opportunityAlert' => $monthlyProgress['opportunity_alert'],
-                    'commissionRanges' => $monthlyProgress['commission_ranges']
+                    'commissionRanges' => $monthlyProgress['commission_ranges'],
+                    'displayMonth' => $currentMonth,
+                    'displayYear' => $currentYear,
+                    'isCurrentMonth' => ($currentMonth === now()->month && $currentYear === now()->year)
                 ],
                 'recentSales' => $recentSales,
                 'allMonthlySales' => $allMonthlySales,

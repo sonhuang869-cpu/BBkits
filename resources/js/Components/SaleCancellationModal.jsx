@@ -91,7 +91,7 @@ export default function SaleCancellationModal({ show, onClose, onConfirm, sale, 
                                                         ⚠️ Esta ação irá cancelar a venda e remover os valores das estatísticas gerais e comissão da vendedora.
                                                     </p>
                                                     <p className="text-blue-600 bg-blue-50 p-2 rounded">
-                                                        🔐 Senha de administrador necessária para confirmar o cancelamento. Vendedoras podem solicitar, mas apenas administradores podem autorizar.
+                                                        🔐 <strong>Senha de administrador necessária:</strong> Entre a senha do usuário administrador do sistema. Se você não souber a senha, contate o administrador (admin@bbkits.com) para autorizar este cancelamento.
                                                     </p>
                                                 </div>
                                                 
@@ -104,11 +104,14 @@ export default function SaleCancellationModal({ show, onClose, onConfirm, sale, 
                                                             value={password}
                                                             onChange={(e) => setPassword(e.target.value)}
                                                             className="mt-1 block w-full"
-                                                            placeholder="Digite sua senha para confirmar"
+                                                            placeholder="Digite a senha do administrador do sistema"
                                                         />
                                                         {errors.password && (
                                                             <p className="text-red-600 text-xs mt-1">{errors.password}</p>
                                                         )}
+                                                        <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
+                                                            💡 <strong>Dica:</strong> Esta é a senha do usuário administrador cadastrado no sistema. Entre em contato com o administrador se não souber a senha.
+                                                        </div>
                                                     </div>
                                                     
                                                     <div>
@@ -121,9 +124,14 @@ export default function SaleCancellationModal({ show, onClose, onConfirm, sale, 
                                                             rows="3"
                                                             placeholder="Ex: Cliente solicitou cancelamento, produto com defeito, etc."
                                                         />
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            Mínimo 10 caracteres. Esta informação será registrada para auditoria.
-                                                        </p>
+                                                        <div className="flex justify-between items-center mt-1">
+                                                            <p className="text-xs text-gray-500">
+                                                                <strong>Obrigatório:</strong> Mínimo 10 caracteres. Esta informação será registrada para auditoria.
+                                                            </p>
+                                                            <p className={`text-xs ${explanation.length >= 10 ? 'text-green-600' : 'text-red-600'}`}>
+                                                                {explanation.length}/10
+                                                            </p>
+                                                        </div>
                                                         {errors.explanation && (
                                                             <p className="text-red-600 text-xs mt-1">{errors.explanation}</p>
                                                         )}

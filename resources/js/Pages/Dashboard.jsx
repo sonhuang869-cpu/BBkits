@@ -9,6 +9,14 @@ export default function Dashboard() {
     const { auth, gamification, salesData, recentSales, allMonthlySales, topPerformers } = usePage().props;
     const [modalOpen, setModalOpen] = useState(false);
     
+    const getMonthName = (month) => {
+        const months = [
+            '', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        ];
+        return months[month] || '';
+    };
+    
     const handleViewSales = () => {
         setModalOpen(true);
     };
@@ -565,10 +573,28 @@ export default function Dashboard() {
                                         <div className="w-12 h-12 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                                             <span className="text-2xl">📊</span>
                                         </div>
-                                        <h4 className="text-2xl font-bold text-gray-800">Informações Detalhadas</h4>
+                                        <h4 className="text-2xl font-bold text-gray-800">
+                                            Informações Detalhadas
+                                            {!salesData?.isCurrentMonth && (
+                                                <span className="text-sm font-normal text-blue-600 ml-2">
+                                                    ({getMonthName(salesData?.displayMonth)} {salesData?.displayYear})
+                                                </span>
+                                            )}
+                                        </h4>
                                     </div>
                                     
                                     <div className="space-y-3 mb-6">
+                                        {!salesData?.isCurrentMonth && (
+                                            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                                <div className="flex items-center gap-2 text-sm text-blue-700">
+                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                                    </svg>
+                                                    <span>Exibindo dados do mês mais recente com vendas</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
                                         {/* 1. Total Sales */}
                                         <div className="flex justify-between items-center p-4 bg-white/50 rounded-lg border border-gray-200">
                                             <span className="text-sm font-medium text-gray-600">1. Total de Vendas</span>
