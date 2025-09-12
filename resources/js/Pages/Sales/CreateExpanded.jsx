@@ -799,19 +799,130 @@ export default function CreateExpanded() {
                                             
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">🎨 Design do Bordado</label>
-                                                <select
-                                                    value={currentProduct.embroidery_design}
-                                                    onChange={e => setCurrentProduct(prev => ({...prev, embroidery_design: e.target.value}))}
-                                                    className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 mb-4"
-                                                    disabled={loadingOptions}
-                                                >
-                                                    <option value="">Selecione um design</option>
-                                                    {embroideryDesigns.map((design) => (
-                                                        <option key={design.id} value={design.id}>
-                                                            {design.name} - {design.description}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                
+                                                {loadingOptions ? (
+                                                    <div className="text-center py-8">
+                                                        <div className="inline-flex items-center px-4 py-2 text-sm text-gray-600">
+                                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                            </svg>
+                                                            Carregando designs...
+                                                        </div>
+                                                    </div>
+                                                ) : embroideryDesigns.length === 0 ? (
+                                                    <div className="text-center py-8 text-gray-500">
+                                                        <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <p>Nenhum design disponível</p>
+                                                    </div>
+                                                ) : (
+                                                    /* Group designs by categories */
+                                                    (() => {
+                                                        const groupedDesigns = embroideryDesigns.reduce((groups, design) => {
+                                                            const category = design.category || 'Outros';
+                                                            if (!groups[category]) {
+                                                                groups[category] = [];
+                                                            }
+                                                            groups[category].push(design);
+                                                            return groups;
+                                                        }, {});
+
+                                                        const categoryIcons = {
+                                                            'Animais': '🐾',
+                                                            'Brasões': '🛡️',
+                                                            'Iniciais': '🔤',
+                                                            'Natureza': '🌿',
+                                                            'Personagens': '👑',
+                                                            'Outros': '🎨'
+                                                        };
+
+                                                        return (
+                                                            <div className="space-y-6 mb-4">
+                                                                {Object.entries(groupedDesigns).map(([category, designs]) => (
+                                                                    <div key={category} className="border border-gray-200 rounded-lg overflow-hidden">
+                                                                        {/* Category Header */}
+                                                                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b border-gray-200">
+                                                                            <div className="flex items-center justify-between">
+                                                                                <h5 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                                                                                    <span className="text-lg">{categoryIcons[category] || '🎨'}</span>
+                                                                                    {category}
+                                                                                    <span className="ml-2 px-2 py-1 text-xs bg-white text-gray-600 rounded-full">
+                                                                                        {designs.length} design{designs.length !== 1 ? 's' : ''}
+                                                                                    </span>
+                                                                                </h5>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        {/* Designs Grid */}
+                                                                        <div className="p-4">
+                                                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                                                                {designs.map((design) => (
+                                                                                    <div
+                                                                                        key={design.id}
+                                                                                        onClick={() => setCurrentProduct(prev => ({...prev, embroidery_design: design.id}))}
+                                                                                        className={`relative cursor-pointer rounded-lg border-2 p-3 transition-all hover:shadow-md ${
+                                                                                            currentProduct.embroidery_design == design.id
+                                                                                                ? 'border-blue-500 bg-blue-50 shadow-md'
+                                                                                                : 'border-gray-200 hover:border-gray-300'
+                                                                                        }`}
+                                                                                    >
+                                                                                        {/* Design Image */}
+                                                                                        <div className="aspect-square rounded-md overflow-hidden bg-gray-100 mb-2">
+                                                                                            {design.image_url ? (
+                                                                                                <img
+                                                                                                    src={design.image_url}
+                                                                                                    alt={design.name}
+                                                                                                    className="w-full h-full object-cover"
+                                                                                                    onError={(e) => {
+                                                                                                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgNzBDOTEuNzE1NyA3MCA4NS4yODQzIDc2LjQzMTQgODUuMjg0MyA4NC43MTVDODU4LjI4NDMgOTMgNzMuNTI5NCA5OSA2MC40MzE0IDk5Qzc2IDE3NSAxNTEuNTY5IDE3NSAxNTEuNTY5IDk5QzEzOC40NzEgOTkgMTI1LjcxNiA5MyAxMjYuNzE2IDg0LjcxNUMxMjYuNzE2IDc2LjQzMTQgMTIwLjI4NCA3MCAxMTIgNzBINzBaIiBmaWxsPSIjOUNBM0FGIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iNDAiIGZpbGw9IiNEMUQ1REIiLz4KPHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgc3R5bGU9InRyYW5zZm9ybTogdHJhbnNsYXRlKDgwcHgsIDgwcHgpOyI+CjxwYXRoIGQ9Ik0xNiA4SDE2VjMySDI0VjhIMTZaIiBmaWxsPSIjNjM3M0ZGIi8+CjxwYXRoIGQ9Ik0xNiA4SDE2VjMySDI0VjhIMTZaIiBmaWxsPSIjNjM3M0ZGIi8+CjxyZWN0IHg9IjgiIHk9IjE2IiB3aWR0aD0iMjQiIGhlaWdodD0iOCIgZmlsbD0iIzYzNzNGRiIvPgo8L3N2Zz4KPC9zdmc+';
+                                                                                                    }}
+                                                                                                />
+                                                                                            ) : (
+                                                                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                                                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                                                                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                                                                                                    </svg>
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        
+                                                                                        {/* Selected Indicator */}
+                                                                                        {currentProduct.embroidery_design == design.id && (
+                                                                                            <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                                                                                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                                                                </svg>
+                                                                                            </div>
+                                                                                        )}
+                                                                                        
+                                                                                        {/* Design Info */}
+                                                                                        <div className="text-center">
+                                                                                            <h4 className="text-sm font-medium text-gray-900 truncate" title={design.name}>
+                                                                                                {design.name}
+                                                                                            </h4>
+                                                                                            {design.description && (
+                                                                                                <p className="text-xs text-gray-500 mt-1 line-clamp-2" title={design.description}>
+                                                                                                    {design.description}
+                                                                                                </p>
+                                                                                            )}
+                                                                                            {design.additional_cost > 0 && (
+                                                                                                <span className="inline-block mt-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">
+                                                                                                    +R$ {design.additional_cost}
+                                                                                                </span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        );
+                                                    })()
+                                                )}
                                                 
                                                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
                                                     <div className="flex items-center gap-2 text-sm">
@@ -930,47 +1041,82 @@ export default function CreateExpanded() {
                                         </h4>
                                         
                                         <div className="space-y-3">
-                                            {data.products.map((product, index) => (
-                                                <div key={product.id || index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                                                    <div className="flex-1">
-                                                        <div className="font-medium text-gray-900">{product.product_name}</div>
-                                                        <div className="text-sm text-gray-600">
-                                                            {product.embroidery_text} • Tamanho: {product.size} • Qtd: {product.quantity}
+                                            {data.products.map((product, index) => {
+                                                const selectedDesign = embroideryDesigns.find(d => d.id == product.embroidery_design);
+                                                return (
+                                                    <div key={product.id || index} className="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                                                        {/* Design Preview */}
+                                                        <div className="flex-shrink-0">
+                                                            <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-100 border">
+                                                                {selectedDesign?.image_url ? (
+                                                                    <img
+                                                                        src={selectedDesign.image_url}
+                                                                        alt={selectedDesign.name}
+                                                                        className="w-full h-full object-cover"
+                                                                        onError={(e) => {
+                                                                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjE2IiBmaWxsPSIjRDFENURCIi8+Cjwvc3ZnPg==';
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                                                                        </svg>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className="text-xs text-gray-500">
-                                                            {embroideryDesigns.find(d => d.id == product.embroidery_design)?.name || 'Sem design'} • 
-                                                            {embroideryFonts.find(f => f.id == product.embroidery_font)?.display_name || 'Fonte'} • 
-                                                            {embroideryColors.find(c => c.id == product.embroidery_color)?.name || 'Cor'} • 
-                                                            {embroideryPositions.find(p => p.id == product.embroidery_position)?.display_name || 'Posição'}
+
+                                                        {/* Product Details */}
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="font-medium text-gray-900 truncate">{product.product_name}</div>
+                                                            <div className="text-sm text-gray-600 mt-1">
+                                                                <span className="inline-flex items-center gap-1 font-medium text-pink-600">
+                                                                    "👶 {product.embroidery_text}"
+                                                                </span>
+                                                                <span className="ml-2 text-gray-500">
+                                                                    • Tam: {product.size} • Qtd: {product.quantity}
+                                                                </span>
+                                                            </div>
+                                                            <div className="text-xs text-gray-500 mt-1">
+                                                                🎨 {selectedDesign?.name || 'Sem design'} • 
+                                                                {embroideryFonts.find(f => f.id == product.embroidery_font)?.display_name || 'Fonte'} • 
+                                                                {embroideryColors.find(c => c.id == product.embroidery_color)?.name || 'Cor'} • 
+                                                                {embroideryPositions.find(p => p.id == product.embroidery_position)?.display_name || 'Posição'}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Price & Actions */}
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="text-right">
+                                                                <div className="font-bold text-green-600">{formatBRL(product.total_price || 0)}</div>
+                                                                <div className="text-xs text-gray-500">
+                                                                    {formatBRL(product.unit_total || (
+                                                                        (parseFloat(product.unit_price || 0) + 
+                                                                         parseFloat(product.size_price || 0) + 
+                                                                         parseFloat(product.embroidery_cost || 0))
+                                                                    ))} × {product.quantity}
+                                                                </div>
+                                                                <div className="text-xs text-gray-400">
+                                                                    Base: {formatBRL(product.unit_price || 0)}
+                                                                    {product.size_price > 0 && ` +${formatBRL(product.size_price)}`}
+                                                                    {product.embroidery_cost > 0 && ` +${formatBRL(product.embroidery_cost)}`}
+                                                                </div>
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeProductFromCart(index)}
+                                                                className="text-red-600 hover:text-red-800 p-1"
+                                                                title="Remover item"
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                </svg>
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                    <div className="text-right mr-4">
-                                                        <div className="font-bold text-green-600">{formatBRL(product.total_price || 0)}</div>
-                                                        <div className="text-xs text-gray-500">
-                                                            {formatBRL(product.unit_total || (
-                                                                (parseFloat(product.unit_price || 0) + 
-                                                                 parseFloat(product.size_price || 0) + 
-                                                                 parseFloat(product.embroidery_cost || 0))
-                                                            ))} × {product.quantity}
-                                                        </div>
-                                                        <div className="text-xs text-gray-400">
-                                                            Base: {formatBRL(product.unit_price || 0)}
-                                                            {product.size_price > 0 && ` +${formatBRL(product.size_price)}`}
-                                                            {product.embroidery_cost > 0 && ` +${formatBRL(product.embroidery_cost)}`}
-                                                        </div>
-                                                    </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeProductFromCart(index)}
-                                                        className="text-red-600 hover:text-red-800 p-1"
-                                                        title="Remover item"
-                                                    >
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                         
                                         <div className="mt-4 pt-4 border-t border-green-200">

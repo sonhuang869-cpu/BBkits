@@ -750,7 +750,7 @@ class SaleController extends Controller
             }
         });
 
-        return back()->with('success', 'Venda cancelada com sucesso.');
+        return response()->json(['success' => true, 'message' => 'Venda cancelada com sucesso.']);
     }
 
     // Public client page
