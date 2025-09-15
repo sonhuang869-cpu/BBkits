@@ -9,84 +9,95 @@ import { Toaster } from 'react-hot-toast';
 // Import Ziggy for routing
 import { Ziggy } from './ziggy';
 
-// Enhanced route helper function that returns route object with method
+// Simple, reliable route helper that always returns a valid object
 function route(name, params = {}, absolute = false) {
+    // Always ensure we have a fallback
+    if (!name) {
+        return createRouteObject('/', ['GET', 'HEAD']);
+    }
+
     let url = '';
     let methods = ['GET', 'HEAD']; // default methods
 
-    // Check for route data in both window.Ziggy and imported Ziggy
-    const routeData = (window.Ziggy && window.Ziggy.routes && window.Ziggy.routes[name]) ||
-                     (Ziggy && Ziggy.routes && Ziggy.routes[name]);
+    try {
+        // Check for route data in both window.Ziggy and imported Ziggy
+        const routeData = (window.Ziggy && window.Ziggy.routes && window.Ziggy.routes[name]) ||
+                         (Ziggy && Ziggy.routes && Ziggy.routes[name]);
 
-    if (routeData) {
-        url = routeData.uri;
-        methods = routeData.methods || ['GET', 'HEAD'];
+        if (routeData) {
+            url = routeData.uri;
+            methods = routeData.methods || ['GET', 'HEAD'];
 
-        // Replace parameters in the URL
-        if (params && typeof params === 'object') {
-            Object.keys(params).forEach(key => {
-                const value = params[key];
-                url = url.replace(`{${key}}`, value);
-                url = url.replace(`{${key}?}`, value); // optional parameters
-            });
-        }
-
-        // Clean up any remaining optional parameters
-        url = url.replace(/\{[^}]+\?\}/g, '');
-
-        // Add leading slash if missing
-        if (!url.startsWith('/')) {
-            url = '/' + url;
-        }
-
-        // Add base URL if absolute
-        if (absolute) {
-            const baseUrl = (window.Ziggy && window.Ziggy.url) || (Ziggy && Ziggy.url) || '';
-            if (baseUrl) {
-                url = baseUrl.replace(/\/$/, '') + url;
+            // Replace parameters in the URL
+            if (params && typeof params === 'object') {
+                Object.keys(params).forEach(key => {
+                    const value = params[key];
+                    if (value !== undefined && value !== null) {
+                        url = url.replace(`{${key}}`, value);
+                        url = url.replace(`{${key}?}`, value); // optional parameters
+                    }
+                });
             }
-        }
-    } else {
-        // Better fallback: try to convert route name to URL path
-        console.warn(`Route '${name}' not found in Ziggy routes`);
 
-        // Convert route names like 'admin.suppliers.index' to '/admin/suppliers'
-        if (name.includes('.')) {
-            const parts = name.split('.');
-            if (parts[parts.length - 1] === 'index') {
-                parts.pop(); // remove 'index'
+            // Clean up any remaining optional parameters
+            url = url.replace(/\{[^}]+\?\}/g, '');
+
+            // Add leading slash if missing
+            if (!url.startsWith('/')) {
+                url = '/' + url;
             }
-            url = '/' + parts.join('/');
+
+            // Add base URL if absolute
+            if (absolute) {
+                const baseUrl = (window.Ziggy && window.Ziggy.url) || (Ziggy && Ziggy.url) || '';
+                if (baseUrl) {
+                    url = baseUrl.replace(/\/$/, '') + url;
+                }
+            }
         } else {
-            url = `/${name}`;
+            // Fallback: convert route name to URL path
+            if (name.includes('.')) {
+                const parts = name.split('.');
+                if (parts[parts.length - 1] === 'index') {
+                    parts.pop(); // remove 'index'
+                }
+                url = '/' + parts.join('/');
+            } else {
+                url = `/${name}`;
+            }
         }
+    } catch (error) {
+        console.error('Route error:', error);
+        // Emergency fallback
+        url = '/' + name.replace(/\./g, '/');
     }
 
-    // Create route object that works as both string and object
-    const routeObj = {
-        url: url,
-        method: methods[0], // primary method
-        methods: methods,
-        toString: () => url, // Allow route() to be used as string
-        valueOf: () => url
-    };
-
-    // Make the object itself act like a string when used in contexts that expect strings
-    return new Proxy(routeObj, {
-        get(target, prop) {
-            if (prop === Symbol.toPrimitive) {
-                return () => url;
-            }
-            if (prop === 'href' || prop === 'pathname') {
-                return url;
-            }
-            return target[prop];
-        }
-    });
+    return createRouteObject(url, methods);
 }
 
-// Make route function available globally
+// Helper function to create consistent route objects
+function createRouteObject(url, methods = ['GET', 'HEAD']) {
+    const routeObj = {
+        url: url,
+        method: methods[0] || 'GET', // Always have a method
+        methods: methods || ['GET', 'HEAD'],
+        toString: function() { return url; },
+        valueOf: function() { return url; }
+    };
+
+    // Add Symbol.toPrimitive for better string coercion
+    routeObj[Symbol.toPrimitive] = function(hint) {
+        return url;
+    };
+
+    return routeObj;
+}
+
+// Make route function available globally immediately
 window.route = route;
+
+// Also ensure it's available in global scope for modules
+globalThis.route = route;
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
