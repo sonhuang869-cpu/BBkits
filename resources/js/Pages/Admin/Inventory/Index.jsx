@@ -23,7 +23,7 @@ export default function Index({ transactions, materials, users, filters, stats }
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.inventory.index'), {
+        router.get('/admin/inventory', {
             search, type, material_id: materialId, user_id: userId, date_from: dateFrom, date_to: dateTo
         }, { preserveState: true });
     };
@@ -35,7 +35,7 @@ export default function Index({ transactions, materials, users, filters, stats }
         setUserId('');
         setDateFrom('');
         setDateTo('');
-        router.get(route('admin.inventory.index'));
+        router.get('/admin/inventory');
     };
 
     const getTransactionBadge = (transaction) => {
@@ -68,7 +68,7 @@ export default function Index({ transactions, materials, users, filters, stats }
                     <div className="flex space-x-3">
                         {canBulkAdjust() && (
                             <Link
-                                href={route('admin.inventory.bulk.adjustment')}
+                                href="/admin/inventory/bulk-adjustment"
                                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
                             >
                                 Ajuste em Lote
@@ -76,7 +76,7 @@ export default function Index({ transactions, materials, users, filters, stats }
                         )}
                         {canCreateTransactions() && (
                             <Link
-                                href={route('admin.inventory.create')}
+                                href="/admin/inventory/create"
                                 className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
                             >
                                 Nova Transação
@@ -336,7 +336,7 @@ export default function Index({ transactions, materials, users, filters, stats }
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <Link
-                                                href={route('admin.inventory.show', transaction.id)}
+                                                href={`/admin/inventory/${transaction.id}`}
                                                 className="text-purple-600 hover:text-purple-900"
                                             >
                                                 Ver Detalhes

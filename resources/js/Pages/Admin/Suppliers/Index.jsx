@@ -8,7 +8,7 @@ export default function Index({ suppliers, filters }) {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.suppliers.index'), { search, status }, { preserveState: true });
+        router.get('/admin/suppliers', { search, status }, { preserveState: true });
     };
 
     return (
@@ -20,7 +20,7 @@ export default function Index({ suppliers, filters }) {
                         <p className="mt-1 text-sm text-gray-600">Gerencie fornecedores e parceiros comerciais</p>
                     </div>
                     <Link
-                        href={route('admin.suppliers.create')}
+                        href="/admin/suppliers/create"
                         className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                         Novo Fornecedor
@@ -126,13 +126,13 @@ export default function Index({ suppliers, filters }) {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <Link
-                                                href={route('admin.suppliers.show', supplier.id)}
+                                                href={`/admin/suppliers/${supplier.id}`}
                                                 className="text-purple-600 hover:text-purple-900 mr-3"
                                             >
                                                 Ver
                                             </Link>
                                             <Link
-                                                href={route('admin.suppliers.edit', supplier.id)}
+                                                href={`/admin/suppliers/${supplier.id}/edit`}
                                                 className="text-indigo-600 hover:text-indigo-900"
                                             >
                                                 Editar
