@@ -1188,7 +1188,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     {/* Materials Management Mobile Navigation */}
                                     {canViewMaterials() && (
                                         <ResponsiveNavLink
-                                            href={route("admin.materials.index")}
+                                            href="/admin/materials"
                                             active={window.location.pathname.includes('/admin/materials')}
                                             className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                         >
@@ -1211,7 +1211,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                     {canViewSuppliers() && (
                                         <ResponsiveNavLink
-                                            href={route("admin.suppliers.index")}
+                                            href="/admin/suppliers"
                                             active={window.location.pathname.includes('/admin/suppliers')}
                                             className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                         >
@@ -1234,7 +1234,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                     {canViewInventory() && (
                                         <ResponsiveNavLink
-                                            href={route("admin.inventory.index")}
+                                            href="/admin/inventory"
                                             active={window.location.pathname.includes('/admin/inventory')}
                                             className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                         >

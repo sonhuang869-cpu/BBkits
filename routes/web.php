@@ -294,7 +294,7 @@ Route::middleware(['auth', 'approved'])->group(function () {
 
         // Materials & Inventory Management Routes
         // Materials Management Routes
-        Route::resource('admin/materials', \App\Http\Controllers\Admin\MaterialController::class)->names([
+        Route::resource('admin/materials', \App\Http\Controllers\Admin\MaterialsController::class)->names([
             'index' => 'admin.materials.index',
             'create' => 'admin.materials.create',
             'store' => 'admin.materials.store',
@@ -303,7 +303,7 @@ Route::middleware(['auth', 'approved'])->group(function () {
             'update' => 'admin.materials.update',
             'destroy' => 'admin.materials.destroy',
         ]);
-        Route::post('/admin/materials/{material}/adjust-stock', [\App\Http\Controllers\Admin\MaterialController::class, 'adjustStock'])->name('admin.materials.adjust-stock');
+        Route::post('/admin/materials/{material}/adjust-stock', [\App\Http\Controllers\Admin\MaterialsController::class, 'adjustStock'])->name('admin.materials.adjust-stock');
 
         // Inventory Transaction Routes
         Route::prefix('admin/inventory')->name('admin.inventory.')->group(function () {
