@@ -621,7 +621,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                 <div className="hidden md:flex items-center space-x-0.5 lg:space-x-1 xl:space-x-2 ms-2 sm:ms-3 md:ms-4 lg:ms-6 xl:ms-10">
                                     <NavLink
-                                        href={route("dashboard")}
+                                        href="/dashboard"
                                         active={window.location.pathname === "/dashboard"}
                                         className={`nav-link flex items-center gap-0.5 lg:gap-1 xl:gap-2 ${
                                             window.location.pathname === "/dashboard" ? "active" : ""
@@ -634,7 +634,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </NavLink>
 
                                     <NavLink
-                                        href={route("sales.index")}
+                                        href="/sales"
                                         active={window.location.pathname.includes("/sales")}
                                         className={`nav-link flex items-center gap-0.5 lg:gap-1 xl:gap-2 ${
                                             window.location.pathname.includes("/sales") ? "active" : ""
@@ -649,7 +649,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     {/* Finance Admin Navigation */}
                                     {(user.role === "finance_admin" || user.role === "financeiro" || user.role === "admin") && (
                                         <NavLink
-                                            href={route("finance.orders.index")}
+                                            href="/finance/orders"
                                             active={window.location.pathname.includes("/finance")}
                                             className={`nav-link flex items-center gap-0.5 lg:gap-1 xl:gap-2 ${
                                                 window.location.pathname.includes("/finance") ? "active" : ""
@@ -665,7 +665,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     {/* Production Admin Navigation */}
                                     {(user.role === "production_admin" || user.role === "admin") && (
                                         <NavLink
-                                            href={route("production.orders.index")}
+                                            href="/production/orders"
                                             active={window.location.pathname.includes("/production")}
                                             className={`nav-link flex items-center gap-0.5 lg:gap-1 xl:gap-2 ${
                                                 window.location.pathname.includes("/production") ? "active" : ""
@@ -681,7 +681,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     {/* Manager Dashboard */}
                                     {(user.role === "manager" || user.role === "admin") && (
                                         <NavLink
-                                            href={route("manager.dashboard")}
+                                            href="/manager/dashboard"
                                             active={window.location.pathname.includes("/manager")}
                                             className={`nav-link flex items-center gap-0.5 lg:gap-1 xl:gap-2 ${
                                                 window.location.pathname.includes("/manager") ? "active" : ""
@@ -712,7 +712,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             }
                                         >
                                             <Link
-                                                href={route("admin.dashboard")}
+                                                href="/admin/dashboard"
                                                 className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -721,7 +721,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 Dashboard Admin
                                             </Link>
                                             <Link
-                                                href={route("admin.users.index")}
+                                                href="/admin/users"
                                                 className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -730,7 +730,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 Usuários
                                             </Link>
                                             <Link
-                                                href={route("admin.sales.index")}
+                                                href="/admin/sales"
                                                 className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -750,7 +750,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </Link>
                                             {user.role === 'admin' && (
                                                 <Link
-                                                    href={route("admin.permissions.index")}
+                                                    href="/admin/permissions"
                                                     className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
                                                 >
                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -761,7 +761,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             )}
                                             {['admin', 'manager'].includes(user.role) && (
                                                 <Link
-                                                    href={route("admin.reports.index")}
+                                                    href="/admin/reports"
                                                     className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
                                                 >
                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -894,7 +894,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 </div>
                                             </div>
                                             <Dropdown.Link
-                                                href={route("profile.edit")}
+                                                href="/profile"
                                                 className="dropdown-link flex items-center gap-3"
                                             >
                                                 <svg
@@ -913,7 +913,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 👤 Meu Perfil
                                             </Dropdown.Link>
                                             <Dropdown.Link
-                                                href={route("logout")}
+                                                href="/logout"
                                                 method="post"
                                                 as="button"
                                                 className="dropdown-link flex items-center gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 w-full text-left"
@@ -1005,7 +1005,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     >
                         <div className="space-y-2 pb-4 pt-4 px-4">
                             <ResponsiveNavLink
-                                href={route("dashboard")}
+                                href="/dashboard"
                                 active={window.location.pathname === "/dashboard"}
                                 className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                             >
@@ -1026,7 +1026,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             </ResponsiveNavLink>
 
                             <ResponsiveNavLink
-                                href={route("sales.index")}
+                                href="/sales"
                                 active={window.location.pathname.includes("/sales")}
                                 className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                             >
@@ -1049,7 +1049,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             {/* Finance Admin Mobile Navigation */}
                             {(user.role === "finance_admin" || user.role === "financeiro" || user.role === "admin") && (
                                 <ResponsiveNavLink
-                                    href={route("finance.orders.index")}
+                                    href="/finance/orders"
                                     active={window.location.pathname.includes("/finance")}
                                     className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                 >
@@ -1063,7 +1063,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             {/* Production Admin Mobile Navigation */}
                             {(user.role === "production_admin" || user.role === "admin") && (
                                 <ResponsiveNavLink
-                                    href={route("production.orders.index")}
+                                    href="/production/orders"
                                     active={window.location.pathname.includes("/production")}
                                     className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                 >
@@ -1078,7 +1078,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 user.role === "financeiro") && (
                                 <>
                                     <ResponsiveNavLink
-                                        href={route("admin.dashboard")}
+                                        href="/admin/dashboard"
                                         active={window.location.pathname === "/admin/dashboard"}
                                         className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                     >
@@ -1101,7 +1101,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             {/* Manager Dashboard Mobile */}
                             {(user.role === "manager" || user.role === "admin") && (
                                 <ResponsiveNavLink
-                                    href={route("manager.dashboard")}
+                                    href="/manager/dashboard"
                                     active={window.location.pathname.includes("/manager")}
                                     className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                 >
@@ -1123,7 +1123,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             )}
 
                                     <ResponsiveNavLink
-                                        href={route("admin.users.index")}
+                                        href="/admin/users"
                                         active={window.location.pathname === "/admin/users"}
                                         className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                     >
@@ -1144,7 +1144,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </ResponsiveNavLink>
 
                                     <ResponsiveNavLink
-                                        href={route("admin.sales.index")}
+                                        href="/admin/sales"
                                         active={window.location.pathname.includes("/admin/sales")}
                                         className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                     >
@@ -1258,7 +1258,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     {/* Permission Management Mobile Navigation - Admin Only */}
                                     {user.role === 'admin' && (
                                         <ResponsiveNavLink
-                                            href={route("admin.permissions.index")}
+                                            href="/admin/permissions"
                                             active={window.location.pathname.includes('/admin/permissions')}
                                             className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                         >
@@ -1313,7 +1313,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                             <div className="space-y-2">
                                 <ResponsiveNavLink
-                                    href={route("profile.edit")}
+                                    href="/profile"
                                     className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                                 >
                                     <svg
@@ -1333,7 +1333,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
                                     method="post"
-                                    href={route("logout")}
+                                    href="/logout"
                                     as="button"
                                     className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50 w-full text-left"
                                 >
