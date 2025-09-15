@@ -26,7 +26,7 @@ class SalePaymentController extends Controller
         $status = 'unpaid';
         if ($approvedPaidAmount >= $totalWithShipping) {
             $status = 'fully_paid';
-        } elseif ($approvedPaidAmount > 0) {
+        } elseif ($approvedPaidAmount > 0 || $pendingAmount > 0) {
             $status = 'partially_paid';
         }
         

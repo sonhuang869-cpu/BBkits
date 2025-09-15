@@ -329,7 +329,7 @@ export default function CreateExpanded() {
             return;
         }
 
-        post(route('sales.store'), {
+        post(route('sales.store-products'), {
             onSuccess: () => {
                 toast.success('Venda registrada com sucesso! Cliente receberá o link personalizado. 🎉');
             },

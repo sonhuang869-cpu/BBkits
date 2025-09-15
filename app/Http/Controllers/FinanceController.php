@@ -68,6 +68,13 @@ class FinanceController extends Controller
                     'approved_at' => now() // Legacy field
                 ]);
                 
+                // Approve all pending payments for this sale
+                $sale->payments()->where('status', 'pending')->update([
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+                ]);
+                
                 // Create commission record if needed
                 $commissionService = app(\App\Services\CommissionService::class);
                 $commissionService->createCommissionForSale($sale->fresh());

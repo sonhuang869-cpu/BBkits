@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sale;
 use App\Models\Product;
 use App\Models\SaleProduct;
+use App\Models\SalePayment;
 use App\Models\EmbroideryFont;
 use App\Models\EmbroideryColor;
 use Illuminate\Http\Request;
@@ -278,6 +279,22 @@ class SaleController extends Controller
             'delivery_state' => 'nullable|string|size:2',
             'delivery_zipcode' => 'nullable|string|regex:/^\d{5}-?\d{3}$/',
             
+            // Product specifications - REQUIRED for inventory control
+            'mesa_livre_details' => 'required|string|max:1000',
+            'chaveiros' => 'required|string|max:255',
+            'kit_main_color' => 'required|string|max:255',
+            'alcas' => 'required|string|max:255',
+            'faixa' => 'required|string|max:255',
+            'friso' => 'required|string|max:255',
+            'vies' => 'required|string|max:255',
+            'ziper' => 'required|string|max:255',
+            'production_estimate' => 'required|date|after:today',
+            'delivery_estimate' => 'required|date|after:production_estimate',
+            
+            // Delivery estimates
+            'estimated_delivery_date' => 'nullable|date',
+            'delivery_days' => 'nullable|integer|min:1',
+            
             // Optional
             'notes' => 'nullable|string',
             'preferred_delivery_date' => 'nullable|date'
@@ -334,6 +351,19 @@ class SaleController extends Controller
                     'embroidery_color_id' => $productData['embroidery_color_id'] ?? null,
                     'embroidery_position' => $productData['embroidery_position'] ?? null,
                     'embroidery_cost' => $productData['embroidery_cost'] ?? 0,
+                ]);
+            }
+            
+            // Create initial payment record if there's a received amount
+            if ($validated['received_amount'] > 0) {
+                SalePayment::create([
+                    'sale_id' => $sale->id,
+                    'amount' => $validated['received_amount'],
+                    'payment_date' => $validated['payment_date'],
+                    'payment_method' => $validated['payment_method'],
+                    'status' => 'pending', // Will be approved by admin/finance
+                    'proof_data' => $validated['receipt_data'] ?? null,
+                    'notes' => 'Pagamento inicial registrado na criação da venda',
                 ]);
             }
             
@@ -750,7 +780,7 @@ class SaleController extends Controller
             }
         });
 
-        return response()->json(['success' => true, 'message' => 'Venda cancelada com sucesso.']);
+        return back()->with('message', 'Venda cancelada com sucesso.');
     }
 
     // Public client page
