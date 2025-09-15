@@ -62,7 +62,7 @@ class InventoryTransactionController extends Controller
             'returns' => InventoryTransaction::where('type', 'return')->count(),
         ];
 
-        return Inertia::render('Admin/Inventory/Index', [
+        return Inertia::render('Admin/Inventory/TestIndex', [
             'transactions' => $transactions,
             'materials' => $materials,
             'users' => $users,

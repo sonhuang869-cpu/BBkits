@@ -31,7 +31,7 @@ class SupplierController extends Controller
 
         $suppliers = $query->paginate(15)->withQueryString();
 
-        return Inertia::render('Admin/Suppliers/Index', [
+        return Inertia::render('Admin/Suppliers/TestIndex', [
             'suppliers' => $suppliers,
             'filters' => $request->only(['search', 'status', 'sort', 'direction']),
         ]);
