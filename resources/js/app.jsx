@@ -9,98 +9,141 @@ import { Toaster } from 'react-hot-toast';
 // Import Ziggy for routing
 import { Ziggy } from './ziggy';
 
-// BULLETPROOF route helper that NEVER returns null and ALWAYS returns an object with method
+// ULTRA-DEFENSIVE route helper that can NEVER EVER return null or undefined
 function route(name, params = {}, absolute = false) {
-    // NEVER return null - always return a valid object with method property
-    if (!name || typeof name !== 'string') {
-        console.warn('Invalid route name provided:', name);
-        return createRouteObject('/dashboard', ['GET', 'HEAD']);
-    }
-
-    let url = '';
-
+    // Triple-layer safety net - this function can NEVER fail
     try {
-        // Check for route data in both window.Ziggy and imported Ziggy
-        const routeData = (window.Ziggy && window.Ziggy.routes && window.Ziggy.routes[name]) ||
-                         (Ziggy && Ziggy.routes && Ziggy.routes[name]);
-
-        if (routeData && routeData.uri) {
-            url = routeData.uri;
-
-            // Replace parameters in the URL
-            if (params && typeof params === 'object') {
-                Object.keys(params).forEach(key => {
-                    const value = params[key];
-                    if (value !== undefined && value !== null) {
-                        url = url.replace(`{${key}}`, value);
-                        url = url.replace(`{${key}?}`, value); // optional parameters
-                    }
-                });
-            }
-
-            // Clean up any remaining optional parameters
-            url = url.replace(/\{[^}]+\?\}/g, '');
-
-            // Add leading slash if missing
-            if (!url.startsWith('/')) {
-                url = '/' + url;
-            }
-
-            // Add base URL if absolute
-            if (absolute) {
-                const baseUrl = (window.Ziggy && window.Ziggy.url) || (Ziggy && Ziggy.url) || '';
-                if (baseUrl) {
-                    url = baseUrl.replace(/\/$/, '') + url;
-                }
-            }
-
-            // Return route object with methods from routeData
-            const methods = routeData.methods || ['GET', 'HEAD'];
-            return createRouteObject(url, methods);
-        } else {
-            // Fallback: convert route name to URL path
-            console.warn('Route not found in Ziggy, using fallback for:', name);
-            if (name.includes('.')) {
-                const parts = name.split('.');
-                if (parts[parts.length - 1] === 'index') {
-                    parts.pop(); // remove 'index'
-                }
-                url = '/' + parts.join('/');
-            } else {
-                url = `/${name}`;
-            }
+        // Layer 1: Input validation
+        if (!name || typeof name !== 'string') {
+            console.warn('Invalid route name provided:', name);
+            return createRouteObject('/dashboard', ['GET', 'HEAD']);
         }
-    } catch (error) {
-        console.error('Route generation error:', error, 'for route:', name);
-        // Emergency fallback - never return null
-        url = '/' + String(name).replace(/\./g, '/');
-    }
 
-    // GUARANTEE: always return a valid route object
-    if (!url || typeof url !== 'string') {
-        console.error('Route function would return invalid value:', url, 'for:', name);
+        let url = '';
+
+        try {
+            // Layer 2: Route resolution
+            const routeData = (window.Ziggy && window.Ziggy.routes && window.Ziggy.routes[name]) ||
+                             (Ziggy && Ziggy.routes && Ziggy.routes[name]);
+
+            if (routeData && routeData.uri) {
+                url = routeData.uri;
+
+                // Parameter replacement with safety
+                if (params && typeof params === 'object') {
+                    Object.keys(params).forEach(key => {
+                        try {
+                            const value = params[key];
+                            if (value !== undefined && value !== null && value !== '') {
+                                url = url.replace(`{${key}}`, String(value));
+                                url = url.replace(`{${key}?}`, String(value));
+                            }
+                        } catch (e) {
+                            console.warn('Parameter replacement error for key:', key, e);
+                        }
+                    });
+                }
+
+                // Clean up optional parameters
+                url = url.replace(/\{[^}]+\?\}/g, '');
+
+                // Ensure leading slash
+                if (!url.startsWith('/')) {
+                    url = '/' + url;
+                }
+
+                // Handle absolute URLs
+                if (absolute) {
+                    try {
+                        const baseUrl = (window.Ziggy && window.Ziggy.url) || (Ziggy && Ziggy.url) || '';
+                        if (baseUrl) {
+                            url = baseUrl.replace(/\/$/, '') + url;
+                        }
+                    } catch (e) {
+                        console.warn('Base URL handling error:', e);
+                    }
+                }
+
+                // Return with route methods
+                const methods = (routeData.methods && Array.isArray(routeData.methods)) ? routeData.methods : ['GET', 'HEAD'];
+                return createRouteObject(url, methods);
+            } else {
+                // Fallback route generation
+                console.warn('Route not found in Ziggy, using fallback for:', name);
+                if (name.includes('.')) {
+                    const parts = name.split('.');
+                    if (parts[parts.length - 1] === 'index') {
+                        parts.pop();
+                    }
+                    url = '/' + parts.join('/');
+                } else {
+                    url = `/${name}`;
+                }
+            }
+        } catch (error) {
+            // Layer 3: Error recovery
+            console.error('Route resolution error:', error, 'for route:', name);
+            url = '/' + String(name).replace(/\./g, '/');
+        }
+
+        // Final validation and fallback
+        if (!url || typeof url !== 'string' || url.length === 0) {
+            console.error('Route function generated invalid URL:', url, 'for:', name);
+            url = '/dashboard';
+        }
+
+        return createRouteObject(url, ['GET', 'HEAD']);
+
+    } catch (error) {
+        // Ultimate safety net - this should NEVER be reached
+        console.error('CRITICAL: Route function completely failed:', error, 'for route:', name);
         return createRouteObject('/dashboard', ['GET', 'HEAD']);
     }
-
-    return createRouteObject(url, ['GET', 'HEAD']);
 }
 
-// Helper function to create consistent route objects
+// ULTRA-DEFENSIVE helper function to create route objects that can NEVER be null
 function createRouteObject(url, methods = ['GET', 'HEAD']) {
-    const routeObj = {
-        url: url,
-        method: methods[0] || 'GET', // Always have a method
-        methods: methods || ['GET', 'HEAD'],
-        toString: function() { return url; },
-        valueOf: function() { return url; }
-    };
+    try {
+        // Ensure url is always a valid string
+        const safeUrl = (url && typeof url === 'string') ? url : '/dashboard';
 
-    // Add Symbol.toPrimitive for better string coercion
-    routeObj[Symbol.toPrimitive] = function(hint) {
-        return url;
-    };
+        // Ensure methods is always a valid array
+        const safeMethods = (methods && Array.isArray(methods) && methods.length > 0) ? methods : ['GET', 'HEAD'];
 
-    return routeObj;
+        const routeObj = {
+            url: safeUrl,
+            method: safeMethods[0] || 'GET', // ALWAYS have a method property
+            methods: safeMethods,
+            toString: function() { return safeUrl; },
+            valueOf: function() { return safeUrl; }
+        };
+
+        // Add Symbol.toPrimitive for string coercion
+        routeObj[Symbol.toPrimitive] = function(hint) {
+            return safeUrl;
+        };
+
+        // Additional safety: ensure method property is never null/undefined
+        Object.defineProperty(routeObj, 'method', {
+            get: function() {
+                return safeMethods[0] || 'GET';
+            },
+            enumerable: true,
+            configurable: false
+        });
+
+        return routeObj;
+    } catch (error) {
+        // Emergency fallback object
+        console.error('CRITICAL: createRouteObject failed:', error);
+        return {
+            url: '/dashboard',
+            method: 'GET',
+            methods: ['GET', 'HEAD'],
+            toString: function() { return '/dashboard'; },
+            valueOf: function() { return '/dashboard'; }
+        };
+    }
 }
 
 // Make route function available globally immediately
