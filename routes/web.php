@@ -292,6 +292,40 @@ Route::middleware(['auth', 'approved'])->group(function () {
         Route::put('/admin/sales/{sale}/correct', [SaleController::class, 'correct'])->name('admin.sales.correct');
         Route::put('/admin/sales/{sale}/cancel', [SaleController::class, 'cancel'])->name('admin.sales.cancel');
 
+        // Materials & Inventory Management Routes
+        // Materials Management Routes
+        Route::resource('admin/materials', \App\Http\Controllers\Admin\MaterialController::class)->names([
+            'index' => 'admin.materials.index',
+            'create' => 'admin.materials.create',
+            'store' => 'admin.materials.store',
+            'show' => 'admin.materials.show',
+            'edit' => 'admin.materials.edit',
+            'update' => 'admin.materials.update',
+            'destroy' => 'admin.materials.destroy',
+        ]);
+        Route::post('/admin/materials/{material}/adjust-stock', [\App\Http\Controllers\Admin\MaterialController::class, 'adjustStock'])->name('admin.materials.adjust-stock');
+
+        // Inventory Transaction Routes
+        Route::prefix('admin/inventory')->name('admin.inventory.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\InventoryTransactionController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\InventoryTransactionController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\InventoryTransactionController::class, 'store'])->name('store');
+            Route::get('/{transaction}', [\App\Http\Controllers\Admin\InventoryTransactionController::class, 'show'])->name('show');
+            Route::get('/bulk/adjustment', [\App\Http\Controllers\Admin\InventoryTransactionController::class, 'bulkAdjustment'])->name('bulk.adjustment');
+            Route::post('/bulk/adjustment', [\App\Http\Controllers\Admin\InventoryTransactionController::class, 'processBulkAdjustment'])->name('bulk.process');
+        });
+
+        // Suppliers Management Routes
+        Route::resource('admin/suppliers', \App\Http\Controllers\Admin\SupplierController::class)->names([
+            'index' => 'admin.suppliers.index',
+            'create' => 'admin.suppliers.create',
+            'store' => 'admin.suppliers.store',
+            'show' => 'admin.suppliers.show',
+            'edit' => 'admin.suppliers.edit',
+            'update' => 'admin.suppliers.update',
+            'destroy' => 'admin.suppliers.destroy',
+        ]);
+
         // Embroidery Management Routes
         Route::get('/admin/embroidery', [EmbroideryController::class, 'dashboard'])->name('admin.embroidery.dashboard');
         
@@ -336,6 +370,69 @@ Route::middleware(['auth', 'approved'])->group(function () {
         Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
         Route::post('/admin/products/{product}/update', [ProductController::class, 'update'])->name('admin.products.update-with-file');
         Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+
+        // Permission Management Routes
+        Route::prefix('admin/permissions')->name('admin.permissions.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PermissionController::class, 'index'])->name('index');
+            Route::get('/role/{role}', [\App\Http\Controllers\Admin\PermissionController::class, 'rolePermissions'])->name('role');
+        });
+
+        // Materials Reports Routes
+        Route::prefix('admin/reports')->name('admin.reports.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ReportsController::class, 'index'])->name('index');
+            Route::get('/low-stock-alerts', [\App\Http\Controllers\Admin\ReportsController::class, 'lowStockAlerts'])->name('low-stock-alerts');
+            Route::get('/inventory-status', [\App\Http\Controllers\Admin\ReportsController::class, 'inventoryStatus'])->name('inventory-status');
+            Route::get('/stock-movements', [\App\Http\Controllers\Admin\ReportsController::class, 'stockMovements'])->name('stock-movements');
+            Route::get('/supplier-performance', [\App\Http\Controllers\Admin\ReportsController::class, 'supplierPerformance'])->name('supplier-performance');
+        });
+
+        // Material Categories Routes
+        Route::resource('admin/material-categories', \App\Http\Controllers\Admin\MaterialCategoriesController::class)->names([
+            'index' => 'admin.material-categories.index',
+            'create' => 'admin.material-categories.create',
+            'store' => 'admin.material-categories.store',
+            'show' => 'admin.material-categories.show',
+            'edit' => 'admin.material-categories.edit',
+            'update' => 'admin.material-categories.update',
+            'destroy' => 'admin.material-categories.destroy',
+        ]);
+
+        // Materials CRUD Routes
+        Route::resource('admin/materials', \App\Http\Controllers\Admin\MaterialsController::class)->names([
+            'index' => 'admin.materials.index',
+            'create' => 'admin.materials.create',
+            'store' => 'admin.materials.store',
+            'show' => 'admin.materials.show',
+            'edit' => 'admin.materials.edit',
+            'update' => 'admin.materials.update',
+            'destroy' => 'admin.materials.destroy',
+        ]);
+
+        // Material Image Routes
+        Route::post('/admin/materials/{material}/upload-image', [\App\Http\Controllers\Admin\MaterialsController::class, 'uploadImage'])->name('admin.materials.upload-image');
+        Route::delete('/admin/materials/{material}/delete-image', [\App\Http\Controllers\Admin\MaterialsController::class, 'deleteImage'])->name('admin.materials.delete-image');
+
+        // Material Import/Export Routes
+        Route::prefix('admin/materials')->name('admin.materials.')->group(function () {
+            Route::get('/import-export', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'index'])->name('import-export');
+            Route::get('/export-template', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'exportTemplate'])->name('export-template');
+            Route::post('/export', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'export'])->name('export');
+            Route::post('/import', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'import'])->name('import');
+            Route::get('/validate-units', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'validateUnits'])->name('validate-units');
+        });
+
+        // Notification Routes
+        Route::prefix('admin/notifications')->name('admin.notifications.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('index');
+            Route::get('/preferences', [\App\Http\Controllers\Admin\NotificationController::class, 'preferences'])->name('preferences');
+            Route::post('/preferences', [\App\Http\Controllers\Admin\NotificationController::class, 'updatePreferences'])->name('update-preferences');
+            Route::post('/{notification}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('mark-read');
+            Route::post('/{notification}/unread', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsUnread'])->name('mark-unread');
+            Route::post('/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+            Route::delete('/{notification}', [\App\Http\Controllers\Admin\NotificationController::class, 'delete'])->name('delete');
+            Route::get('/unread-count', [\App\Http\Controllers\Admin\NotificationController::class, 'getUnreadCount'])->name('unread-count');
+            Route::post('/test', [\App\Http\Controllers\Admin\NotificationController::class, 'testNotifications'])->name('test');
+        });
     });
 
     Route::get('/reports/sales', [SaleController::class, 'generateSalesReport'])->name('reports.sales');

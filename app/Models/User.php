@@ -193,4 +193,111 @@ class User extends Authenticatable
     {
         return $this->role === 'vendedora';
     }
+
+    // Materials Management Permissions
+    public function canViewMaterials(): bool
+    {
+        return $this->isAdmin() ||
+               $this->isManager() ||
+               $this->isProductionAdmin() ||
+               $this->isFinanceAdmin() ||
+               $this->isFinanceiro();
+    }
+
+    public function canEditMaterials(): bool
+    {
+        return $this->isAdmin() ||
+               $this->isManager() ||
+               $this->isProductionAdmin();
+    }
+
+    public function canManageMaterials(): bool
+    {
+        return $this->isAdmin() || $this->isManager();
+    }
+
+    public function canViewSuppliers(): bool
+    {
+        return $this->isAdmin() ||
+               $this->isManager() ||
+               $this->isProductionAdmin() ||
+               $this->isFinanceAdmin() ||
+               $this->isFinanceiro();
+    }
+
+    public function canEditSuppliers(): bool
+    {
+        return $this->isAdmin() ||
+               $this->isManager() ||
+               $this->isProductionAdmin();
+    }
+
+    public function canManageSuppliers(): bool
+    {
+        return $this->isAdmin() || $this->isManager();
+    }
+
+    public function canViewInventoryTransactions(): bool
+    {
+        return $this->isAdmin() ||
+               $this->isManager() ||
+               $this->isProductionAdmin() ||
+               $this->isFinanceAdmin() ||
+               $this->isFinanceiro();
+    }
+
+    public function canCreateInventoryTransactions(): bool
+    {
+        return $this->isAdmin() ||
+               $this->isManager() ||
+               $this->isProductionAdmin();
+    }
+
+    public function canManageInventory(): bool
+    {
+        return $this->isAdmin() || $this->isManager();
+    }
+
+    public function canAdjustStock(): bool
+    {
+        return $this->isAdmin() ||
+               $this->isManager() ||
+               $this->isProductionAdmin();
+    }
+
+    public function canDeleteMaterials(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    public function canDeleteSuppliers(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    public function canBulkAdjustInventory(): bool
+    {
+        return $this->isAdmin() || $this->isManager();
+    }
+
+    // Notification relationships
+    public function notificationPreferences(): HasMany
+    {
+        return $this->hasMany(NotificationPreference::class);
+    }
+
+    public function systemNotifications(): HasMany
+    {
+        return $this->hasMany(SystemNotification::class);
+    }
+
+    public function unreadNotifications(): HasMany
+    {
+        return $this->hasMany(SystemNotification::class)->unread();
+    }
+
+    public function getUnreadNotificationsCountAttribute(): int
+    {
+        return $this->unreadNotifications()->count();
+    }
 }
