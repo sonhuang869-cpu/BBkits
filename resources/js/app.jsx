@@ -9,8 +9,11 @@ import { Toaster } from 'react-hot-toast';
 // Import Ziggy for routing
 import { Ziggy } from './ziggy';
 
-// ULTRA-DEFENSIVE route helper that can NEVER EVER return null or undefined
+// ULTRA-DEFENSIVE route helper with EMERGENCY DEBUGGING
 function route(name, params = {}, absolute = false) {
+    // Emergency debugging - log every call
+    console.log('🚨 ROUTE CALL:', {name, params, absolute, typeof_name: typeof name});
+
     // Triple-layer safety net - this function can NEVER fail
     try {
         // Layer 1: Input validation
@@ -92,12 +95,23 @@ function route(name, params = {}, absolute = false) {
             url = '/dashboard';
         }
 
-        return createRouteObject(url, ['GET', 'HEAD']);
+        const result = createRouteObject(url, ['GET', 'HEAD']);
+        console.log('✅ ROUTE RESULT:', {name, url, result, hasMethod: !!result.method});
+
+        // Final emergency check
+        if (!result || !result.method) {
+            console.error('🚨 ROUTE RESULT INVALID:', result);
+            return createRouteObject('/dashboard', ['GET', 'HEAD']);
+        }
+
+        return result;
 
     } catch (error) {
         // Ultimate safety net - this should NEVER be reached
         console.error('CRITICAL: Route function completely failed:', error, 'for route:', name);
-        return createRouteObject('/dashboard', ['GET', 'HEAD']);
+        const emergencyResult = createRouteObject('/dashboard', ['GET', 'HEAD']);
+        console.log('🆘 EMERGENCY RESULT:', emergencyResult);
+        return emergencyResult;
     }
 }
 
@@ -146,11 +160,23 @@ function createRouteObject(url, methods = ['GET', 'HEAD']) {
     }
 }
 
-// Make route function available globally immediately
+// FORCE our route function to be the ONLY one used
 window.route = route;
-
-// Also ensure it's available in global scope for modules
 globalThis.route = route;
+
+// Override any existing route function
+Object.defineProperty(window, 'route', {
+    value: route,
+    writable: false,
+    configurable: false
+});
+
+// Emergency global override
+if (typeof global !== 'undefined') {
+    global.route = route;
+}
+
+console.log('🔧 ROUTE FUNCTION INITIALIZED:', typeof window.route);
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

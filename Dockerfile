@@ -15,10 +15,16 @@ COPY vite.config.js ./
 COPY tailwind.config.js ./
 COPY public public
 
+# Clear any existing build cache
+RUN rm -rf public/build/*
+
 # Build frontend with environment variable
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL}
 RUN npm run build
+
+# Verify build was successful
+RUN ls -la public/build/ && echo "Build assets created successfully"
 
 # ------------------------------
 # 2. Build Laravel Backend
