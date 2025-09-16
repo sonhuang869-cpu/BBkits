@@ -15,16 +15,16 @@ COPY vite.config.js ./
 COPY tailwind.config.js ./
 COPY public public
 
-# Clear any existing build cache
-RUN rm -rf public/build/*
+# Force cache bust - change this comment to force rebuild: v1.1
+RUN echo "Force rebuild timestamp: $(date)" && rm -rf public/build/*
 
 # Build frontend with environment variable
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL}
 RUN npm run build
 
-# Verify build was successful
-RUN ls -la public/build/ && echo "Build assets created successfully"
+# Verify build was successful and show exact filenames
+RUN ls -la public/build/assets/ && echo "Build assets created successfully at $(date)"
 
 # ------------------------------
 # 2. Build Laravel Backend
@@ -51,8 +51,14 @@ COPY . .
 # Verify composer files exist
 RUN ls -la composer.json composer.lock || echo "WARNING: Composer files missing"
 
+# Ensure public/build directory exists and clear any old assets
+RUN mkdir -p public/build && rm -rf public/build/*
+
 # Copy built frontend assets only (not entire public directory)
 COPY --from=frontend /app/public/build ./public/build
+
+# Verify assets were copied and show filenames for debugging
+RUN ls -la public/build/assets/ | head -5 && echo "Assets copied successfully"
 
 # Make sure server.php is executable
 RUN chmod +x server.php
