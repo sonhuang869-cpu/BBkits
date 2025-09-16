@@ -741,6 +741,7 @@ class SaleController extends Controller
     public function cancel(Request $request, Sale $sale)
     {
         // Any authenticated user can request cancellation, but admin password is required for authorization
+        // Note: We don't use $this->authorize() here because authorization is done via admin password check
 
         $validated = $request->validate([
             'admin_password' => 'required|string',
@@ -759,21 +760,17 @@ class SaleController extends Controller
         }
 
         DB::transaction(function () use ($sale, $validated) {
-            $originalStatus = $sale->status;
             $originalMonth = $sale->payment_date ? $sale->payment_date->month : null;
             $originalYear = $sale->payment_date ? $sale->payment_date->year : null;
+            $saleUser = $sale->user; // Store user reference before deletion
 
-            $sale->update([
-                'status' => 'cancelado',
-                'corrected_by' => auth()->id(),
-                'corrected_at' => now(),
-                'correction_reason' => $validated['explanation'],
-                'original_status' => $originalStatus,
-            ]);
+            // Delete the sale record completely
+            $sale->delete();
 
-            if ($originalMonth && $originalYear) {
+            // Recalculate commissions for the affected month after deletion
+            if ($originalMonth && $originalYear && $saleUser) {
                 $this->commissionService->recalculateMonthlyCommissions(
-                    $sale->user,
+                    $saleUser,
                     $originalMonth,
                     $originalYear
                 );
