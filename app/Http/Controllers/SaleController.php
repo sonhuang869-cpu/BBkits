@@ -756,28 +756,39 @@ class SaleController extends Controller
             });
             
         if (!$isValidAdminPassword) {
-            return response()->json(['admin_password' => 'Senha do administrador incorreta.'], 422);
+            return back()->withErrors(['admin_password' => 'Senha do administrador incorreta.']);
         }
 
-        DB::transaction(function () use ($sale, $validated) {
-            $originalMonth = $sale->payment_date ? $sale->payment_date->month : null;
-            $originalYear = $sale->payment_date ? $sale->payment_date->year : null;
-            $saleUser = $sale->user; // Store user reference before deletion
+        try {
+            DB::transaction(function () use ($sale, $validated) {
+                $originalMonth = $sale->payment_date ? $sale->payment_date->month : null;
+                $originalYear = $sale->payment_date ? $sale->payment_date->year : null;
+                $saleUser = $sale->user; // Store user reference before deletion
 
-            // Delete the sale record completely
-            $sale->delete();
+                // Delete the sale record completely
+                $sale->delete();
 
-            // Recalculate commissions for the affected month after deletion
-            if ($originalMonth && $originalYear && $saleUser) {
-                $this->commissionService->recalculateMonthlyCommissions(
-                    $saleUser,
-                    $originalMonth,
-                    $originalYear
-                );
-            }
-        });
+                // Recalculate commissions for the affected month after deletion
+                if ($originalMonth && $originalYear && $saleUser) {
+                    $this->commissionService->recalculateMonthlyCommissions(
+                        $saleUser,
+                        $originalMonth,
+                        $originalYear
+                    );
+                }
+            });
 
-        return back()->with('message', 'Venda cancelada com sucesso.');
+            return back()->with('message', 'Venda cancelada com sucesso.');
+
+        } catch (\Exception $e) {
+            Log::error('Error cancelling sale', [
+                'sale_id' => $sale->id,
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id()
+            ]);
+
+            return back()->withErrors(['error' => 'Erro ao cancelar venda. Tente novamente.']);
+        }
     }
 
     // Public client page

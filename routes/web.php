@@ -203,6 +203,11 @@ Route::post('/pedido/{token}/update-address', [SaleController::class, 'clientUpd
 Route::post('/pedido/{token}/upload-payment', [SaleController::class, 'clientUploadPayment'])->name('sales.client.upload-payment');
 Route::post('/pedido/{token}/approve-photo', [SaleController::class, 'clientApprovePhoto'])->name('sales.client.approve-photo');
 
+// Sale cancellation route - only requires auth, not approval (admin password required)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/sales/{sale}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
+});
+
 Route::middleware(['auth', 'approved'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -214,7 +219,6 @@ Route::middleware(['auth', 'approved'])->group(function () {
     Route::post('/sales/store-products', [SaleController::class, 'storeWithProducts'])->name('sales.store-products');
     Route::get('/sales/kanban', [SaleController::class, 'kanban'])->name('sales.kanban');
     Route::patch('/sales/{sale}/status', [SaleController::class, 'updateStatus'])->name('sales.update-status');
-    Route::post('/sales/{sale}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
     Route::resource('sales', SaleController::class);
 
     Route::get('/sales/{sale}/payments', [SalePaymentController::class, 'index'])->name('payments.index');

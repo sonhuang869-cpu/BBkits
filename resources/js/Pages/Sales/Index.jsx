@@ -33,6 +33,8 @@ export default function Index({ sales, auth }) {
                         toast.error('Senha do administrador incorreta.');
                     } else if (errors.explanation) {
                         toast.error('Explicação inválida.');
+                    } else if (errors.error) {
+                        toast.error('Erro ao cancelar a venda.');
                     } else {
                         toast.error('Erro ao cancelar a venda.');
                     }
