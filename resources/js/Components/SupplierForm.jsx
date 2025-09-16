@@ -17,10 +17,6 @@ export default function SupplierForm({ supplier = null }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const action = isEditing ? 'put' : 'post';
-        const route_name = isEditing ? 'admin.suppliers.update' : 'admin.suppliers.store';
-        const route_params = isEditing ? [supplier.id] : [];
-
         const options = {
             onSuccess: () => {
                 toast.success(isEditing ? 'Fornecedor atualizado com sucesso!' : 'Fornecedor criado com sucesso!');
@@ -32,10 +28,10 @@ export default function SupplierForm({ supplier = null }) {
             }
         };
 
-        if (action === 'post') {
-            post(route(route_name), options);
+        if (isEditing) {
+            put(`/admin/suppliers/${supplier.id}`, options);
         } else {
-            put(route(route_name, route_params), options);
+            post('/admin/suppliers', options);
         }
     };
 

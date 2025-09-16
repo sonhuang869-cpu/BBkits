@@ -21,6 +21,7 @@ class MaterialsAccess
 
         $hasPermission = match($permission) {
             'view' => $user->canViewMaterials(),
+            'create' => $user->canEditMaterials(), // Use edit permission for create
             'edit' => $user->canEditMaterials(),
             'manage' => $user->canManageMaterials(),
             'delete' => $user->canDeleteMaterials(),

@@ -22,10 +22,6 @@ export default function MaterialForm({ material = null, suppliers = [] }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const action = isEditing ? 'put' : 'post';
-        const route_name = isEditing ? 'admin.materials.update' : 'admin.materials.store';
-        const route_params = isEditing ? [material.id] : [];
-
         const options = {
             onSuccess: () => {
                 toast.success(isEditing ? 'Material atualizado com sucesso!' : 'Material criado com sucesso!');
@@ -37,10 +33,10 @@ export default function MaterialForm({ material = null, suppliers = [] }) {
             }
         };
 
-        if (action === 'post') {
-            post(route(route_name), options);
+        if (isEditing) {
+            put(`/admin/materials/${material.id}`, options);
         } else {
-            put(route(route_name, route_params), options);
+            post('/admin/materials', options);
         }
     };
 

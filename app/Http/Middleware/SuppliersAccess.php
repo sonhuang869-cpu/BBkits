@@ -21,6 +21,7 @@ class SuppliersAccess
 
         $hasPermission = match($permission) {
             'view' => $user->canViewSuppliers(),
+            'create' => $user->canEditSuppliers(), // Use edit permission for create
             'edit' => $user->canEditSuppliers(),
             'manage' => $user->canManageSuppliers(),
             'delete' => $user->canDeleteSuppliers(),

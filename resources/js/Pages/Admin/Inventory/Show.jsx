@@ -33,13 +33,13 @@ export default function Show({ transaction }) {
                     </div>
                     <div className="flex space-x-3">
                         <Link
-                            href={route('admin.materials.show', transaction.material.id)}
+                            href={`/admin/materials/${transaction.material.id}`}
                             className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
                         >
                             Ver Material
                         </Link>
                         <Link
-                            href={route('admin.inventory.index')}
+                            href="/admin/inventory"
                             className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
                         >
                             Voltar

@@ -12,13 +12,13 @@ export default function Show({ supplier }) {
                     </div>
                     <div className="flex space-x-3">
                         <Link
-                            href={route('admin.suppliers.edit', supplier.id)}
+                            href={`/admin/suppliers/${supplier.id}/edit`}
                             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
                         >
                             Editar Fornecedor
                         </Link>
                         <Link
-                            href={route('admin.suppliers.index')}
+                            href="/admin/suppliers"
                             className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
                         >
                             Voltar
@@ -172,7 +172,7 @@ export default function Show({ supplier }) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     <Link
-                                                        href={route('admin.materials.show', material.id)}
+                                                        href={`/admin/materials/${material.id}`}
                                                         className="text-purple-600 hover:text-purple-900"
                                                     >
                                                         Ver Material

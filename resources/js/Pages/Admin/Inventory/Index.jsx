@@ -68,7 +68,7 @@ export default function Index({ transactions, materials, users, filters, stats }
                     <div className="flex space-x-3">
                         {canBulkAdjust() && (
                             <Link
-                                href="/admin/inventory/bulk-adjustment"
+                                href="/admin/inventory/bulk/adjustment"
                                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
                             >
                                 Ajuste em Lote
