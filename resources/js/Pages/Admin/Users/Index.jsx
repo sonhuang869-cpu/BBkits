@@ -20,21 +20,21 @@ export default function Index({ auth, users }) {
 
     const handleApprove = (userId) => {
         setProcessing(true);
-        router.put(route('admin.users.approve', userId), {}, {
+        router.put(`/admin/users/${userId}/approve`, {}, {
             onFinish: () => setProcessing(false)
         });
     };
 
     const handleReject = (userId) => {
         setProcessing(true);
-        router.put(route('admin.users.reject', userId), {}, {
+        router.put(`/admin/users/${userId}/reject`, {}, {
             onFinish: () => setProcessing(false)
         });
     };
 
     const handleCreateUser = (e) => {
         e.preventDefault();
-        post(route('admin.users.store'), {
+        post('/admin/users', {
             onSuccess: () => {
                 toast.success('Usuário criado com sucesso!');
                 setShowCreateModal(false);
