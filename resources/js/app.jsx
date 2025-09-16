@@ -12,7 +12,6 @@ import { Ziggy } from './ziggy';
 // ULTRA-DEFENSIVE route helper with EMERGENCY DEBUGGING
 function route(name, params = {}, absolute = false) {
     // Emergency debugging - log every call
-    console.log('🚨 ROUTE CALL:', {name, params, absolute, typeof_name: typeof name});
 
     // Triple-layer safety net - this function can NEVER fail
     try {
