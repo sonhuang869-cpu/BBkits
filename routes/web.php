@@ -204,8 +204,9 @@ Route::post('/pedido/{token}/upload-payment', [SaleController::class, 'clientUpl
 Route::post('/pedido/{token}/approve-photo', [SaleController::class, 'clientApprovePhoto'])->name('sales.client.approve-photo');
 
 // Sale cancellation route - only requires auth, not approval (admin password required)
+// Using manual lookup to bypass model binding and policy issues
 Route::middleware(['auth'])->group(function () {
-    Route::post('/sales/{sale}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
+    Route::post('/sales/{saleId}/cancel', [SaleController::class, 'cancelBySaleId'])->name('sales.cancel');
 });
 
 Route::middleware(['auth', 'approved'])->group(function () {

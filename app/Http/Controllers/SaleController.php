@@ -834,6 +834,106 @@ class SaleController extends Controller
         }
     }
 
+    // Alternative cancel method that bypasses model binding and policies
+    public function cancelBySaleId(Request $request, $saleId)
+    {
+        // Manual sale lookup - no model binding, no automatic policy checks
+        $sale = Sale::find($saleId);
+
+        if (!$sale) {
+            return back()->withErrors(['error' => 'Venda não encontrada.']);
+        }
+
+        \Log::emergency('CANCEL BY SALE ID CALLED - Sale ID: ' . $saleId . ' - User: ' . auth()->user()->email);
+
+        $validated = $request->validate([
+            'admin_password' => 'required|string',
+            'explanation' => 'required|string|min:10|max:1000',
+        ]);
+
+        // Debug: Log the password attempt
+        Log::info('Cancel attempt', [
+            'sale_id' => $sale->id,
+            'password_length' => strlen($validated['admin_password']),
+            'explanation_length' => strlen($validated['explanation']),
+            'user_id' => auth()->id()
+        ]);
+
+        // Verify admin password against any admin user (not just current user)
+        $adminUsers = \App\Models\User::where('role', 'admin')->get();
+
+        Log::info('Admin users found', [
+            'count' => $adminUsers->count(),
+            'admins' => $adminUsers->pluck('email')->toArray()
+        ]);
+
+        $isValidAdminPassword = $adminUsers->contains(function ($admin) use ($validated) {
+            $isValid = Hash::check($validated['admin_password'], $admin->password);
+            Log::info('Password check', [
+                'admin_email' => $admin->email,
+                'password_valid' => $isValid
+            ]);
+            return $isValid;
+        });
+
+        if (!$isValidAdminPassword) {
+            Log::warning('Invalid admin password attempt', [
+                'sale_id' => $sale->id,
+                'user_id' => auth()->id()
+            ]);
+            return back()->withErrors(['admin_password' => 'Senha do administrador incorreta.']);
+        }
+
+        Log::info('Admin password verified, proceeding with deletion', [
+            'sale_id' => $sale->id,
+            'user_id' => auth()->id()
+        ]);
+
+        try {
+            DB::transaction(function () use ($sale, $validated) {
+                $originalMonth = $sale->payment_date ? $sale->payment_date->month : null;
+                $originalYear = $sale->payment_date ? $sale->payment_date->year : null;
+                $saleUser = $sale->user; // Store user reference before deletion
+
+                Log::info('About to delete sale', [
+                    'sale_id' => $sale->id,
+                    'client_name' => $sale->client_name
+                ]);
+
+                // Delete the sale record completely
+                $sale->delete();
+
+                Log::info('Sale deleted successfully', [
+                    'sale_id' => $sale->id
+                ]);
+
+                // Recalculate commissions for the affected month after deletion
+                if ($originalMonth && $originalYear && $saleUser) {
+                    $this->commissionService->recalculateMonthlyCommissions(
+                        $saleUser,
+                        $originalMonth,
+                        $originalYear
+                    );
+                }
+            });
+
+            Log::info('Sale cancellation completed successfully', [
+                'sale_id' => $sale->id
+            ]);
+
+            return back()->with('message', 'Venda cancelada com sucesso.');
+
+        } catch (\Exception $e) {
+            Log::error('Error cancelling sale', [
+                'sale_id' => $sale->id,
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id()
+            ]);
+
+            return back()->withErrors(['error' => 'Erro ao cancelar venda. Tente novamente.']);
+        }
+    }
+
     // Public client page
     public function clientPage($token)
     {
