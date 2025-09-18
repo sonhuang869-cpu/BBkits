@@ -4,6 +4,7 @@ import { useState } from 'react';
 import SalesModal from '@/Components/SalesModal';
 import RankingDisplay from '@/Components/RankingDisplay';
 import { formatBRL } from '@/utils/currency';
+import { Plus, ArrowRight, Users, DollarSign, Target, Award, FileText, ChevronRight, Info } from 'lucide-react';
 
 export default function Dashboard() {
     const { auth, gamification, salesData, recentSales, allMonthlySales, topPerformers } = usePage().props;
@@ -336,8 +337,8 @@ export default function Dashboard() {
                         ))}
                     </div>
 
-                    <div className="py-12 relative z-10">
-                        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div className="py-6 sm:py-8 lg:py-12 relative z-10">
+                        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             {/* Quick Action Button for Salespeople */}
                             {auth.user.role === 'vendedora' && (
                                 <div className="mb-8 text-center animate-fadeInUp">
@@ -349,13 +350,9 @@ export default function Dashboard() {
                                             boxShadow: '0 10px 30px rgba(255, 107, 157, 0.4), 0 0 20px rgba(201, 108, 190, 0.3)',
                                         }}
                                     >
-                                        <svg className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                        </svg>
+                                        <Plus className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
                                         <span className="mr-2">✨ Nova Venda</span>
-                                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5-5 5M6 12h12" />
-                                        </svg>
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                                     </a>
                                     <p className="text-gray-600 mt-3 text-sm">
                                         💼 Registre uma venda e aumente suas comissões!
@@ -375,17 +372,15 @@ export default function Dashboard() {
                             )}
 
                             {/* Stats Cards */}
-                            <div className="grid gap-8 mb-12 md:grid-cols-2 xl:grid-cols-4">
+                            <div className="grid gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
                                 <div className="stat-card animate-fadeInUp">
-                                    <div className="p-6 flex items-center text-white relative z-10">
-                                        <div className="feature-icon p-4 rounded-full mr-6">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
-                                            </svg>
+                                    <div className="p-4 sm:p-6 flex items-center text-white relative z-10">
+                                        <div className="feature-icon p-3 sm:p-4 rounded-full mr-4 sm:mr-6">
+                                            <Users className="w-6 sm:w-8 h-6 sm:h-8" />
                                         </div>
                                         <div>
-                                            <p className="mb-2 text-sm font-medium text-white/90">Total de Vendas</p>
-                                            <p className="text-2xl font-bold drop-shadow-lg">
+                                            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-medium text-white/90">Total de Vendas</p>
+                                            <p className="text-lg sm:text-2xl font-bold drop-shadow-lg">
                                                 {formatBRL(salesData?.totalSalesAmount || 0)}
                                             </p>
                                             <p className="text-xs text-white/80 mt-1">💼 {salesData?.monthlySalesCount || 0} vendas cadastradas</p>
@@ -394,15 +389,13 @@ export default function Dashboard() {
                                 </div>
                                 
                                 <div className="stat-card animate-fadeInUp">
-                                    <div className="p-6 flex items-center text-white relative z-10">
-                                        <div className="feature-icon p-4 rounded-full mr-6">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path>
-                                            </svg>
+                                    <div className="p-4 sm:p-6 flex items-center text-white relative z-10">
+                                        <div className="feature-icon p-3 sm:p-4 rounded-full mr-4 sm:mr-6">
+                                            <DollarSign className="w-6 sm:w-8 h-6 sm:h-8" />
                                         </div>
                                         <div>
-                                            <p className="mb-2 text-sm font-medium text-white/90">Comissão do Mês</p>
-                                            <p className="text-2xl font-bold drop-shadow-lg">
+                                            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-medium text-white/90">Comissão do Mês</p>
+                                            <p className="text-lg sm:text-2xl font-bold drop-shadow-lg">
                                                 {formatBRL(salesData?.monthlyCommission || 0)}
                                             </p>
                                             <p className="text-xs text-white/80 mt-1">💰 Seus ganhos</p>
@@ -411,15 +404,13 @@ export default function Dashboard() {
                                 </div>
                                 
                                 <div className="stat-card animate-fadeInUp">
-                                    <div className="p-6 flex items-center text-white relative z-10">
-                                        <div className="feature-icon p-4 rounded-full mr-6">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
-                                            </svg>
+                                    <div className="p-4 sm:p-6 flex items-center text-white relative z-10">
+                                        <div className="feature-icon p-3 sm:p-4 rounded-full mr-4 sm:mr-6">
+                                            <Award className="w-6 sm:w-8 h-6 sm:h-8" />
                                         </div>
                                         <div>
-                                            <p className="mb-2 text-sm font-medium text-white/90">Vendas Aprovadas</p>
-                                            <p className="text-2xl font-bold drop-shadow-lg">
+                                            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-medium text-white/90">Vendas Aprovadas</p>
+                                            <p className="text-lg sm:text-2xl font-bold drop-shadow-lg">
                                                 {formatBRL(salesData?.approvedSalesTotal || 0)}
                                             </p>
                                             <p className="text-xs text-white/80 mt-1">✅ {salesData?.approvedSalesCount || 0} aprovadas</p>
@@ -428,15 +419,13 @@ export default function Dashboard() {
                                 </div>
                                 
                                 <div className="stat-card animate-fadeInUp">
-                                    <div className="p-6 flex items-center text-white relative z-10">
-                                        <div className="feature-icon p-4 rounded-full mr-6">
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
-                                            </svg>
+                                    <div className="p-4 sm:p-6 flex items-center text-white relative z-10">
+                                        <div className="feature-icon p-3 sm:p-4 rounded-full mr-4 sm:mr-6">
+                                            <Target className="w-6 sm:w-8 h-6 sm:h-8" />
                                         </div>
                                         <div>
-                                            <p className="mb-2 text-sm font-medium text-white/90">Meta do Mês</p>
-                                            <p className="text-2xl font-bold drop-shadow-lg">
+                                            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-medium text-white/90">Meta do Mês</p>
+                                            <p className="text-lg sm:text-2xl font-bold drop-shadow-lg">
                                                 {formatBRL(salesData?.monthlyGoal || 40000)}
                                             </p>
                                             <p className="text-xs text-white/80 mt-1">🎯 Objetivo</p>
@@ -445,14 +434,14 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             
-                            <div className="grid gap-8 mb-12 md:grid-cols-2">
+                            <div className="grid gap-6 sm:gap-8 mb-8 sm:mb-12 grid-cols-1 md:grid-cols-2">
                                 {/* Progress Section */}
-                                <div className="card-gradient p-8 relative z-10">
+                                <div className="card-gradient p-4 sm:p-6 lg:p-8 relative z-10">
                                     <div className="flex items-center mb-6">
                                         <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                                             <span className="text-2xl">🎯</span>
                                         </div>
-                                        <h4 className="text-2xl font-bold text-gray-800">Progresso da Meta</h4>
+                                        <h4 className="text-lg sm:text-2xl font-bold text-gray-800">Progresso da Meta</h4>
                                     </div>
                                     <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner mb-4">
                                         <div className="progress-bar h-4 rounded-full shadow-lg" style={{width: `${salesData?.progressPercentage || 0}%`}}></div>
@@ -480,12 +469,12 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Commission Insights */}
-                                <div className="card-gradient p-8 relative z-10">
+                                <div className="card-gradient p-4 sm:p-6 lg:p-8 relative z-10">
                                     <div className="flex items-center mb-6">
                                         <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                                             <span className="text-2xl">💎</span>
                                         </div>
-                                        <h4 className="text-2xl font-bold text-gray-800">Insights de Comissão</h4>
+                                        <h4 className="text-lg sm:text-2xl font-bold text-gray-800">Insights de Comissão</h4>
                                     </div>
                                     
                                     {/* Current Commission Rate */}
@@ -568,7 +557,7 @@ export default function Dashboard() {
                                 </div>
                                 
                                 {/* 7-Point Detailed Information System */}
-                                <div className="card-gradient p-8 relative z-10">
+                                <div className="card-gradient p-4 sm:p-6 lg:p-8 relative z-10">
                                     <div className="flex items-center mb-6">
                                         <div className="w-12 h-12 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                                             <span className="text-2xl">📊</span>
@@ -648,16 +637,14 @@ export default function Dashboard() {
                                             onClick={handleViewSales}
                                             className="w-full p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
                                         >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                            </svg>
+                                            <FileText className="w-5 h-5" />
                                             7. Ver Todas as Vendas
                                         </button>
                                     </div>
                                 </div>
                                 
                                 {/* Recent Sales */}
-                                <div className="card-gradient p-8 relative z-10">
+                                <div className="card-gradient p-4 sm:p-6 lg:p-8 relative z-10">
                                     <div className="flex items-center mb-6">
                                         <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-teal-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                                             <span className="text-2xl">📋</span>
@@ -789,7 +776,7 @@ export default function Dashboard() {
                             </div>
                             
                             {/* Call to Action */}
-                            <div className="stat-card p-8 mb-12 relative z-10">
+                            <div className="stat-card p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 relative z-10">
                                 <div className="flex items-center justify-between text-white">
                                     <div>
                                         <div className="flex items-center mb-3">
@@ -806,7 +793,7 @@ export default function Dashboard() {
                                                 'Acesse as ferramentas administrativas'}
                                         </p>
                                     </div>
-                                    <div className="flex space-x-4">
+                                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                                         {auth.user.role === 'vendedora' ? (
                                             <>
                                                 <a href="/sales/create" className="cta-buttons px-6 py-3 text-sm font-semibold text-white bg-white/20 border border-white/30 rounded-2xl transition-all duration-300 hover:scale-105">

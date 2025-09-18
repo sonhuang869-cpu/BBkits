@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatBRL } from '@/utils/currency';
 import toast from 'react-hot-toast';
+import { Package, Info, Truck, Play, Camera, Upload, X } from 'lucide-react';
 
 export default function OrdersIndex({ orders, statusFilter }) {
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -17,7 +18,21 @@ export default function OrdersIndex({ orders, statusFilter }) {
         invoice_number: ''
     });
 
-    const handleOrderClick = (order) => {
+    const handleOrderClick = (event, order) => {
+        // Don't open modal if user is selecting text
+        const selection = window.getSelection();
+        if (selection && selection.toString().length > 0) {
+            return;
+        }
+
+        // Don't open modal if user is clicking on buttons or interactive elements
+        if (event.target.tagName === 'BUTTON' ||
+            event.target.closest('button') ||
+            event.target.tagName === 'A' ||
+            event.target.closest('a')) {
+            return;
+        }
+
         setSelectedOrder(order);
         setModalType('view');
         setShowModal(true);
@@ -77,11 +92,18 @@ export default function OrdersIndex({ orders, statusFilter }) {
         });
     };
 
-    const handleGenerateShipping = () => {
-        post(`/production/orders/${selectedOrder.id}/generate-shipping`, {
+    const handleGenerateShipping = (order) => {
+        post(`/production/orders/${order.id}/generate-shipping`, {
             onSuccess: () => {
                 toast.success('Etiqueta de envio gerada!');
-                setShowModal(false);
+                // Don't close modal since this is direct button action, not modal action
+            },
+            onError: (errors) => {
+                if (errors.error) {
+                    toast.error(errors.error);
+                } else {
+                    toast.error('Erro ao gerar etiqueta de envio.');
+                }
             }
         });
     };
@@ -117,7 +139,7 @@ export default function OrdersIndex({ orders, statusFilter }) {
         };
 
         return (
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${badges[status]}`}>
+            <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${badges[status]}`}>
                 {labels[status]}
             </span>
         );
@@ -194,10 +216,10 @@ export default function OrdersIndex({ orders, statusFilter }) {
     };
 
     const statusCounts = {
-        payment_approved: orders.filter(o => o.order_status === 'payment_approved').length,
-        in_production: orders.filter(o => o.order_status === 'in_production').length,
-        photo_sent: orders.filter(o => o.order_status === 'photo_sent').length,
-        ready_for_shipping: orders.filter(o => o.order_status === 'ready_for_shipping').length
+        payment_approved: orders.data?.filter(o => o.order_status === 'payment_approved').length || 0,
+        in_production: orders.data?.filter(o => o.order_status === 'in_production').length || 0,
+        photo_sent: orders.data?.filter(o => o.order_status === 'photo_sent').length || 0,
+        ready_for_shipping: orders.data?.filter(o => o.order_status === 'ready_for_shipping').length || 0
     };
 
     return (
@@ -216,25 +238,25 @@ export default function OrdersIndex({ orders, statusFilter }) {
                     </div>
                 }
             >
-                <div className="py-12 bg-gray-50 min-h-screen">
+                <div className="py-6 sm:py-8 lg:py-12 bg-gray-50 min-h-screen">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         {/* Filter Tabs */}
-                        <div className="bg-white rounded-lg shadow-md mb-6">
+                        <div className="bg-white rounded-lg shadow-md mb-4 sm:mb-6">
                             <div className="border-b border-gray-200">
-                                <nav className="-mb-px flex space-x-8 px-6">
+                                <nav className="-mb-px flex flex-wrap gap-2 sm:gap-4 lg:gap-8 px-4 sm:px-6">
                                     <Link
                                         href="/production/orders"
-                                        className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                                        className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm ${
                                             !statusFilter || statusFilter === 'all' 
                                                 ? 'border-blue-500 text-blue-600' 
                                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                         }`}
                                     >
-                                        Todos ({orders.length})
+                                        Todos ({orders.total || 0})
                                     </Link>
                                     <Link
                                         href="/production/orders?status=payment_approved"
-                                        className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                                        className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm ${
                                             statusFilter === 'payment_approved'
                                                 ? 'border-green-500 text-green-600' 
                                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -244,7 +266,7 @@ export default function OrdersIndex({ orders, statusFilter }) {
                                     </Link>
                                     <Link
                                         href="/production/orders?status=in_production"
-                                        className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                                        className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm ${
                                             statusFilter === 'in_production'
                                                 ? 'border-blue-500 text-blue-600' 
                                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -254,7 +276,7 @@ export default function OrdersIndex({ orders, statusFilter }) {
                                     </Link>
                                     <Link
                                         href="/production/orders?status=ready_for_shipping"
-                                        className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                                        className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm ${
                                             statusFilter === 'ready_for_shipping'
                                                 ? 'border-teal-500 text-teal-600' 
                                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -267,16 +289,16 @@ export default function OrdersIndex({ orders, statusFilter }) {
                         </div>
 
                         {/* Orders Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {orders.map((order) => (
-                                <div 
-                                    key={order.id} 
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                            {orders.data?.map((order) => (
+                                <div
+                                    key={order.id}
                                     className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-                                    onClick={() => handleOrderClick(order)}
+                                    onClick={(event) => handleOrderClick(event, order)}
                                 >
-                                    <div className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-lg font-semibold text-gray-900">
+                                    <div className="p-4 sm:p-6">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
                                                 {order.client_name}
                                             </h3>
                                             {getStatusBadge(order.order_status)}
@@ -345,12 +367,38 @@ export default function OrdersIndex({ orders, statusFilter }) {
                             ))}
                         </div>
 
-                        {orders.length === 0 && (
-                            <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                        {/* Pagination */}
+                        {orders.links && orders.links.length > 3 && (
+                            <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 rounded-b-lg">
+                                <div className="flex justify-between items-center">
+                                    <div className="text-sm text-gray-700">
+                                        Mostrando {orders.from || 0} a {orders.to || 0} de {orders.total} pedidos
+                                    </div>
+                                    <div className="flex space-x-1">
+                                        {orders.links.map((link, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => link.url && router.get(link.url)}
+                                                disabled={!link.url}
+                                                className={`px-3 py-2 text-sm font-medium rounded ${
+                                                    link.active
+                                                        ? 'bg-indigo-600 text-white'
+                                                        : link.url
+                                                        ? 'bg-white text-gray-700 hover:bg-gray-50 border'
+                                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                }`}
+                                                dangerouslySetInnerHTML={{ __html: link.label }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {(!orders.data || orders.data.length === 0) && (
+                            <div className="bg-white rounded-lg shadow-md p-6 sm:p-12 text-center">
                                 <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 7.172V5L8 4z" />
-                                    </svg>
+                                    <Package className="w-12 h-12 text-gray-400" />
                                 </div>
                                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                                     Nenhum pedido na produção
@@ -376,9 +424,7 @@ export default function OrdersIndex({ orders, statusFilter }) {
                                     onClick={() => setShowModal(false)}
                                     className="p-2 hover:bg-gray-100 rounded-lg"
                                 >
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <X className="w-6 h-6" />
                                 </button>
                             </div>
 
@@ -562,9 +608,7 @@ export default function OrdersIndex({ orders, statusFilter }) {
                                     onClick={() => setShowModal(false)}
                                     className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                                 >
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <X className="w-6 h-6" />
                                 </button>
                             </div>
 

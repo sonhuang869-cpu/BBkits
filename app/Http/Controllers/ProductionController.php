@@ -52,8 +52,8 @@ class ProductionController extends Controller
                 break;
         }
         
-        $orders = $query->latest()->get();
-        
+        $orders = $query->latest()->paginate(15)->withQueryString();
+
         return Inertia::render('Production/OrdersIndex', [
             'orders' => $orders,
             'statusFilter' => $statusFilter

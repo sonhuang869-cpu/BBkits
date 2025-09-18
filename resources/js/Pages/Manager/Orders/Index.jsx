@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatBRL } from '@/utils/currency';
 import toast from 'react-hot-toast';
+import { Info } from 'lucide-react';
 
 export default function ManagerOrdersIndex({ auth, orders, filters, statusOptions }) {
     const [search, setSearch] = useState(filters.search || '');
@@ -100,15 +101,13 @@ export default function ManagerOrdersIndex({ auth, orders, filters, statusOption
                     </div>
                 }
             >
-                <div className="py-8">
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="py-6 sm:py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         {/* Payment Status Information */}
                         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-6 border border-blue-200">
                             <div className="flex items-start">
                                 <div className="flex-shrink-0">
-                                    <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
+                                    <Info className="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div className="ml-3">
                                     <h3 className="text-sm font-medium text-blue-800">
@@ -139,21 +138,21 @@ export default function ManagerOrdersIndex({ auth, orders, filters, statusOption
                         </div>
 
                         {/* Filters */}
-                        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
                             <div className="flex flex-col md:flex-row gap-4">
                                 {/* Search */}
                                 <form onSubmit={handleSearch} className="flex-1">
-                                    <div className="flex">
+                                    <div className="flex flex-col sm:flex-row">
                                         <input
                                             type="text"
                                             value={search}
                                             onChange={(e) => setSearch(e.target.value)}
                                             placeholder="Buscar por cliente, criança ou token..."
-                                            className="flex-1 rounded-l-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                                            className="flex-1 rounded-lg sm:rounded-l-lg sm:rounded-r-none border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 mb-2 sm:mb-0"
                                         />
                                         <button
                                             type="submit"
-                                            className="px-4 py-2 bg-indigo-600 text-white rounded-r-lg hover:bg-indigo-700 transition-colors"
+                                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg sm:rounded-l-none sm:rounded-r-lg hover:bg-indigo-700 transition-colors"
                                         >
                                             🔍
                                         </button>
@@ -164,7 +163,7 @@ export default function ManagerOrdersIndex({ auth, orders, filters, statusOption
                                 <select
                                     value={selectedStatus}
                                     onChange={(e) => handleStatusFilter(e.target.value)}
-                                    className="rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 w-full sm:w-auto"
                                 >
                                     {Object.entries(statusOptions).map(([key, label]) => (
                                         <option key={key} value={key}>{label}</option>
@@ -175,8 +174,8 @@ export default function ManagerOrdersIndex({ auth, orders, filters, statusOption
 
                         {/* Orders List */}
                         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200">
-                                <h3 className="text-lg font-medium text-gray-900">
+                            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+                                <h3 className="text-base sm:text-lg font-medium text-gray-900">
                                     Pedidos ({orders.data.length} de {orders.total})
                                 </h3>
                             </div>
@@ -186,22 +185,22 @@ export default function ManagerOrdersIndex({ auth, orders, filters, statusOption
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead className="bg-gray-50">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Pedido
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Cliente
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Status
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Valor / Status Pagamento
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Data
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Ações
                                                 </th>
                                             </tr>
@@ -209,7 +208,7 @@ export default function ManagerOrdersIndex({ auth, orders, filters, statusOption
                                         <tbody className="bg-white divide-y divide-gray-200">
                                             {orders.data.map((order) => (
                                                 <tr key={order.id} className="hover:bg-gray-50">
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
                                                             <div>
                                                                 <div className="text-sm font-medium text-gray-900">
@@ -221,16 +220,16 @@ export default function ManagerOrdersIndex({ auth, orders, filters, statusOption
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">{order.client_name}</div>
                                                         <div className="text-sm text-gray-500">{order.client_email}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(order.order_status)}`}>
                                                             {getStatusIcon(order.order_status)} {statusOptions[order.order_status]}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">
                                                             {formatBRL(parseFloat(order.total_amount) + parseFloat(order.shipping_amount || 0))}
                                                         </div>

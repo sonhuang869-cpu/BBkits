@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { formatBRL, formatBRLNumber, formatBrazilianCurrencyInput, parseBrazilianCurrency, formatAdditionalCost } from '@/utils/currency';
+import { Check, Loader2, Plus, Minus, ShoppingCart, Palette, Type, MapPin, Package, CreditCard, Trash2 } from 'lucide-react';
 
 export default function CreateExpanded() {
     const { data, setData, post, processing, errors } = useForm({
@@ -365,17 +366,17 @@ export default function CreateExpanded() {
                     </div>
                 }
             >
-                <div className="py-12 bg-gray-50 min-h-screen">
-                    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+                <div className="py-4 sm:py-8 lg:py-12 bg-gray-50 min-h-screen">
+                    <div className="mx-auto max-w-5xl px-2 sm:px-4 md:px-6 lg:px-8">
                         <form onSubmit={submit} className="space-y-6">
                             {/* Cliente Section */}
-                            <div className="bg-white rounded-xl shadow-md p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
                                     <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">👤</span>
                                     Dados da Cliente
                                 </h3>
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Nome Completo *</label>
                                         <input
@@ -383,7 +384,7 @@ export default function CreateExpanded() {
                                             name="client_name"
                                             value={data.client_name}
                                             onChange={e => setData('client_name', e.target.value)}
-                                            className="w-full rounded-lg focus:ring-purple-500 border-gray-300 focus:border-purple-500"
+                                            className="w-full rounded-lg focus:ring-purple-500 border-gray-300 focus:border-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Maria Silva"
                                             required
                                         />
@@ -396,7 +397,7 @@ export default function CreateExpanded() {
                                             name="client_email"
                                             value={data.client_email}
                                             onChange={e => setData('client_email', e.target.value)}
-                                            className="w-full rounded-lg focus:ring-purple-500 border-gray-300 focus:border-purple-500"
+                                            className="w-full rounded-lg focus:ring-purple-500 border-gray-300 focus:border-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="maria@email.com"
                                             required
                                         />
@@ -408,7 +409,7 @@ export default function CreateExpanded() {
                                             type="tel"
                                             value={data.client_phone}
                                             onChange={e => setData('client_phone', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="(11) 98765-4321"
                                             required
                                         />
@@ -418,8 +419,8 @@ export default function CreateExpanded() {
                             </div>
 
                             {/* Product Selection Section */}
-                            <div className="bg-white rounded-xl shadow-md p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
                                     <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">🛍️</span>
                                     Seleção de Produto
                                 </h3>
@@ -432,9 +433,7 @@ export default function CreateExpanded() {
                                 ) : availableProducts.length === 0 ? (
                                     <div className="text-center py-8">
                                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7h16" />
-                                            </svg>
+                                            <Package className="w-8 h-8 text-gray-400" />
                                         </div>
                                         <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum produto encontrado</h3>
                                         <p className="text-gray-500 mb-4">
@@ -455,9 +454,7 @@ export default function CreateExpanded() {
                                             >
                                                 {currentProduct.product_id == product.id && (
                                                     <div className="absolute top-2 right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                                                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                        </svg>
+                                                        <Check className="w-4 h-4 text-white" />
                                                     </div>
                                                 )}
                                                 
@@ -628,18 +625,14 @@ export default function CreateExpanded() {
                                                                                             />
                                                                                         ) : (
                                                                                             <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                                                                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                                                                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                                                                                                </svg>
+                                                                                                <Palette className="w-8 h-8" />
                                                                                             </div>
                                                                                         )}
                                                                                     </div>
                                                                                     
                                                                                     {currentProduct.embroidery_design == design.id && (
                                                                                         <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                                                                                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                                                            </svg>
+                                                                                            <Check className="w-4 h-4 text-white" />
                                                                                         </div>
                                                                                     )}
                                                                                     
@@ -762,9 +755,7 @@ export default function CreateExpanded() {
                                                 disabled={!currentProduct.product_id || !currentProduct.embroidery_design || !data.child_name?.trim()}
                                                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                             >
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                </svg>
+                                                <ShoppingCart className="w-4 h-4" />
                                                 Adicionar ao Carrinho
                                             </button>
                                         </div>
@@ -773,8 +764,8 @@ export default function CreateExpanded() {
                             </div>
 
                             {/* Baby's Name Section */}
-                            <div className="bg-white rounded-xl shadow-md p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
                                     <span className="w-8 h-8 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center">👶</span>
                                     Dados da Criança
                                 </h3>
@@ -805,7 +796,7 @@ export default function CreateExpanded() {
                                                     })));
                                                 }
                                             }}
-                                            className="w-full rounded-lg focus:ring-purple-500 border-gray-300 focus:border-purple-500"
+                                            className="w-full rounded-lg focus:ring-purple-500 border-gray-300 focus:border-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Helena"
                                             required
                                         />
@@ -818,8 +809,8 @@ export default function CreateExpanded() {
 
                             {/* Order Details Section - Only show when products are selected */}
                             {data.products && data.products.length > 0 && (
-                                <div className="bg-white rounded-xl shadow-md p-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                                <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
                                         <span className="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">📋</span>
                                         Resumo do Pedido
                                     </h3>
@@ -852,9 +843,7 @@ export default function CreateExpanded() {
                                                                         />
                                                                     ) : (
                                                                         <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                                                                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                                                                            </svg>
+                                                                            <Palette className="w-6 h-6" />
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -895,9 +884,7 @@ export default function CreateExpanded() {
                                                                     className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
                                                                     title="Remover item"
                                                                 >
-                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                    </svg>
+                                                                    <Trash2 className="w-4 h-4" />
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -948,13 +935,13 @@ export default function CreateExpanded() {
                             )}
 
                             {/* Product Specifications Section */}
-                            <div className="bg-white rounded-xl shadow-md p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
                                     <span className="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center">🎨</span>
                                     Especificações do Kit
                                 </h3>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Mesa Livre (Detalhes) *
@@ -962,7 +949,7 @@ export default function CreateExpanded() {
                                         <textarea
                                             value={data.mesa_livre_details}
                                             onChange={e => setData('mesa_livre_details', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Descreva os detalhes da mesa livre/trabalho personalizado..."
                                             rows="3"
                                             required
@@ -977,7 +964,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.chaveiros}
                                             onChange={e => setData('chaveiros', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Ex: 2 chaveiros personalizados"
                                             required
                                         />
@@ -991,7 +978,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.kit_main_color}
                                             onChange={e => setData('kit_main_color', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Ex: Rosa, Azul, Amarelo..."
                                             required
                                         />
@@ -1005,7 +992,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.alcas}
                                             onChange={e => setData('alcas', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Ex: Alças em tecido rosa"
                                             required
                                         />
@@ -1019,7 +1006,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.faixa}
                                             onChange={e => setData('faixa', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Ex: Faixa decorativa floral"
                                             required
                                         />
@@ -1033,7 +1020,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.friso}
                                             onChange={e => setData('friso', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Ex: Friso em tecido coordenado"
                                             required
                                         />
@@ -1047,7 +1034,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.vies}
                                             onChange={e => setData('vies', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Ex: Viés em cor contrastante"
                                             required
                                         />
@@ -1061,7 +1048,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.ziper}
                                             onChange={e => setData('ziper', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Ex: Zíper invisível rosa"
                                             required
                                         />
@@ -1075,7 +1062,7 @@ export default function CreateExpanded() {
                                             type="date"
                                             value={data.production_estimate}
                                             onChange={e => setData('production_estimate', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             min={new Date(Date.now() + 86400000).toISOString().split('T')[0]} // Tomorrow
                                             required
                                         />
@@ -1089,7 +1076,7 @@ export default function CreateExpanded() {
                                             type="date"
                                             value={data.delivery_estimate}
                                             onChange={e => setData('delivery_estimate', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             min={data.production_estimate || new Date(Date.now() + 172800000).toISOString().split('T')[0]} // After production or day after tomorrow
                                             required
                                         />
@@ -1110,10 +1097,10 @@ export default function CreateExpanded() {
                             </div>
 
                             {/* Payment Section */}
-                            <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-6">💰 Informações de Pagamento</h3>
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Valor do Frete *</label>
                                         <input
@@ -1124,7 +1111,7 @@ export default function CreateExpanded() {
                                                 const parsed = parseBrazilianCurrencyValue(formatted);
                                                 setData('shipping_amount', parsed);
                                             }}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="25,00"
                                             required
                                         />
@@ -1135,7 +1122,7 @@ export default function CreateExpanded() {
                                         <select
                                             value={data.payment_method}
                                             onChange={e => setData('payment_method', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             required
                                         >
                                             {Object.entries(paymentMethods).map(([value, label]) => (
@@ -1154,7 +1141,7 @@ export default function CreateExpanded() {
                                                 const parsed = parseBrazilianCurrencyValue(formatted);
                                                 setData('received_amount', parsed);
                                             }}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="150,00"
                                             required
                                         />
@@ -1166,7 +1153,7 @@ export default function CreateExpanded() {
                                             type="date"
                                             value={data.payment_date}
                                             onChange={e => setData('payment_date', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             required
                                         />
                                     </div>
@@ -1223,14 +1210,14 @@ export default function CreateExpanded() {
                             </div>
 
                             {/* Delivery Address Section */}
-                            <div className="bg-white rounded-xl shadow-md p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
                                     <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">📦</span>
                                     Endereço de Entrega
                                     <span className="text-sm font-normal text-gray-500">(Opcional - Cliente pode preencher depois)</span>
                                 </h3>
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Endereço
@@ -1239,7 +1226,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.delivery_address}
                                             onChange={e => setData('delivery_address', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Rua das Flores"
                                         />
                                     </div>
@@ -1252,7 +1239,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.delivery_number}
                                             onChange={e => setData('delivery_number', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="123"
                                         />
                                     </div>
@@ -1265,7 +1252,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.delivery_complement}
                                             onChange={e => setData('delivery_complement', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Apto 12B"
                                         />
                                     </div>
@@ -1278,7 +1265,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.delivery_neighborhood}
                                             onChange={e => setData('delivery_neighborhood', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="Jardim Primavera"
                                         />
                                     </div>
@@ -1291,7 +1278,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.delivery_city}
                                             onChange={e => setData('delivery_city', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="São Paulo"
                                         />
                                     </div>
@@ -1303,7 +1290,7 @@ export default function CreateExpanded() {
                                         <select
                                             value={data.delivery_state}
                                             onChange={e => setData('delivery_state', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                         >
                                             <option value="">Selecione...</option>
                                             <option value="AC">Acre (AC)</option>
@@ -1344,7 +1331,7 @@ export default function CreateExpanded() {
                                             type="text"
                                             value={data.delivery_zipcode}
                                             onChange={e => setData('delivery_zipcode', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="01234-567"
                                         />
                                     </div>
@@ -1357,7 +1344,7 @@ export default function CreateExpanded() {
                                             type="date"
                                             value={data.estimated_delivery_date}
                                             onChange={e => setData('estimated_delivery_date', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                         />
                                     </div>
 
@@ -1369,7 +1356,7 @@ export default function CreateExpanded() {
                                             type="number"
                                             value={data.delivery_days}
                                             onChange={e => setData('delivery_days', e.target.value)}
-                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                                            className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base py-2 sm:py-3"
                                             placeholder="7"
                                             min="1"
                                         />
@@ -1392,31 +1379,26 @@ export default function CreateExpanded() {
 
 
                             {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-4 justify-end">
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
                                 <a
                                     href="/sales"
-                                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-center"
+                                    className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-center text-sm sm:text-base"
                                 >
                                     Cancelar
                                 </a>
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
                                 >
                                     {processing ? (
                                         <>
-                                            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
+                                            <Loader2 className="animate-spin h-5 w-5" />
                                             Processando...
                                         </>
                                     ) : (
                                         <>
-                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                            </svg>
+                                            <Check className="w-5 h-5" />
                                             Registrar Pedido
                                         </>
                                     )}

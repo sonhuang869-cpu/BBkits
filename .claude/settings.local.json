@@ -23,7 +23,11 @@
       "WebFetch(domain:127.0.0.1)",
       "Bash(sqlite3:*)",
       "Read(//tmp/**)",
-      "Bash(composer:*)"
+      "Bash(composer:*)",
+      "Bash(tree:*)",
+      "Bash(awk:*)",
+      "Bash(for dir in /home/admin/Documents/Project/BBkits/resources/js/Pages/*/)",
+      "Bash(done)"
     ],
     "deny": [],
     "additionalDirectories": [

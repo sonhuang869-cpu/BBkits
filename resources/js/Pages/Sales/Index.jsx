@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SaleCancellationModal from '@/Components/SaleCancellationModal';
@@ -10,7 +10,7 @@ import { formatBRL } from '@/utils/currency';
 export default function Index({ sales, auth }) {
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [saleToCancel, setSaleToCancel] = useState(null);
-    const { post, processing } = useForm({});
+    const [processing, setProcessing] = useState(false);
 
     const handleCancelClick = (sale) => {
         setSaleToCancel(sale);
@@ -26,7 +26,9 @@ export default function Index({ sales, auth }) {
                 explanationLength: explanation ? explanation.length : 0
             });
 
-            post(`/sales/${saleToCancel.id}/cancel`, {
+            setProcessing(true);
+
+            router.post(`/sales/${saleToCancel.id}/cancel`, {
                 admin_password: password,
                 explanation: explanation
             }, {
@@ -34,6 +36,7 @@ export default function Index({ sales, auth }) {
                     toast.success('Venda cancelada com sucesso!');
                     setShowCancelModal(false);
                     setSaleToCancel(null);
+                    setProcessing(false);
                 },
                 onError: (errors) => {
                     console.error('Cancel request failed:', errors);
@@ -49,6 +52,10 @@ export default function Index({ sales, auth }) {
                     } else {
                         toast.error('Erro ao cancelar a venda.');
                     }
+                    setProcessing(false);
+                },
+                onFinish: () => {
+                    setProcessing(false);
                 }
             });
         }
