@@ -61,22 +61,15 @@ class FinanceController extends Controller
                 // Validate minimum payment requirement (50% rule)
                 $totalOrderAmount = $sale->total_amount + ($sale->shipping_amount ?? 0);
                 $minimumRequired = $totalOrderAmount * 0.5; // 50% minimum
+                $receivedAmount = (float) ($sale->received_amount ?? 0);
 
-                // Check both existing approved payments + pending payments being approved
-                $existingApprovedAmount = $sale->approvedPayments()->sum('amount');
-                $pendingPaymentsAmount = $sale->pendingPayments()->sum('amount');
-                $receivedAmountFallback = (float) ($sale->received_amount ?? 0);
-
-                // Use the higher of pending payments or received_amount (for legacy orders)
-                $totalPaymentAmount = $existingApprovedAmount + max($pendingPaymentsAmount, $receivedAmountFallback);
-
-                if ($totalPaymentAmount < $minimumRequired) {
+                if ($receivedAmount < $minimumRequired) {
                     DB::rollBack();
                     return back()->withErrors([
                         'error' => sprintf(
                             'Pagamento insuficiente para aprovação. Mínimo de 50%% necessário: %s (Enviado: %s)',
                             'R$ ' . number_format($minimumRequired, 2, ',', '.'),
-                            'R$ ' . number_format($totalPaymentAmount, 2, ',', '.')
+                            'R$ ' . number_format($receivedAmount, 2, ',', '.')
                         )
                     ]);
                 }

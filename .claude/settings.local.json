@@ -27,7 +27,8 @@
       "Bash(tree:*)",
       "Bash(awk:*)",
       "Bash(for dir in /home/admin/Documents/Project/BBkits/resources/js/Pages/*/)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(truncate:*)"
     ],
     "deny": [],
     "additionalDirectories": [
