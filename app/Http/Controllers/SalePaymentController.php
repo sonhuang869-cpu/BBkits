@@ -15,9 +15,17 @@ class SalePaymentController extends Controller
         $payments = $sale->payments()->with('approvedBy')->orderBy('payment_date', 'desc')->get();
 
         // Calculate payment summary using ONLY payment records (not legacy received_amount)
-        $totalWithShipping = $sale->total_amount + $sale->shipping_amount;
-        $approvedPaidAmount = $sale->approvedPayments()->sum('amount');
-        $pendingAmount = $sale->pendingPayments()->sum('amount');
+        $totalWithShipping = (float) $sale->total_amount + (float) $sale->shipping_amount;
+
+        // Use direct database queries to avoid any caching issues
+        $approvedPaidAmount = (float) \App\Models\SalePayment::where('sale_id', $sale->id)
+            ->where('status', 'approved')
+            ->sum('amount');
+
+        $pendingAmount = (float) \App\Models\SalePayment::where('sale_id', $sale->id)
+            ->where('status', 'pending')
+            ->sum('amount');
+
         $remainingAmount = max(0, $totalWithShipping - $approvedPaidAmount);
 
         // Debug logging to compare with client page

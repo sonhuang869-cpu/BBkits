@@ -988,9 +988,9 @@ class SaleController extends Controller
 
         $remainingAmount = max(0, $totalWithShipping - $approvedPaidAmount);
 
-        // Debug logging for token BBKNFQQ1DH
-        if ($token === 'BBKNFQQ1DH') {
-            \Log::info('CLIENT PAGE DEBUG for BBKNFQQ1DH', [
+        // Debug logging for specific tokens
+        if (in_array($token, ['BBKNFQQ1DH', 'BBHATSAMMM'])) {
+            \Log::info('CLIENT PAGE DEBUG for ' . $token, [
                 'sale_id' => $sale->id,
                 'total_amount' => $sale->total_amount,
                 'shipping_amount' => $sale->shipping_amount,
@@ -1009,6 +1009,13 @@ class SaleController extends Controller
                         'payment_date' => $p->payment_date
                     ];
                 })
+            ]);
+
+            \Log::info('PROPS PASSED TO CLIENT PAGE for ' . $token, [
+                'paidAmount' => $approvedPaidAmount,
+                'remainingAmount' => $remainingAmount,
+                'pendingAmount' => $pendingAmount,
+                'totalAmount' => $totalWithShipping,
             ]);
         }
 
@@ -1131,14 +1138,6 @@ class SaleController extends Controller
             $this->notificationService->notifyPhotoRejected($sale, $validated['reason']);
         }
         
-        // Check if this is an Inertia.js request (AJAX)
-        if ($request->wantsJson() || $request->header('X-Inertia')) {
-            return response()->json([
-                'message' => $validated['approved'] ? 'Foto aprovada!' : 'Solicitação de ajuste enviada',
-                'status' => 'success'
-            ]);
-        }
-
         return back()->with('message', $validated['approved'] ? 'Foto aprovada!' : 'Solicitação de ajuste enviada');
     }
 }
