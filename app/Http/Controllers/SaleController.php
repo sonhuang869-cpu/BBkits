@@ -1049,8 +1049,13 @@ class SaleController extends Controller
                 'photo_approved_at' => now(),
                 'order_status' => $sale->needsFinalPayment() ? 'pending_final_payment' : 'ready_for_shipping'
             ]);
-            
+
             $this->notificationService->notifyPhotoApproved($sale);
+
+            // If final payment is needed, send final payment request notification
+            if ($sale->needsFinalPayment()) {
+                $this->notificationService->notifyFinalPaymentReminder($sale);
+            }
         } else {
             $sale->update([
                 'photo_rejected_at' => now(),

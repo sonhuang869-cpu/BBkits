@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatBRL } from '@/utils/currency';
@@ -10,6 +10,7 @@ export default function OrdersIndex({ orders, statusFilter }) {
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('view'); // 'view', 'photo', 'shipping'
     const [photoPreview, setPhotoPreview] = useState(null);
+    const [currentOrders, setCurrentOrders] = useState(orders.data || []);
     
     const { data, setData, post, processing, errors, reset } = useForm({
         product_photo: null,
@@ -17,6 +18,20 @@ export default function OrdersIndex({ orders, statusFilter }) {
         tracking_code: '',
         invoice_number: ''
     });
+
+    // Update currentOrders when orders prop changes
+    useEffect(() => {
+        setCurrentOrders(orders.data || []);
+    }, [orders.data]);
+
+    // Function to update order status locally for immediate UI feedback
+    const updateOrderStatus = (orderId, newStatus) => {
+        setCurrentOrders(prevOrders =>
+            prevOrders.map(order =>
+                order.id === orderId ? { ...order, order_status: newStatus } : order
+            )
+        );
+    };
 
     const handleOrderClick = (event, order) => {
         // Don't open modal if user is selecting text
@@ -50,6 +65,8 @@ export default function OrdersIndex({ orders, statusFilter }) {
             onSuccess: () => {
                 toast.success('Produção iniciada com sucesso!');
                 setShowModal(false);
+                // Update order status locally for immediate UI feedback
+                updateOrderStatus(order.id, 'in_production');
                 // Redirect to in_production tab to show the order's new location
                 router.get('/production/orders?status=in_production');
             },
@@ -88,6 +105,8 @@ export default function OrdersIndex({ orders, statusFilter }) {
             onSuccess: () => {
                 toast.success('Foto enviada para aprovação!');
                 setShowModal(false);
+                // Update order status locally for immediate UI feedback
+                updateOrderStatus(selectedOrder.id, 'photo_sent');
                 // Redirect to photo_sent tab to show the order's new location
                 router.get('/production/orders?status=photo_sent');
             }
@@ -98,6 +117,8 @@ export default function OrdersIndex({ orders, statusFilter }) {
         post(`/production/orders/${order.id}/generate-shipping`, {
             onSuccess: () => {
                 toast.success('Etiqueta de envio gerada!');
+                // Update order status locally for immediate UI feedback
+                updateOrderStatus(order.id, 'shipped');
                 // Redirect to show all orders or shipped orders depending on implementation
                 router.get('/production/orders');
             },
@@ -241,12 +262,12 @@ export default function OrdersIndex({ orders, statusFilter }) {
     };
 
     const statusCounts = {
-        payment_approved: orders.data?.filter(o => o.order_status === 'payment_approved').length || 0,
-        in_production: orders.data?.filter(o => o.order_status === 'in_production').length || 0,
-        photo_sent: orders.data?.filter(o => o.order_status === 'photo_sent').length || 0,
-        photo_approved: orders.data?.filter(o => o.order_status === 'photo_approved').length || 0,
-        pending_final_payment: orders.data?.filter(o => o.order_status === 'pending_final_payment').length || 0,
-        ready_for_shipping: orders.data?.filter(o => o.order_status === 'ready_for_shipping').length || 0
+        payment_approved: currentOrders.filter(o => o.order_status === 'payment_approved').length || 0,
+        in_production: currentOrders.filter(o => o.order_status === 'in_production').length || 0,
+        photo_sent: currentOrders.filter(o => o.order_status === 'photo_sent').length || 0,
+        photo_approved: currentOrders.filter(o => o.order_status === 'photo_approved').length || 0,
+        pending_final_payment: currentOrders.filter(o => o.order_status === 'pending_final_payment').length || 0,
+        ready_for_shipping: currentOrders.filter(o => o.order_status === 'ready_for_shipping').length || 0
     };
 
     return (

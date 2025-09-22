@@ -152,6 +152,28 @@ class NotificationService
                 ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
             );
 
+            // Notify all production admins
+            $productionAdmins = User::whereIn('role', ['admin', 'production', 'production_admin'])->get();
+            foreach ($productionAdmins as $admin) {
+                $this->createNotification(
+                    $admin->id,
+                    'production_started',
+                    "Produção iniciada para pedido #{$sale->unique_token} por " . auth()->user()->name . " 🏭",
+                    ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
+                );
+            }
+
+            // Notify finance admins
+            $financeAdmins = User::whereIn('role', ['admin', 'financeiro', 'finance_admin'])->get();
+            foreach ($financeAdmins as $admin) {
+                $this->createNotification(
+                    $admin->id,
+                    'production_started',
+                    "Produção iniciada para pedido #{$sale->unique_token} - Acompanhar progresso 📊",
+                    ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
+                );
+            }
+
             // Send WhatsApp notification to client
             $whatsAppService = app(WhatsAppService::class);
             $whatsAppResult = $whatsAppService->sendProductionStarted($sale);
@@ -187,6 +209,28 @@ class NotificationService
                 "Foto do pedido #{$sale->unique_token} enviada para aprovação! 📸",
                 ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
             );
+
+            // Notify all production admins
+            $productionAdmins = User::whereIn('role', ['admin', 'production', 'production_admin'])->get();
+            foreach ($productionAdmins as $admin) {
+                $this->createNotification(
+                    $admin->id,
+                    'photo_sent',
+                    "Foto enviada para aprovação - Pedido #{$sale->unique_token} aguardando retorno do cliente 📸",
+                    ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
+                );
+            }
+
+            // Notify finance admins about progress
+            $financeAdmins = User::whereIn('role', ['admin', 'financeiro', 'finance_admin'])->get();
+            foreach ($financeAdmins as $admin) {
+                $this->createNotification(
+                    $admin->id,
+                    'photo_sent',
+                    "Pedido #{$sale->unique_token} - Foto enviada, aguardando aprovação do cliente 📊",
+                    ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
+                );
+            }
 
             // Send WhatsApp photo approval request to client
             $whatsAppService = app(WhatsAppService::class);
@@ -240,6 +284,36 @@ class NotificationService
                     'tracking_code' => $sale->tracking_code
                 ]
             );
+
+            // Notify all production admins about successful shipment
+            $productionAdmins = User::whereIn('role', ['admin', 'production', 'production_admin'])->get();
+            foreach ($productionAdmins as $admin) {
+                $this->createNotification(
+                    $admin->id,
+                    'order_shipped',
+                    "📦 Pedido #{$sale->unique_token} enviado com sucesso! Código: {$sale->tracking_code}",
+                    [
+                        'sale_id' => $sale->id,
+                        'order_token' => $sale->unique_token,
+                        'tracking_code' => $sale->tracking_code
+                    ]
+                );
+            }
+
+            // Notify finance admins about completion
+            $financeAdmins = User::whereIn('role', ['admin', 'financeiro', 'finance_admin'])->get();
+            foreach ($financeAdmins as $admin) {
+                $this->createNotification(
+                    $admin->id,
+                    'order_shipped',
+                    "✅ Pedido #{$sale->unique_token} finalizado e enviado - Rastreamento: {$sale->tracking_code}",
+                    [
+                        'sale_id' => $sale->id,
+                        'order_token' => $sale->unique_token,
+                        'tracking_code' => $sale->tracking_code
+                    ]
+                );
+            }
 
             // Send WhatsApp shipping notification to client
             $whatsAppService = app(WhatsAppService::class);
@@ -417,6 +491,61 @@ class NotificationService
     }
 
     /**
+     * Notify when final payment is approved and order is ready for shipping
+     */
+    public function notifyFinalPaymentApproved(Sale $sale)
+    {
+        try {
+            // Send internal notification to seller
+            $this->createNotification(
+                $sale->user_id,
+                'final_payment_approved',
+                "Pagamento final aprovado! Pedido #{$sale->unique_token} pronto para envio 🚢",
+                [
+                    'sale_id' => $sale->id,
+                    'order_token' => $sale->unique_token
+                ]
+            );
+
+            // Notify production admins that order is ready for shipping
+            $productionAdmins = User::whereIn('role', ['admin', 'production', 'production_admin'])->get();
+            foreach ($productionAdmins as $admin) {
+                $this->createNotification(
+                    $admin->id,
+                    'final_payment_approved',
+                    "Pedido #{$sale->unique_token} - Pagamento final aprovado, pronto para envio! 📦",
+                    ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
+                );
+            }
+
+            // Send WhatsApp notification to client
+            $whatsAppService = app(WhatsAppService::class);
+            $whatsAppResult = $whatsAppService->sendFinalPaymentApproved($sale);
+
+            if (!$whatsAppResult['success']) {
+                Log::warning('WhatsApp final payment approved notification failed', [
+                    'sale_id' => $sale->id,
+                    'error' => $whatsAppResult['message']
+                ]);
+            }
+
+            Log::info('Final payment approved notifications sent', [
+                'sale_id' => $sale->id
+            ]);
+
+            return ['success' => true, 'whatsapp' => $whatsAppResult];
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send final payment approved notifications', [
+                'sale_id' => $sale->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
      * Notify when photo is approved by client
      */
     public function notifyPhotoApproved(Sale $sale)
@@ -430,10 +559,26 @@ class NotificationService
                 ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
             );
 
-            // Notify production admin
-            if ($sale->production_admin_id) {
+            // Notify all production admins
+            $productionAdmins = User::whereIn('role', ['admin', 'production', 'production_admin'])->get();
+            foreach ($productionAdmins as $admin) {
                 $this->createNotification(
-                    $sale->production_admin_id,
+                    $admin->id,
+                    'photo_approved',
+                    "✅ Foto aprovada pelo cliente - Pedido #{$sale->unique_token} pronto para próximo passo!",
+                    ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
+                );
+            }
+
+            // Notify finance admins about photo approval
+            $financeAdmins = User::whereIn('role', ['admin', 'financeiro', 'finance_admin'])->get();
+            foreach ($financeAdmins as $admin) {
+                $statusMessage = $sale->needsFinalPayment()
+                    ? "aguardando pagamento final 💰"
+                    : "pronto para envio 📦";
+
+                $this->createNotification(
+                    $admin->id,
                     'photo_approved',
                     "Cliente aprovou a foto do pedido #{$sale->unique_token} 📸✅",
                     ['sale_id' => $sale->id, 'order_token' => $sale->unique_token]
@@ -482,12 +627,28 @@ class NotificationService
                 ]
             );
 
-            // Notify production admin
-            if ($sale->production_admin_id) {
+            // Notify all production admins about photo rejection
+            $productionAdmins = User::whereIn('role', ['admin', 'production', 'production_admin'])->get();
+            foreach ($productionAdmins as $admin) {
                 $this->createNotification(
-                    $sale->production_admin_id,
+                    $admin->id,
                     'photo_rejected',
-                    "Cliente rejeitou a foto do pedido #{$sale->unique_token}. Motivo: {$reason} ❌",
+                    "❌ Cliente rejeitou a foto do pedido #{$sale->unique_token}. Motivo: {$reason}",
+                    [
+                        'sale_id' => $sale->id,
+                        'order_token' => $sale->unique_token,
+                        'reason' => $reason
+                    ]
+                );
+            }
+
+            // Notify finance admins about delay
+            $financeAdmins = User::whereIn('role', ['admin', 'financeiro', 'finance_admin'])->get();
+            foreach ($financeAdmins as $admin) {
+                $this->createNotification(
+                    $admin->id,
+                    'photo_rejected',
+                    "🔄 Pedido #{$sale->unique_token} retornou para produção - Cliente solicitou ajustes",
                     [
                         'sale_id' => $sale->id,
                         'order_token' => $sale->unique_token,

@@ -135,7 +135,11 @@ class FinanceController extends Controller
             
             // Notify relevant parties
             $notificationService = app(\App\Services\NotificationService::class);
-            $notificationService->notifyPaymentApproved($sale);
+            if ($sale->order_status === 'payment_approved') {
+                $notificationService->notifyPaymentApproved($sale);
+            } elseif ($sale->order_status === 'ready_for_shipping') {
+                $notificationService->notifyFinalPaymentApproved($sale);
+            }
             
             return back()->with('message', 'Pagamento aprovado com sucesso!');
             

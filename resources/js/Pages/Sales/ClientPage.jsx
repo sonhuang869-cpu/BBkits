@@ -8,6 +8,7 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, paidAm
     const [showAddressForm, setShowAddressForm] = useState(!sale.delivery_address);
     const [paymentPreview, setPaymentPreview] = useState(null);
 
+
     const { data, setData, post, processing, errors } = useForm({
         delivery_address: sale.delivery_address || '',
         delivery_number: sale.delivery_number || '',

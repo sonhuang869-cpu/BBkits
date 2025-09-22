@@ -551,12 +551,9 @@ class Sale extends Model
         if (in_array($this->order_status, ['photo_approved', 'pending_final_payment'])) {
             $totalOrderAmount = $this->total_amount + ($this->shipping_amount ?? 0);
             $paidAmount = $this->getTotalPaidAmount();
-            $minimumForProduction = $totalOrderAmount * 0.5; // 50% minimum
 
-            // Only needs final payment if:
-            // 1. Has at least 50% paid (approved for production)
-            // 2. But not fully paid yet
-            return $paidAmount >= $minimumForProduction && $paidAmount < $totalOrderAmount;
+            // Needs final payment if not fully paid yet
+            return $paidAmount < $totalOrderAmount;
         }
 
         return false;
