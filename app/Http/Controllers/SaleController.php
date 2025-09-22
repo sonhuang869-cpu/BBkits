@@ -1035,7 +1035,19 @@ class SaleController extends Controller
             'pendingAmount' => $pendingAmount,
             'totalAmount' => $totalWithShipping,
             'needsFinalPayment' => $remainingAmount > 0,
-            'productPhotoUrl' => $sale->getProductPhotoUrl()
+            'productPhotoUrl' => $sale->getProductPhotoUrl(),
+            // Temporary debug info to see what's happening
+            'debug' => [
+                'sale_id' => $sale->id,
+                'total_amount' => $sale->total_amount,
+                'shipping_amount' => $sale->shipping_amount,
+                'totalWithShipping' => $totalWithShipping,
+                'approvedPaidAmount' => $approvedPaidAmount,
+                'pendingAmount' => $pendingAmount,
+                'remainingAmount' => $remainingAmount,
+                'payments_count' => $sale->payments->count(),
+                'calculation_method' => 'direct_query'
+            ]
         ]);
     }
 
