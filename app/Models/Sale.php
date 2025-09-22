@@ -318,14 +318,8 @@ class Sale extends Model
 
     public function getTotalPaidAmount(): float
     {
-        // Check if there are actual approved payments (partial payment system)
-        $approvedPayments = $this->approvedPayments();
-        if ($approvedPayments->count() > 0) {
-            return $approvedPayments->sum('amount');
-        }
-        
-        // Fall back to received_amount for simple payment system
-        return (float) ($this->received_amount ?? 0);
+        // UNIFIED CALCULATION: Only count approved payments (consistent across all controllers)
+        return (float) $this->approvedPayments()->sum('amount');
     }
 
     public function getTotalPendingAmount(): float
@@ -335,7 +329,8 @@ class Sale extends Model
 
     public function getRemainingAmount(): float
     {
-        return ($this->total_amount + $this->shipping_amount) - $this->getTotalPaidAmount();
+        // UNIFIED CALCULATION: Remaining = Total - (Approved + Pending) for mathematical consistency
+        return max(0, ($this->total_amount + $this->shipping_amount) - $this->getTotalPaidAmount() - $this->getTotalPendingAmount());
     }
 
     public function isFullyPaid(): bool

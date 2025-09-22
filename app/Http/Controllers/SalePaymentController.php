@@ -14,7 +14,7 @@ class SalePaymentController extends Controller
     {
         $payments = $sale->payments()->with('approvedBy')->orderBy('payment_date', 'desc')->get();
 
-        // Calculate payment summary using ONLY payment records (not legacy received_amount)
+        // UNIFIED PAYMENT CALCULATION LOGIC (used across all controllers)
         $totalWithShipping = (float) $sale->total_amount + (float) $sale->shipping_amount;
 
         // Use direct database queries to avoid any caching issues
@@ -26,10 +26,8 @@ class SalePaymentController extends Controller
             ->where('status', 'pending')
             ->sum('amount');
 
-        // For admin display, show remaining amount after all payments (approved + pending)
-        // This matches the client-side calculation
-        $totalPaidByClient = $approvedPaidAmount + $pendingAmount;
-        $remainingAmount = max(0, $totalWithShipping - $totalPaidByClient);
+        // UNIFIED CALCULATION: Use model method for mathematical consistency
+        $remainingAmount = $sale->getRemainingAmount();
 
         
         // Calculate progress and status based on approved payments only

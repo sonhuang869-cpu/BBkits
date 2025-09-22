@@ -521,7 +521,12 @@ class SaleController extends Controller
             // Validate minimum payment requirement (50% rule)
             $totalOrderAmount = $sale->total_amount + ($sale->shipping_amount ?? 0);
             $minimumRequired = $totalOrderAmount * 0.5; // 50% minimum
-            $receivedAmount = (float) ($sale->received_amount ?? 0);
+
+            // Use new payment system - check approved + pending payments
+            // Pending payments count because customer has submitted proof
+            $approvedAmount = (float) $sale->approvedPayments()->sum('amount');
+            $pendingAmount = (float) $sale->pendingPayments()->sum('amount');
+            $receivedAmount = $approvedAmount + $pendingAmount;
 
             // DEBUG: Log the values
             \Log::info('PAYMENT VALIDATION DEBUG', [
@@ -530,6 +535,8 @@ class SaleController extends Controller
                 'shipping_amount' => $sale->shipping_amount,
                 'totalOrderAmount' => $totalOrderAmount,
                 'minimumRequired' => $minimumRequired,
+                'approvedAmount' => $approvedAmount,
+                'pendingAmount' => $pendingAmount,
                 'receivedAmount' => $receivedAmount,
                 'validation_check' => $receivedAmount < $minimumRequired ? 'SHOULD_BLOCK' : 'SHOULD_ALLOW'
             ]);
@@ -974,7 +981,7 @@ class SaleController extends Controller
         // Load payments relationship explicitly
         $sale->load('payments');
 
-        // Calculate payment summary using the same logic as admin payment page
+        // UNIFIED PAYMENT CALCULATION LOGIC (identical to all other controllers)
         $totalWithShipping = (float) $sale->total_amount + (float) $sale->shipping_amount;
 
         // Force fresh queries to ensure no caching issues
@@ -986,10 +993,8 @@ class SaleController extends Controller
             ->where('status', 'pending')
             ->sum('amount');
 
-        // For client display, show total paid (approved + pending) as "paid"
-        // because the client already submitted their payment
-        $totalPaidByClient = $approvedPaidAmount + $pendingAmount;
-        $remainingAmount = max(0, $totalWithShipping - $totalPaidByClient);
+        // UNIFIED CALCULATION: Use model method for mathematical consistency
+        $remainingAmount = $sale->getRemainingAmount();
 
 
         return Inertia::render('Sales/ClientPage', [
@@ -1003,7 +1008,7 @@ class SaleController extends Controller
             ]),
             'orderStatus' => $sale->getOrderStatusLabel(),
             'orderStatusColor' => $sale->getOrderStatusColor(),
-            'paidAmount' => $totalPaidByClient,
+            'paidAmount' => $approvedPaidAmount,
             'remainingAmount' => $remainingAmount,
             'pendingAmount' => $pendingAmount,
             'totalAmount' => $totalWithShipping,
