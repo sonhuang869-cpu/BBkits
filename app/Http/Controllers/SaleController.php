@@ -1061,6 +1061,14 @@ class SaleController extends Controller
             $this->notificationService->notifyPhotoRejected($sale, $validated['reason']);
         }
         
+        // Check if this is an Inertia.js request (AJAX)
+        if ($request->wantsJson() || $request->header('X-Inertia')) {
+            return response()->json([
+                'message' => $validated['approved'] ? 'Foto aprovada!' : 'Solicitação de ajuste enviada',
+                'status' => 'success'
+            ]);
+        }
+
         return back()->with('message', $validated['approved'] ? 'Foto aprovada!' : 'Solicitação de ajuste enviada');
     }
 }

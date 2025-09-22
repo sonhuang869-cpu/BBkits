@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import toast from 'react-hot-toast';
 import { formatBRL } from '@/utils/currency';
 
@@ -65,9 +65,11 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, paidAm
     };
 
     const approvePhoto = () => {
-        post(`/pedido/${sale.unique_token}/approve-photo`, {
+        router.post(`/pedido/${sale.unique_token}/approve-photo`, {
             approved: true
         }, {
+            preserveState: true,
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Foto aprovada! 🎉 Verificando próximos passos...');
                 // Reload the page after a short delay to show updated status
