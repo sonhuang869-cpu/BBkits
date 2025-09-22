@@ -973,11 +973,12 @@ class SaleController extends Controller
         
         return Inertia::render('Sales/ClientPage', [
             'sale' => $sale->load([
-                'user', 
-                'productionAdmin', 
+                'user',
+                'productionAdmin',
                 'financeAdmin',
                 'saleProducts.product',  // Load product details
-                'embroideryDesign'       // Load embroidery design details
+                'embroideryDesign',      // Load embroidery design details
+                'payments'               // Load payments for correct financial calculations
             ]),
             'orderStatus' => $sale->getOrderStatusLabel(),
             'orderStatusColor' => $sale->getOrderStatusColor(),
