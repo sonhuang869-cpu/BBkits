@@ -986,7 +986,10 @@ class SaleController extends Controller
             ->where('status', 'pending')
             ->sum('amount');
 
-        $remainingAmount = max(0, $totalWithShipping - $approvedPaidAmount);
+        // For client display, show total paid (approved + pending) as "paid"
+        // because the client already submitted their payment
+        $totalPaidByClient = $approvedPaidAmount + $pendingAmount;
+        $remainingAmount = max(0, $totalWithShipping - $totalPaidByClient);
 
         // Debug logging for specific tokens
         if (in_array($token, ['BBKNFQQ1DH', 'BBHATSAMMM'])) {
@@ -1030,7 +1033,7 @@ class SaleController extends Controller
             ]),
             'orderStatus' => $sale->getOrderStatusLabel(),
             'orderStatusColor' => $sale->getOrderStatusColor(),
-            'paidAmount' => $approvedPaidAmount,
+            'paidAmount' => $totalPaidByClient,
             'remainingAmount' => $remainingAmount,
             'pendingAmount' => $pendingAmount,
             'totalAmount' => $totalWithShipping,
@@ -1043,6 +1046,7 @@ class SaleController extends Controller
                 'shipping_amount' => $sale->shipping_amount,
                 'totalWithShipping' => $totalWithShipping,
                 'approvedPaidAmount' => $approvedPaidAmount,
+                'totalPaidByClient' => $totalPaidByClient,
                 'pendingAmount' => $pendingAmount,
                 'remainingAmount' => $remainingAmount,
                 'payments_count' => $sale->payments->count(),

@@ -553,6 +553,7 @@ export default function ClientPage({ sale, orderStatus, orderStatusColor, paidAm
                                         <div>Shipping: {debug.shipping_amount}</div>
                                         <div>Total with Shipping: {debug.totalWithShipping}</div>
                                         <div>Approved Paid: {debug.approvedPaidAmount}</div>
+                                        <div>Total Paid by Client: {debug.totalPaidByClient}</div>
                                         <div>Pending: {debug.pendingAmount}</div>
                                         <div>Remaining: {debug.remainingAmount}</div>
                                         <div>Payments Count: {debug.payments_count}</div>
