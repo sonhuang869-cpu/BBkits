@@ -113,11 +113,11 @@ export default function OrdersIndex({ orders, statusFilter, tabCounts }) {
             onSuccess: () => {
                 toast.success('✨ Pedido processado com sucesso!');
                 // Get the updated order status from the response or check if order needs final payment
-                const totalAmount = parseFloat(order.total_amount) + parseFloat(order.shipping_amount || 0);
+                const totalAmount = parseFloat(order.total_amount_with_shipping || 0);
                 const approvedPayments = order.payments ? order.payments.filter(p => p.status === 'approved') : [];
                 const paidAmount = approvedPayments.length > 0
                     ? approvedPayments.reduce((sum, p) => sum + parseFloat(p.amount), 0)
-                    : parseFloat(order.received_amount || 0);
+                    : parseFloat(order.total_paid_amount || 0);
                 const needsFinalPayment = paidAmount < totalAmount;
 
                 // Redirect to the appropriate tab based on payment status
@@ -256,19 +256,18 @@ export default function OrdersIndex({ orders, statusFilter, tabCounts }) {
 
     // Helper function to get financial summary for an order
     const getFinancialSummary = (order) => {
-        const totalAmount = parseFloat(order.total_amount) + parseFloat(order.shipping_amount || 0);
+        const totalAmount = parseFloat(order.total_amount_with_shipping || 0);
         
         // Fix: Check if there are actual approved payments, not just if payments array exists
         const approvedPayments = order.payments ? order.payments.filter(p => p.status === 'approved') : [];
-        const paidAmount = approvedPayments.length > 0 
-            ? approvedPayments.reduce((sum, p) => sum + parseFloat(p.amount), 0)
-            : parseFloat(order.received_amount || 0);
-            
-        const remainingAmount = Math.max(0, totalAmount - paidAmount);
+        const paidAmount = parseFloat(order.total_paid_amount || 0);
+        const pendingAmount = parseFloat(order.total_pending_amount || 0);
+        const remainingAmount = parseFloat(order.remaining_amount || 0);
         
         return {
             totalAmount,
             paidAmount,
+            pendingAmount,
             remainingAmount,
             isFullyPaid: remainingAmount <= 0
         };

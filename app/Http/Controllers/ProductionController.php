@@ -62,6 +62,15 @@ class ProductionController extends Controller
         
         $orders = $query->latest()->paginate(15)->withQueryString();
 
+        // Add unified payment calculations to each order
+        $orders->getCollection()->transform(function ($order) {
+            $order->total_amount_with_shipping = $order->getTotalAmount();
+            $order->total_paid_amount = $order->getTotalPaidAmount();
+            $order->total_pending_amount = $order->getTotalPendingAmount();
+            $order->remaining_amount = $order->getRemainingAmount();
+            return $order;
+        });
+
         // Calculate counts for all tabs to display in navigation
         $tabCounts = [
             'payment_approved' => Sale::where('order_status', 'payment_approved')->count(),

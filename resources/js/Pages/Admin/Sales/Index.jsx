@@ -640,11 +640,19 @@ export default function Index({ sales }) {
                                                             </th>
                                                             <th className="px-6 py-4 text-left text-sm font-bold">
                                                                 <i className="fas fa-money-bill-wave mr-2"></i>
-                                                                Valor Total
+                                                                Total
                                                             </th>
                                                             <th className="px-6 py-4 text-left text-sm font-bold">
                                                                 <i className="fas fa-hand-holding-usd mr-2"></i>
-                                                                Valor Recebido
+                                                                Pago
+                                                            </th>
+                                                            <th className="px-6 py-4 text-left text-sm font-bold">
+                                                                <i className="fas fa-clock mr-2"></i>
+                                                                Pendente
+                                                            </th>
+                                                            <th className="px-6 py-4 text-left text-sm font-bold">
+                                                                <i className="fas fa-exclamation-triangle mr-2"></i>
+                                                                Restante
                                                             </th>
                                                             <th className="px-6 py-4 text-left text-sm font-bold">
                                                                 <i className="fas fa-calendar-alt mr-2"></i>
@@ -680,10 +688,16 @@ export default function Index({ sales }) {
                                                                     </div>
                                                                 </td>
                                                                 <td className="px-6 py-4 text-sm font-bold text-green-600">
-                                                                    {formatBRL(sale.total_amount)}
+                                                                    {formatBRL(sale.total_amount_with_shipping)}
                                                                 </td>
                                                                 <td className="px-6 py-4 text-sm font-bold text-blue-600">
-                                                                    {formatBRL(sale.received_amount)}
+                                                                    {formatBRL(sale.total_paid_amount)}
+                                                                </td>
+                                                                <td className="px-6 py-4 text-sm font-bold text-orange-600">
+                                                                    {formatBRL(sale.total_pending_amount)}
+                                                                </td>
+                                                                <td className="px-6 py-4 text-sm font-bold text-red-600">
+                                                                    {formatBRL(sale.remaining_amount)}
                                                                 </td>
                                                                 <td className="px-6 py-4 text-sm text-gray-600 font-medium">
                                                                     📅 {formatDate(sale.payment_date)}
@@ -759,7 +773,7 @@ export default function Index({ sales }) {
                                                                                                         <body>
                                                                                                             <h2>💰 Comprovante de Pagamento</h2>
                                                                                                             <div class="info"><strong>Cliente:</strong> ${sale.client_name}</div>
-                                                                                                            <div class="info"><strong>Valor:</strong> ${formatBRL(sale.total_amount)}</div>
+                                                                                                            <div class="info"><strong>Valor:</strong> ${formatBRL(sale.total_amount_with_shipping)}</div>
                                                                                                             <img src="${sale.receipt_data}" alt="Comprovante de Pagamento" />
                                                                                                         </body>
                                                                                                     </html>
@@ -880,7 +894,7 @@ export default function Index({ sales }) {
                                     </div>
                                     <div>
                                         <p className="font-semibold text-red-900">Cliente: {selectedSale?.client_name}</p>
-                                        <p className="text-red-700 text-sm">Valor: {selectedSale && formatBRL(selectedSale.received_amount)}</p>
+                                        <p className="text-red-700 text-sm">Valor: {selectedSale && formatBRL(selectedSale.total_paid_amount)}</p>
                                     </div>
                                 </div>
                             </div>

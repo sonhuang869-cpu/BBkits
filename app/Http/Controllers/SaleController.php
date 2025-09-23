@@ -499,6 +499,15 @@ class SaleController extends Controller
             ->latest()
             ->paginate(15);
 
+        // Add unified payment calculations to each sale
+        $sales->getCollection()->transform(function ($sale) {
+            $sale->total_amount_with_shipping = $sale->getTotalAmount();
+            $sale->total_paid_amount = $sale->getTotalPaidAmount();
+            $sale->total_pending_amount = $sale->getTotalPendingAmount();
+            $sale->remaining_amount = $sale->getRemainingAmount();
+            return $sale;
+        });
+
         return Inertia::render('Admin/Sales/Index', [
             'sales' => $sales
         ]);
