@@ -428,15 +428,25 @@ export default function Index({ sales, auth }) {
                                                         )
                                                     },
                                                     {
-                                                        header: 'Valor Total',
-                                                        accessor: 'total_amount',
-                                                        render: (sale) => <span className="font-bold text-green-600">{formatCurrency(sale.total_amount)}</span>,
+                                                        header: 'Total',
+                                                        accessor: 'total_amount_with_shipping',
+                                                        render: (sale) => <span className="font-bold text-green-600">{formatCurrency(sale.total_amount_with_shipping || 0)}</span>,
                                                         mobileQuickView: true
                                                     },
                                                     {
-                                                        header: 'Valor Recebido',
-                                                        accessor: 'received_amount',
-                                                        render: (sale) => <span className="font-bold text-blue-600">{formatCurrency(sale.received_amount)}</span>
+                                                        header: 'Pago',
+                                                        accessor: 'total_paid_amount',
+                                                        render: (sale) => <span className="font-bold text-blue-600">{formatCurrency(sale.total_paid_amount || 0)}</span>
+                                                    },
+                                                    {
+                                                        header: 'Pendente',
+                                                        accessor: 'total_pending_amount',
+                                                        render: (sale) => <span className="font-bold text-orange-600">{formatCurrency(sale.total_pending_amount || 0)}</span>
+                                                    },
+                                                    {
+                                                        header: 'Restante',
+                                                        accessor: 'remaining_amount',
+                                                        render: (sale) => <span className="font-bold text-red-600">{formatCurrency(sale.remaining_amount || 0)}</span>
                                                     },
                                                     {
                                                         header: 'Data Pagamento',
