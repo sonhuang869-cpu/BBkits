@@ -47,7 +47,20 @@ export default function OrdersIndex({ orders, statusFilter }) {
             onError: (errors) => {
                 console.error('Approval error:', errors);
                 if (errors.error) {
-                    toast.error(errors.error);
+                    // Show multiline error messages properly
+                    const errorMessage = errors.error.split('\n').filter(line => line.trim());
+                    if (errorMessage.length > 1) {
+                        // Show as a longer duration toast for detailed messages
+                        toast.error(errors.error, {
+                            duration: 8000,
+                            style: {
+                                maxWidth: '500px',
+                                whiteSpace: 'pre-line'
+                            }
+                        });
+                    } else {
+                        toast.error(errors.error);
+                    }
                 } else if (errors.message) {
                     toast.error(errors.message);
                 } else {

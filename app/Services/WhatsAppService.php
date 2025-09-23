@@ -108,6 +108,46 @@ class WhatsAppService
     }
 
     /**
+     * Send final payment approved notification
+     */
+    public function sendFinalPaymentApproved(Sale $sale)
+    {
+        try {
+            Log::info('Sending WhatsApp final payment approved notification', ['sale_id' => $sale->id]);
+
+            $phone = $this->formatPhoneNumber($sale->client_phone);
+            if (!$phone) {
+                return ['success' => false, 'message' => 'Número de telefone inválido'];
+            }
+
+            // Use a simple message instead of template if template doesn't exist
+            $message = "✅ *Pagamento Final Aprovado!*\n\n" .
+                      "Olá {$sale->client_name},\n\n" .
+                      "Seu pagamento final foi aprovado com sucesso!\n" .
+                      "Pedido #{$sale->unique_token} está pronto para envio.\n\n" .
+                      "Em breve você receberá o código de rastreamento.\n\n" .
+                      "Obrigado pela confiança! 🎉";
+
+            $response = $this->sendTextMessage($phone, $message);
+
+            if ($response['success']) {
+                $sale->update([
+                    'whatsapp_final_payment_approved_sent_at' => now()
+                ]);
+            }
+
+            return $response;
+        } catch (\Exception $e) {
+            Log::error('WhatsApp final payment approved exception', [
+                'sale_id' => $sale->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
      * Send production started notification
      */
     public function sendProductionStarted(Sale $sale)

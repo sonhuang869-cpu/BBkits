@@ -71,9 +71,10 @@ class FinanceController extends Controller
                     DB::rollBack();
                     return back()->withErrors([
                         'error' => sprintf(
-                            'Pagamento insuficiente para aprovação. Mínimo de 50%% necessário: %s (Enviado: %s)',
+                            '⚠️ Pagamento Inicial Insuficiente!\n\nMínimo necessário (50%%): %s\nValor enviado pelo cliente: %s\nFaltam: %s\n\nSolicite ao cliente o valor mínimo para iniciar produção.',
                             'R$ ' . number_format($minimumRequired, 2, ',', '.'),
-                            'R$ ' . number_format($receivedAmount, 2, ',', '.')
+                            'R$ ' . number_format($receivedAmount, 2, ',', '.'),
+                            'R$ ' . number_format($minimumRequired - $receivedAmount, 2, ',', '.')
                         )
                     ]);
                 }
@@ -113,7 +114,10 @@ class FinanceController extends Controller
                     $remaining = $totalOrderAmount - $totalAfterApproval;
                     return back()->withErrors([
                         'error' => sprintf(
-                            'Pagamento final insuficiente. Ainda falta: %s para completar o pedido',
+                            '💰 Pagamento Final Incompleto!\n\nTotal do pedido: %s\nJá pago: %s\nPagamento atual: %s\nAinda faltam: %s\n\nO cliente precisa pagar o valor total restante para finalizar o pedido.',
+                            'R$ ' . number_format($totalOrderAmount, 2, ',', '.'),
+                            'R$ ' . number_format($currentPaidAmount, 2, ',', '.'),
+                            'R$ ' . number_format($pendingAmount, 2, ',', '.'),
                             'R$ ' . number_format($remaining, 2, ',', '.')
                         )
                     ]);
