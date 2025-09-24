@@ -22,11 +22,27 @@ export default function PaymentModal({ isOpen, onClose, sale }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Ensure we have a valid sale ID
+        if (!sale?.id) {
+            console.error('Sale ID is missing:', sale);
+            alert('Erro: ID da venda não encontrado. Tente recarregar a página.');
+            return;
+        }
+
+        console.log('Submitting payment for sale ID:', sale.id);
+        console.log('Route URL will be:', route('payments.store', sale.id));
+
         post(route('payments.store', sale.id), {
             forceFormData: true,
             onSuccess: () => {
+                console.log('Payment submitted successfully');
                 reset();
                 onClose();
+            },
+            onError: (errors) => {
+                console.error('Payment submission failed:', errors);
+                alert('Erro ao enviar pagamento. Verifique o console para detalhes.');
             }
         });
     };
