@@ -20,61 +20,97 @@ class MaterialConsumptionReportController extends Controller
 
     public function index(Request $request)
     {
-        $dateFrom = $request->get('date_from', now()->subDays(30)->format('Y-m-d'));
-        $dateTo = $request->get('date_to', now()->format('Y-m-d'));
-        $materialId = $request->get('material_id');
-        $userId = $request->get('user_id');
-        $groupBy = $request->get('group_by', 'day'); // day, week, month
+        try {
+            $dateFrom = $request->get('date_from', now()->subDays(30)->format('Y-m-d'));
+            $dateTo = $request->get('date_to', now()->format('Y-m-d'));
+            $materialId = $request->get('material_id');
+            $userId = $request->get('user_id');
+            $groupBy = $request->get('group_by', 'day'); // day, week, month
 
-        // Validate date range
-        $dateFrom = Carbon::parse($dateFrom)->startOfDay();
-        $dateTo = Carbon::parse($dateTo)->endOfDay();
+            // Validate date range
+            $dateFrom = Carbon::parse($dateFrom)->startOfDay();
+            $dateTo = Carbon::parse($dateTo)->endOfDay();
 
-        // Overall consumption statistics
-        $overallStats = $this->getOverallConsumptionStats($dateFrom, $dateTo, $materialId, $userId);
+            // Overall consumption statistics
+            $overallStats = $this->getOverallConsumptionStats($dateFrom, $dateTo, $materialId, $userId);
 
-        // Top consumed materials by quantity and value
-        $topMaterialsByQuantity = $this->getTopMaterialsByQuantity($dateFrom, $dateTo, $userId, 10);
-        $topMaterialsByValue = $this->getTopMaterialsByValue($dateFrom, $dateTo, $userId, 10);
+            // Top consumed materials by quantity and value
+            $topMaterialsByQuantity = $this->getTopMaterialsByQuantity($dateFrom, $dateTo, $userId, 10);
+            $topMaterialsByValue = $this->getTopMaterialsByValue($dateFrom, $dateTo, $userId, 10);
 
-        // Consumption trends over time
-        $consumptionTrends = $this->getConsumptionTrends($dateFrom, $dateTo, $materialId, $userId, $groupBy);
+            // Consumption trends over time
+            $consumptionTrends = $this->getConsumptionTrends($dateFrom, $dateTo, $materialId, $userId, $groupBy);
 
-        // User/department consumption analysis
-        $consumptionByUser = $this->getConsumptionByUser($dateFrom, $dateTo, $materialId);
+            // User/department consumption analysis
+            $consumptionByUser = $this->getConsumptionByUser($dateFrom, $dateTo, $materialId);
 
-        // Daily average consumption rates
-        $averageConsumptionRates = $this->getAverageConsumptionRates($dateFrom, $dateTo, $materialId, $userId);
+            // Daily average consumption rates
+            $averageConsumptionRates = $this->getAverageConsumptionRates($dateFrom, $dateTo, $materialId, $userId);
 
-        // Cost analysis
-        $costAnalysis = $this->getCostAnalysis($dateFrom, $dateTo, $materialId, $userId);
+            // Cost analysis
+            $costAnalysis = $this->getCostAnalysis($dateFrom, $dateTo, $materialId, $userId);
 
-        // Recent consumption transactions for detail view
-        $recentTransactions = $this->getRecentConsumptionTransactions($dateFrom, $dateTo, $materialId, $userId, 20);
+            // Recent consumption transactions for detail view
+            $recentTransactions = $this->getRecentConsumptionTransactions($dateFrom, $dateTo, $materialId, $userId, 20);
 
-        // Filter options
-        $materials = Material::active()->orderBy('name')->get(['id', 'name', 'reference']);
-        $users = User::orderBy('name')->get(['id', 'name']);
+            // Filter options
+            $materials = Material::active()->orderBy('name')->get(['id', 'name', 'reference']);
+            $users = User::orderBy('name')->get(['id', 'name']);
 
-        return Inertia::render('Admin/Reports/MaterialConsumptionReport', [
-            'overallStats' => $overallStats,
-            'topMaterialsByQuantity' => $topMaterialsByQuantity,
-            'topMaterialsByValue' => $topMaterialsByValue,
-            'consumptionTrends' => $consumptionTrends,
-            'consumptionByUser' => $consumptionByUser,
-            'averageConsumptionRates' => $averageConsumptionRates,
-            'costAnalysis' => $costAnalysis,
-            'recentTransactions' => $recentTransactions,
-            'materials' => $materials,
-            'users' => $users,
-            'filters' => [
-                'date_from' => $dateFrom->format('Y-m-d'),
-                'date_to' => $dateTo->format('Y-m-d'),
-                'material_id' => $materialId,
-                'user_id' => $userId,
-                'group_by' => $groupBy,
-            ],
-        ]);
+            return Inertia::render('Admin/Reports/MaterialConsumptionReport', [
+                'overallStats' => $overallStats,
+                'topMaterialsByQuantity' => $topMaterialsByQuantity,
+                'topMaterialsByValue' => $topMaterialsByValue,
+                'consumptionTrends' => $consumptionTrends,
+                'consumptionByUser' => $consumptionByUser,
+                'averageConsumptionRates' => $averageConsumptionRates,
+                'costAnalysis' => $costAnalysis,
+                'recentTransactions' => $recentTransactions,
+                'materials' => $materials,
+                'users' => $users,
+                'filters' => [
+                    'date_from' => $dateFrom->format('Y-m-d'),
+                    'date_to' => $dateTo->format('Y-m-d'),
+                    'material_id' => $materialId,
+                    'user_id' => $userId,
+                    'group_by' => $groupBy,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Material Consumption Report Error: ' . $e->getMessage());
+
+            // Return empty data structure to prevent 500 errors
+            return Inertia::render('Admin/Reports/MaterialConsumptionReport', [
+                'overallStats' => [
+                    'total_transactions' => 0,
+                    'total_quantity_consumed' => 0,
+                    'total_value_consumed' => 0,
+                    'unique_materials_consumed' => 0,
+                    'unique_users' => 0,
+                    'average_transaction_quantity' => 0,
+                    'daily_average_quantity' => 0,
+                    'daily_average_value' => 0,
+                    'days_in_period' => 0,
+                ],
+                'topMaterialsByQuantity' => [],
+                'topMaterialsByValue' => [],
+                'consumptionTrends' => [],
+                'consumptionByUser' => [],
+                'averageConsumptionRates' => [],
+                'costAnalysis' => ['cost_by_category' => [], 'cost_efficiency' => null],
+                'recentTransactions' => [],
+                'materials' => Material::orderBy('name')->get(['id', 'name', 'reference']) ?? [],
+                'users' => User::orderBy('name')->get(['id', 'name']) ?? [],
+                'filters' => [
+                    'date_from' => $dateFrom->format('Y-m-d'),
+                    'date_to' => $dateTo->format('Y-m-d'),
+                    'material_id' => $materialId,
+                    'user_id' => $userId,
+                    'group_by' => $groupBy,
+                ],
+                'error_message' => 'Unable to load consumption data. Please check the system logs.'
+            ]);
+        }
     }
 
     public function exportPdf(Request $request)

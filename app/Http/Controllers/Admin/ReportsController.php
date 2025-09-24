@@ -29,9 +29,10 @@ class ReportsController extends Controller
 
     public function lowStockAlerts(Request $request)
     {
-        $query = Material::with(['supplier'])
-            ->whereRaw('current_stock <= minimum_stock')
-            ->orderByRaw('(current_stock / NULLIF(minimum_stock, 0)) ASC');
+        try {
+            $query = Material::with(['supplier'])
+                ->whereRaw('current_stock <= minimum_stock')
+                ->orderByRaw('(current_stock / NULLIF(minimum_stock, 0)) ASC');
 
         if ($request->has('supplier_id')) {
             $query->where('supplier_id', $request->get('supplier_id'));
@@ -62,21 +63,35 @@ class ReportsController extends Controller
 
         $suppliers = Supplier::orderBy('name')->get(['id', 'name']);
 
-        return Inertia::render('Admin/Reports/LowStockAlerts', [
-            'materials' => $materials,
-            'suppliers' => $suppliers,
-            'filters' => [
-                'supplier_id' => $request->get('supplier_id'),
-                'severity' => $request->get('severity'),
-            ],
-            'stats' => $this->getLowStockStats(),
-        ]);
+            return Inertia::render('Admin/Reports/LowStockAlerts', [
+                'materials' => $materials,
+                'suppliers' => $suppliers,
+                'filters' => [
+                    'supplier_id' => $request->get('supplier_id'),
+                    'severity' => $request->get('severity'),
+                ],
+                'stats' => $this->getLowStockStats(),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Low Stock Alerts Error: ' . $e->getMessage());
+            return Inertia::render('Admin/Reports/LowStockAlerts', [
+                'materials' => collect([]),
+                'suppliers' => collect([]),
+                'filters' => [
+                    'supplier_id' => $request->get('supplier_id'),
+                    'severity' => $request->get('severity'),
+                ],
+                'stats' => ['critical' => 0, 'low' => 0, 'warning' => 0, 'total' => 0],
+                'error_message' => 'Unable to load low stock alerts. Please check the system logs.'
+            ]);
+        }
     }
 
     public function inventoryStatus(Request $request)
     {
-        $dateFrom = $request->get('date_from', now()->subDays(30)->format('Y-m-d'));
-        $dateTo = $request->get('date_to', now()->format('Y-m-d'));
+        try {
+            $dateFrom = $request->get('date_from', now()->subDays(30)->format('Y-m-d'));
+            $dateTo = $request->get('date_to', now()->format('Y-m-d'));
 
         // Overall inventory status
         $inventoryStatus = [
@@ -119,21 +134,42 @@ class ReportsController extends Controller
             ->orderBy('stock_value', 'desc')
             ->get();
 
-        return Inertia::render('Admin/Reports/InventoryStatus', [
-            'inventoryStatus' => $inventoryStatus,
-            'stockMovements' => $stockMovements,
-            'topMaterialsByActivity' => $topMaterialsByActivity,
-            'stockValueBySupplier' => $stockValueBySupplier,
-            'filters' => [
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
-            ],
-        ]);
+            return Inertia::render('Admin/Reports/InventoryStatus', [
+                'inventoryStatus' => $inventoryStatus,
+                'stockMovements' => $stockMovements,
+                'topMaterialsByActivity' => $topMaterialsByActivity,
+                'stockValueBySupplier' => $stockValueBySupplier,
+                'filters' => [
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Inventory Status Report Error: ' . $e->getMessage());
+            return Inertia::render('Admin/Reports/InventoryStatus', [
+                'inventoryStatus' => [
+                    'total_materials' => 0,
+                    'total_stock_value' => 0,
+                    'active_materials' => 0,
+                    'low_stock_materials' => 0,
+                    'out_of_stock_materials' => 0,
+                ],
+                'stockMovements' => [],
+                'topMaterialsByActivity' => [],
+                'stockValueBySupplier' => [],
+                'filters' => [
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                ],
+                'error_message' => 'Unable to load inventory status. Please check the system logs.'
+            ]);
+        }
     }
 
     public function stockMovements(Request $request)
     {
-        $dateFrom = $request->get('date_from', now()->subDays(30)->format('Y-m-d'));
+        try {
+            $dateFrom = $request->get('date_from', now()->subDays(30)->format('Y-m-d'));
         $dateTo = $request->get('date_to', now()->format('Y-m-d'));
         $materialId = $request->get('material_id');
         $type = $request->get('type');
@@ -201,7 +237,8 @@ class ReportsController extends Controller
 
     public function supplierPerformance(Request $request)
     {
-        $dateFrom = $request->get('date_from', now()->subDays(90)->format('Y-m-d'));
+        try {
+            $dateFrom = $request->get('date_from', now()->subDays(90)->format('Y-m-d'));
         $dateTo = $request->get('date_to', now()->format('Y-m-d'));
 
         // Supplier performance metrics
