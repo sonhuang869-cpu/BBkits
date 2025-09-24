@@ -474,7 +474,7 @@ export default function ReportsIndex({ salesData, commissionData, totalStats }) 
                                 <h3 className="text-2xl font-bold text-gray-800 mb-6">Relatórios Adicionais</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <Link
-                                        href="/admin/reports/material-consumption"
+                                        href={route('admin.reports.material-consumption')}
                                         className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border hover:border-purple-300"
                                     >
                                         <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-xl mb-3">
@@ -485,7 +485,7 @@ export default function ReportsIndex({ salesData, commissionData, totalStats }) 
                                     </Link>
 
                                     <Link
-                                        href="/admin/reports/low-stock-alerts"
+                                        href={route('admin.reports.low-stock-alerts')}
                                         className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border hover:border-red-300"
                                     >
                                         <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-xl mb-3">
@@ -496,7 +496,7 @@ export default function ReportsIndex({ salesData, commissionData, totalStats }) 
                                     </Link>
 
                                     <Link
-                                        href="/admin/reports/inventory-status"
+                                        href={route('admin.reports.inventory-status')}
                                         className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border hover:border-blue-300"
                                     >
                                         <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xl mb-3">
@@ -507,7 +507,7 @@ export default function ReportsIndex({ salesData, commissionData, totalStats }) 
                                     </Link>
 
                                     <Link
-                                        href="/admin/reports/supplier-performance"
+                                        href={route('admin.reports.supplier-performance')}
                                         className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border hover:border-green-300"
                                     >
                                         <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xl mb-3">

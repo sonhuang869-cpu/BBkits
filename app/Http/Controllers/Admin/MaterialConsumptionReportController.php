@@ -15,7 +15,7 @@ class MaterialConsumptionReportController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'approved', 'materials.access:view']);
+        $this->middleware(['auth', 'approved']);
     }
 
     public function index(Request $request)
