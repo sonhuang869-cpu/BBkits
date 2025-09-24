@@ -390,6 +390,9 @@ Route::middleware(['auth', 'approved'])->group(function () {
             Route::get('/inventory-status', [\App\Http\Controllers\Admin\ReportsController::class, 'inventoryStatus'])->name('inventory-status');
             Route::get('/stock-movements', [\App\Http\Controllers\Admin\ReportsController::class, 'stockMovements'])->name('stock-movements');
             Route::get('/supplier-performance', [\App\Http\Controllers\Admin\ReportsController::class, 'supplierPerformance'])->name('supplier-performance');
+            Route::get('/material-consumption', [\App\Http\Controllers\Admin\MaterialConsumptionReportController::class, 'index'])->name('material-consumption');
+            Route::get('/material-consumption/export/pdf', [\App\Http\Controllers\Admin\MaterialConsumptionReportController::class, 'exportPdf'])->name('material-consumption.export.pdf');
+            Route::get('/material-consumption/export/excel', [\App\Http\Controllers\Admin\MaterialConsumptionReportController::class, 'exportExcel'])->name('material-consumption.export.excel');
         });
 
         // Material Categories Routes

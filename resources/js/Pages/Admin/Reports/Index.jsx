@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import SalesModal from '@/Components/SalesModal';
@@ -466,6 +466,56 @@ export default function ReportsIndex({ salesData, commissionData, totalStats }) 
                                             <p className="text-gray-600">Não há vendas registradas para o período selecionado.</p>
                                         </div>
                                     )}
+                                </div>
+                            </div>
+
+                            {/* Additional Reports Section */}
+                            <div className="card-gradient p-8 mb-8">
+                                <h3 className="text-2xl font-bold text-gray-800 mb-6">Relatórios Adicionais</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <Link
+                                        href="/admin/reports/material-consumption"
+                                        className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border hover:border-purple-300"
+                                    >
+                                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-xl mb-3">
+                                            📈
+                                        </div>
+                                        <h4 className="font-semibold text-gray-900 text-center">Consumo de Materiais</h4>
+                                        <p className="text-sm text-gray-600 text-center mt-2">Análise detalhada do consumo</p>
+                                    </Link>
+
+                                    <Link
+                                        href="/admin/reports/low-stock-alerts"
+                                        className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border hover:border-red-300"
+                                    >
+                                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-xl mb-3">
+                                            ⚠️
+                                        </div>
+                                        <h4 className="font-semibold text-gray-900 text-center">Estoque Baixo</h4>
+                                        <p className="text-sm text-gray-600 text-center mt-2">Alertas de estoque crítico</p>
+                                    </Link>
+
+                                    <Link
+                                        href="/admin/reports/inventory-status"
+                                        className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border hover:border-blue-300"
+                                    >
+                                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xl mb-3">
+                                            📦
+                                        </div>
+                                        <h4 className="font-semibold text-gray-900 text-center">Status do Inventário</h4>
+                                        <p className="text-sm text-gray-600 text-center mt-2">Visão geral do estoque</p>
+                                    </Link>
+
+                                    <Link
+                                        href="/admin/reports/supplier-performance"
+                                        className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border hover:border-green-300"
+                                    >
+                                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xl mb-3">
+                                            🏪
+                                        </div>
+                                        <h4 className="font-semibold text-gray-900 text-center">Fornecedores</h4>
+                                        <p className="text-sm text-gray-600 text-center mt-2">Performance dos fornecedores</p>
+                                    </Link>
                                 </div>
                             </div>
 
