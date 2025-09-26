@@ -55,8 +55,12 @@ RUN echo "=== DEBUGGING: Checking copied files ===" && \
     echo "=== Checking if critical files exist ===" && \
     (ls -la public/index.php || echo "public/index.php NOT COPIED") && \
     (ls -la server.php || echo "server.php NOT COPIED") && \
-    echo "=== Checking .dockerignore effects ===" && \
-    ls -la public/ && echo "Public directory after copy"
+    echo "=== Checking Services directory ===" && \
+    (ls -la app/Services/ || echo "app/Services/ NOT COPIED") && \
+    echo "=== Checking TinyERPService specifically ===" && \
+    (ls -la app/Services/TinyERPService.php || echo "TinyERPService.php NOT COPIED") && \
+    echo "=== Checking Controllers ===" && \
+    (ls -la app/Http/Controllers/Admin/TinyERPIntegrationController.php || echo "TinyERPIntegrationController.php NOT COPIED")
 
 # Verify composer files exist
 RUN ls -la composer.json composer.lock || echo "WARNING: Composer files missing"
@@ -156,10 +160,13 @@ RUN if [ -f .env.example ] && [ ! -f .env ]; then cp .env.example .env; fi && \
 
 # Clear composer cache and install PHP dependencies
 RUN composer clear-cache && \
-    composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --verbose
+    composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts --verbose
 
 # Generate application key AFTER composer install
 RUN php artisan key:generate --force || true
+
+# Run package discovery manually after application is ready
+RUN php artisan package:discover --ansi || true
 
 # Create storage symlink
 RUN php artisan storage:link || echo "Storage link will be created at runtime"

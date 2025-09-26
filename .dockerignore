@@ -19,3 +19,7 @@ README.md
 !public/.htaccess
 !public/robots.txt
 !public/favicon.ico
+!app/Services/TinyERPService.php
+!app/Services/WATIService.php
+!app/Http/Controllers/Admin/TinyERPIntegrationController.php
+!app/Http/Controllers/Admin/WATIIntegrationController.php
