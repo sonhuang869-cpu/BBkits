@@ -53,13 +53,107 @@ class WATIIntegrationController extends Controller
                 ->count(),
         ];
 
+        // Add demo data if no real data exists (for demonstration purposes)
+        if ($stats['messages_sent_today'] == 0 && $stats['messages_sent_this_month'] == 0) {
+            $stats = array_merge($stats, [
+                'demo_mode' => true,
+                'totalMessages' => 156,
+                'deliveredMessages' => 142,
+                'pendingMessages' => 8,
+                'failedMessages' => 6,
+            ]);
+        }
+
         $recentNotifications = $this->getRecentNotifications();
         $messageTemplates = $this->watiService->getMessageTemplates();
 
+        // Add demo notifications if no real notifications exist
+        if (empty($recentNotifications) && isset($stats['demo_mode'])) {
+            $recentNotifications = [
+                [
+                    'id' => 1,
+                    'phone' => '+5511999887766',
+                    'template' => 'order_confirmation',
+                    'status' => 'delivered',
+                    'message' => 'Olá! Seu pedido #1025 foi confirmado. Obrigado por escolher a BBKits!',
+                    'sent_at' => now()->subMinutes(15)->toISOString(),
+                ],
+                [
+                    'id' => 2,
+                    'phone' => '+5511888776655',
+                    'template' => 'payment_approved',
+                    'status' => 'delivered',
+                    'message' => '✅ Pagamento aprovado! Seu pedido #1024 está sendo preparado.',
+                    'sent_at' => now()->subHours(1)->toISOString(),
+                ],
+                [
+                    'id' => 3,
+                    'phone' => '+5511777665544',
+                    'template' => 'production_started',
+                    'status' => 'pending',
+                    'message' => '🎯 Ótima notícia! Sua peça personalizada está em produção.',
+                    'sent_at' => now()->subHours(2)->toISOString(),
+                ],
+                [
+                    'id' => 4,
+                    'phone' => '+5511666554433',
+                    'template' => 'order_shipped',
+                    'status' => 'delivered',
+                    'message' => '📦 Pedido enviado! Código de rastreamento: BR123456789',
+                    'sent_at' => now()->subHours(3)->toISOString(),
+                ],
+                [
+                    'id' => 5,
+                    'phone' => '+5511555443322',
+                    'template' => 'photo_approval',
+                    'status' => 'failed',
+                    'message' => '📸 Sua peça está pronta! Clique para aprovar a foto.',
+                    'sent_at' => now()->subHours(4)->toISOString(),
+                ],
+            ];
+        }
+
+        // Add demo templates if no real templates exist
+        if (empty($messageTemplates) && isset($stats['demo_mode'])) {
+            $messageTemplates = [
+                [
+                    'name' => 'order_confirmation',
+                    'description' => 'Sent when customer places an order',
+                    'template' => 'Olá {{customer_name}}! Seu pedido #{{order_id}} foi confirmado. Total: R$ {{total}}. Obrigado por escolher a BBKits! 🎯',
+                ],
+                [
+                    'name' => 'payment_approved',
+                    'description' => 'Sent when payment is approved',
+                    'template' => '✅ Pagamento aprovado! Olá {{customer_name}}, seu pedido #{{order_id}} está sendo preparado. Prazo de produção: {{production_days}} dias úteis.',
+                ],
+                [
+                    'name' => 'production_started',
+                    'description' => 'Sent when production begins',
+                    'template' => '🎯 Ótima notícia {{customer_name}}! Sua peça personalizada está em produção. Acompanhe o progresso em nosso site.',
+                ],
+                [
+                    'name' => 'photo_approval',
+                    'description' => 'Sent when photo needs approval',
+                    'template' => '📸 Sua peça está pronta {{customer_name}}! Clique no link para ver a foto e aprovar: {{approval_link}}',
+                ],
+                [
+                    'name' => 'order_shipped',
+                    'description' => 'Sent when order is shipped',
+                    'template' => '📦 Pedido enviado! Olá {{customer_name}}, seu pedido #{{order_id}} foi postado. Rastreamento: {{tracking_code}}',
+                ],
+                [
+                    'name' => 'payment_reminder',
+                    'description' => 'Sent for payment reminders',
+                    'template' => '💳 Lembrete: Seu pedido #{{order_id}} está aguardando pagamento. Valor: R$ {{total}}. Link: {{payment_link}}',
+                ],
+            ];
+        }
+
         return Inertia::render('Admin/WATI/Dashboard', [
             'stats' => $stats,
-            'recentNotifications' => $recentNotifications,
-            'messageTemplates' => $messageTemplates,
+            'recentMessages' => $recentNotifications,
+            'templates' => $messageTemplates,
+            'connectionStatus' => $stats['connection_status'] ?? ['connected' => false, 'error' => 'WATI credentials not configured'],
             'config' => [
                 'templates' => config('services.wati.templates'),
                 'enabled' => config('services.wati.enabled'),
