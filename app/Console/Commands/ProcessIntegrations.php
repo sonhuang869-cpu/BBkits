@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Sale;
-use App\Services\TinyErpService;
+use App\Services\TinyERPService;
 use App\Services\WhatsAppService;
 use App\Services\NotificationService;
 use Illuminate\Console\Command;
@@ -20,7 +20,7 @@ class ProcessIntegrations extends Command
     protected $notificationService;
 
     public function __construct(
-        TinyErpService $tinyErpService,
+        TinyERPService $tinyErpService,
         WhatsAppService $whatsAppService,
         NotificationService $notificationService
     ) {

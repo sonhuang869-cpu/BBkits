@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sale;
-use App\Services\TinyErpService;
+use App\Services\TinyERPService;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +14,7 @@ class IntegrationController extends Controller
     protected $tinyErpService;
     protected $whatsAppService;
 
-    public function __construct(TinyErpService $tinyErpService, WhatsAppService $whatsAppService)
+    public function __construct(TinyERPService $tinyErpService, WhatsAppService $whatsAppService)
     {
         $this->middleware('admin');
         $this->tinyErpService = $tinyErpService;

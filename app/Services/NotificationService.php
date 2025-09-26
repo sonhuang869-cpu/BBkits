@@ -261,7 +261,7 @@ class NotificationService
     {
         try {
             // Generate invoice and shipping label via Tiny ERP
-            $tinyErpService = app(TinyErpService::class);
+            $tinyErpService = app(TinyERPService::class);
             
             // Generate shipping label (will also create invoice if needed)
             $shippingResult = $tinyErpService->generateShippingLabel($sale);

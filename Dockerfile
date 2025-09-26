@@ -129,7 +129,7 @@ RUN chmod +x server.php
 RUN mkdir -p database && touch database/database.sqlite && chown -R www-data:www-data database
 
 # Remove broken storage symlink and prepare storage structure
-RUN rm -f public/storage && \
+RUN rm -rf public/storage && \
     mkdir -p storage/app/public
 
 # Setup .env file (without key:generate yet)
