@@ -14,12 +14,14 @@ use Carbon\Carbon;
 
 class TinyERPIntegrationController extends Controller
 {
-    private TinyERPService $tinyERPService;
-
-    public function __construct(TinyERPService $tinyERPService)
+    public function __construct()
     {
         $this->middleware(['auth', 'approved']);
-        $this->tinyERPService = $tinyERPService;
+    }
+
+    private function getTinyERPService(): TinyERPService
+    {
+        return app(TinyERPService::class);
     }
 
     /**
@@ -33,7 +35,7 @@ class TinyERPIntegrationController extends Controller
             'pending_sync' => Sale::whereNull('tiny_erp_invoice_id')
                 ->whereIn('order_status', ['payment_approved', 'in_production', 'ready_for_shipping'])
                 ->count(),
-            'connection_status' => $this->tinyERPService->testConnection(),
+            'connection_status' => $this->getTinyERPService()->testConnection(),
         ];
 
         // Add demo data if no real data exists (for demonstration purposes)
@@ -118,7 +120,7 @@ class TinyERPIntegrationController extends Controller
             }
 
             // Generate invoice in Tiny ERP
-            $result = $this->tinyERPService->generateInvoice($sale->tiny_erp_invoice_id);
+            $result = $this->getTinyERPService()->generateInvoice($sale->tiny_erp_invoice_id);
 
             if (isset($result['retorno']['status']) && $result['retorno']['status'] === 'OK') {
                 // Create local invoice record
@@ -213,13 +215,13 @@ class TinyERPIntegrationController extends Controller
             ];
 
             // Send shipping to Tiny ERP
-            $result = $this->tinyERPService->sendShipping($shippingData);
+            $result = $this->getTinyERPService()->sendShipping($shippingData);
 
             if (isset($result['retorno']['status']) && $result['retorno']['status'] === 'OK') {
                 $shippingId = $result['retorno']['id'];
 
                 // Get shipping label
-                $labelResult = $this->tinyERPService->getShippingLabel($shippingId);
+                $labelResult = $this->getTinyERPService()->getShippingLabel($shippingId);
 
                 if (isset($labelResult['retorno']['etiqueta_url'])) {
                     // Update sale with shipping info
@@ -271,7 +273,7 @@ class TinyERPIntegrationController extends Controller
         ]);
 
         try {
-            $result = $this->tinyERPService->updateOrderTracking(
+            $result = $this->getTinyERPService()->updateOrderTracking(
                 $sale->tiny_erp_invoice_id,
                 $request->tracking_code,
                 $request->shipping_method
@@ -373,7 +375,7 @@ class TinyERPIntegrationController extends Controller
             $webhookData = $request->all();
             Log::info('Tiny ERP webhook received', $webhookData);
 
-            $result = $this->tinyERPService->processWebhook($webhookData);
+            $result = $this->getTinyERPService()->processWebhook($webhookData);
 
             return response()->json(['status' => 'processed']);
 
@@ -393,8 +395,8 @@ class TinyERPIntegrationController extends Controller
     public function testConnection()
     {
         try {
-            $isConnected = $this->tinyERPService->testConnection();
-            $status = $this->tinyERPService->getStatus();
+            $isConnected = $this->getTinyERPService()->testConnection();
+            $status = $this->getTinyERPService()->getStatus();
 
             return response()->json([
                 'connected' => $isConnected,
@@ -449,7 +451,7 @@ class TinyERPIntegrationController extends Controller
         ];
 
         // Create order in Tiny ERP
-        $result = $this->tinyERPService->createOrder($orderData);
+        $result = $this->getTinyERPService()->createOrder($orderData);
 
         if (isset($result['retorno']['status']) && $result['retorno']['status'] === 'OK') {
             $tinyErpId = $result['retorno']['id'];

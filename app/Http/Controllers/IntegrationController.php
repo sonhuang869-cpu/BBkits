@@ -11,14 +11,19 @@ use Inertia\Inertia;
 
 class IntegrationController extends Controller
 {
-    protected $tinyErpService;
-    protected $whatsAppService;
-
-    public function __construct(TinyERPService $tinyErpService, WhatsAppService $whatsAppService)
+    public function __construct()
     {
         $this->middleware('admin');
-        $this->tinyErpService = $tinyErpService;
-        $this->whatsAppService = $whatsAppService;
+    }
+
+    private function getTinyERPService(): TinyERPService
+    {
+        return app(TinyERPService::class);
+    }
+
+    private function getWhatsAppService(): WhatsAppService
+    {
+        return app(WhatsAppService::class);
     }
 
     /**
@@ -27,8 +32,8 @@ class IntegrationController extends Controller
     public function index()
     {
         // Test connections
-        $tinyErpStatus = $this->tinyErpService->testConnection();
-        $whatsAppStatus = $this->whatsAppService->testConnection();
+        $tinyErpStatus = $this->getTinyERPService()->testConnection();
+        $whatsAppStatus = $this->getWhatsAppService()->testConnection();
 
         // Get integration statistics
         $stats = $this->getIntegrationStats();
@@ -61,7 +66,7 @@ class IntegrationController extends Controller
     public function testTinyErp()
     {
         try {
-            $result = $this->tinyErpService->testConnection();
+            $result = $this->getTinyERPService()->testConnection();
             
             return response()->json([
                 'success' => $result['success'],
@@ -84,7 +89,7 @@ class IntegrationController extends Controller
     public function testWhatsApp()
     {
         try {
-            $result = $this->whatsAppService->testConnection();
+            $result = $this->getWhatsAppService()->testConnection();
             
             return response()->json([
                 'success' => $result['success'],
@@ -107,7 +112,7 @@ class IntegrationController extends Controller
     public function generateInvoice(Request $request, Sale $sale)
     {
         try {
-            $result = $this->tinyErpService->generateInvoice($sale);
+            $result = $this->getTinyERPService()->generateInvoice($sale);
             
             if ($result['success']) {
                 return back()->with('message', $result['message']);
@@ -130,7 +135,7 @@ class IntegrationController extends Controller
     public function generateShippingLabel(Request $request, Sale $sale)
     {
         try {
-            $result = $this->tinyErpService->generateShippingLabel($sale);
+            $result = $this->getTinyERPService()->generateShippingLabel($sale);
             
             if ($result['success']) {
                 return back()->with('message', $result['message']);
@@ -162,28 +167,28 @@ class IntegrationController extends Controller
             
             switch ($validated['message_type']) {
                 case 'order_confirmation':
-                    $result = $this->whatsAppService->sendOrderConfirmation($sale);
+                    $result = $this->getWhatsAppService()->sendOrderConfirmation($sale);
                     break;
                 case 'payment_approved':
-                    $result = $this->whatsAppService->sendPaymentApproved($sale);
+                    $result = $this->getWhatsAppService()->sendPaymentApproved($sale);
                     break;
                 case 'production_started':
-                    $result = $this->whatsAppService->sendProductionStarted($sale);
+                    $result = $this->getWhatsAppService()->sendProductionStarted($sale);
                     break;
                 case 'photo_approval':
-                    $result = $this->whatsAppService->sendPhotoApprovalRequest($sale);
+                    $result = $this->getWhatsAppService()->sendPhotoApprovalRequest($sale);
                     break;
                 case 'order_shipped':
-                    $result = $this->whatsAppService->sendShippingNotification($sale);
+                    $result = $this->getWhatsAppService()->sendShippingNotification($sale);
                     break;
                 case 'payment_rejected':
-                    $result = $this->whatsAppService->sendPaymentRejected($sale, 'Teste manual');
+                    $result = $this->getWhatsAppService()->sendPaymentRejected($sale, 'Teste manual');
                     break;
                 case 'final_payment_reminder':
-                    $result = $this->whatsAppService->sendFinalPaymentReminder($sale);
+                    $result = $this->getWhatsAppService()->sendFinalPaymentReminder($sale);
                     break;
                 case 'custom':
-                    $result = $this->whatsAppService->sendCustomMessage(
+                    $result = $this->getWhatsAppService()->sendCustomMessage(
                         $sale->client_phone,
                         $validated['custom_message'] ?? 'Mensagem de teste BBKits'
                     );
@@ -212,7 +217,7 @@ class IntegrationController extends Controller
     public function syncOrderStatus(Request $request, Sale $sale)
     {
         try {
-            $result = $this->tinyErpService->syncOrderStatus($sale);
+            $result = $this->getTinyERPService()->syncOrderStatus($sale);
             
             if ($result['success']) {
                 return back()->with('message', $result['message']);
@@ -244,7 +249,7 @@ class IntegrationController extends Controller
             $errors = 0;
 
             foreach ($orders as $order) {
-                $result = $this->tinyErpService->syncOrderStatus($order);
+                $result = $this->getTinyERPService()->syncOrderStatus($order);
                 
                 if ($result['success']) {
                     $synced++;
@@ -294,7 +299,7 @@ class IntegrationController extends Controller
                 'payment_notifications' => Sale::where('whatsapp_payment_approved_sent', true)->count(),
                 'photo_requests' => Sale::where('whatsapp_photo_sent', true)->count(),
                 'shipping_notifications' => Sale::where('whatsapp_shipping_sent', true)->count(),
-                'success_rate' => $this->whatsAppService->getMessagingStats()['success_rate'] ?? 0
+                'success_rate' => $this->getWhatsAppService()->getMessagingStats()['success_rate'] ?? 0
             ],
             'orders' => [
                 'total_orders' => Sale::count(),

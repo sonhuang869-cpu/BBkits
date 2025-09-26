@@ -15,19 +15,24 @@ class ProcessIntegrations extends Command
     protected $signature = 'bbkits:process-integrations {--type=all : Type of integration to process (all, reminders, sync)}';
     protected $description = 'Process BBKits integrations (WhatsApp reminders, Tiny ERP sync, etc.)';
 
-    protected $tinyErpService;
-    protected $whatsAppService;
-    protected $notificationService;
-
-    public function __construct(
-        TinyERPService $tinyErpService,
-        WhatsAppService $whatsAppService,
-        NotificationService $notificationService
-    ) {
+    public function __construct()
+    {
         parent::__construct();
-        $this->tinyErpService = $tinyErpService;
-        $this->whatsAppService = $whatsAppService;
-        $this->notificationService = $notificationService;
+    }
+
+    private function getTinyERPService(): TinyERPService
+    {
+        return app(TinyERPService::class);
+    }
+
+    private function getWhatsAppService(): WhatsAppService
+    {
+        return app(WhatsAppService::class);
+    }
+
+    private function getNotificationService(): NotificationService
+    {
+        return app(NotificationService::class);
     }
 
     public function handle()
@@ -81,7 +86,7 @@ class ProcessIntegrations extends Command
 
         foreach ($finalPaymentReminders as $sale) {
             try {
-                $result = $this->notificationService->notifyFinalPaymentReminder($sale);
+                $result = $this->getNotificationService()->notifyFinalPaymentReminder($sale);
                 
                 if ($result['success']) {
                     $this->info("✅ Lembrete enviado para pedido #{$sale->unique_token}");
@@ -104,7 +109,7 @@ class ProcessIntegrations extends Command
 
         foreach ($photoReminders as $sale) {
             try {
-                $result = $this->whatsAppService->sendCustomMessage(
+                $result = $this->getWhatsAppService()->sendCustomMessage(
                     $sale->client_phone,
                     "🔔 Olá {$sale->client_name}! Não se esqueça de aprovar a foto do seu pedido #{$sale->unique_token}. Acesse: {$sale->getPersonalizedPageUrl()}"
                 );
@@ -144,7 +149,7 @@ class ProcessIntegrations extends Command
 
         foreach ($ordersToSync as $sale) {
             try {
-                $result = $this->tinyErpService->syncOrderStatus($sale);
+                $result = $this->getTinyERPService()->syncOrderStatus($sale);
                 
                 if ($result['success']) {
                     $synced++;
@@ -180,7 +185,7 @@ class ProcessIntegrations extends Command
 
         foreach ($newOrders as $sale) {
             try {
-                $result = $this->notificationService->notifyOrderCreated($sale);
+                $result = $this->getNotificationService()->notifyOrderCreated($sale);
                 
                 if ($result['success']) {
                     $this->info("✅ Confirmação enviada para pedido #{$sale->unique_token}");
@@ -202,7 +207,7 @@ class ProcessIntegrations extends Command
 
         foreach ($readyForShipping as $sale) {
             try {
-                $result = $this->notificationService->notifyOrderShipped($sale);
+                $result = $this->getNotificationService()->notifyOrderShipped($sale);
                 
                 if ($result['success']) {
                     $this->info("✅ Nota fiscal e etiqueta geradas para pedido #{$sale->unique_token}");

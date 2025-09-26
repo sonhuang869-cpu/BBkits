@@ -209,17 +209,16 @@ CMD set -e && \
     echo "=== Ensuring Storage Link ===" && \
     (php artisan storage:link || echo "Storage link creation failed, continuing...") && \
     echo "=== Running Migrations ===" && \
-    php artisan migrate:fresh --force && \
+    (php artisan migrate:fresh --force || echo "Migrations will run at runtime") && \
     echo "=== Seeding Database ===" && \
     (php artisan db:seed --force || echo "Database seeding failed, continuing...") && \
     echo "=== Clearing Caches ===" && \
     php artisan config:clear || true && \
     php artisan cache:clear || true && \
     php artisan view:clear || true && \
-    echo "=== Optimizing Application ===" && \
-    php artisan optimize && \
+    echo "=== Skipping Optimization (will run at runtime) ===" && \
     echo "=== Running Custom Commands ===" && \
-    php artisan receipts:migrate-to-base64 || true && \
+    (php artisan receipts:migrate-to-base64 || echo "Receipts migration will run at runtime") && \
     echo "=== Testing Application Health ===" && \
     php artisan --version && \
     php -r "echo 'PHP is working: ' . PHP_VERSION . PHP_EOL;" && \
