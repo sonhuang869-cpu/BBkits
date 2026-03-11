@@ -462,6 +462,52 @@ Route::middleware(['auth', 'approved'])->group(function () {
             Route::get('/color/{color}', [\App\Http\Controllers\Admin\ColorMappingController::class, 'getByColor'])->name('by-color');
         });
 
+        // Cutting List Routes
+        Route::prefix('admin/cutting-list')->name('admin.cutting-list.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\CuttingListController::class, 'index'])->name('index');
+            Route::post('/generate', [\App\Http\Controllers\Admin\CuttingListController::class, 'generate'])->name('generate');
+            Route::post('/preview', [\App\Http\Controllers\Admin\CuttingListController::class, 'preview'])->name('preview');
+            Route::post('/export-pdf', [\App\Http\Controllers\Admin\CuttingListController::class, 'exportPdf'])->name('export-pdf');
+        });
+
+        // Purchase Suggestions Routes
+        Route::prefix('admin/purchase-suggestions')->name('admin.purchase-suggestions.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PurchaseSuggestionController::class, 'index'])->name('index');
+            Route::get('/suggestions', [\App\Http\Controllers\Admin\PurchaseSuggestionController::class, 'getSuggestions'])->name('suggestions');
+            Route::post('/export-pdf', [\App\Http\Controllers\Admin\PurchaseSuggestionController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/reorder-config', [\App\Http\Controllers\Admin\PurchaseSuggestionController::class, 'reorderConfig'])->name('reorder-config');
+            Route::post('/bulk-update', [\App\Http\Controllers\Admin\PurchaseSuggestionController::class, 'bulkUpdate'])->name('bulk-update');
+            Route::get('/auto-calculate', [\App\Http\Controllers\Admin\PurchaseSuggestionController::class, 'autoCalculate'])->name('auto-calculate');
+            Route::post('/apply-auto-calculated', [\App\Http\Controllers\Admin\PurchaseSuggestionController::class, 'applyAutoCalculated'])->name('apply-auto-calculated');
+        });
+
+        // Purchase Orders Routes
+        Route::prefix('admin/purchase-orders')->name('admin.purchase-orders.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'store'])->name('store');
+            Route::get('/{purchaseOrder}', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'show'])->name('show');
+            Route::get('/{purchaseOrder}/edit', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'edit'])->name('edit');
+            Route::put('/{purchaseOrder}', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'update'])->name('update');
+            Route::delete('/{purchaseOrder}', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'destroy'])->name('destroy');
+            Route::post('/{purchaseOrder}/approve', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'approve'])->name('approve');
+            Route::put('/{purchaseOrder}/status', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'updateStatus'])->name('update-status');
+            Route::post('/{purchaseOrder}/receive', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'receive'])->name('receive');
+            Route::get('/{purchaseOrder}/export-pdf', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'exportPdf'])->name('export-pdf');
+            Route::post('/from-suggestions', [\App\Http\Controllers\Admin\PurchaseOrderController::class, 'createFromSuggestions'])->name('from-suggestions');
+        });
+
+        // Product Costs Routes
+        Route::prefix('admin/product-costs')->name('admin.product-costs.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ProductCostController::class, 'index'])->name('index');
+            Route::get('/compare', [\App\Http\Controllers\Admin\ProductCostController::class, 'compare'])->name('compare');
+            Route::get('/export-pdf', [\App\Http\Controllers\Admin\ProductCostController::class, 'exportPdf'])->name('export-pdf');
+            Route::post('/simulate-sale', [\App\Http\Controllers\Admin\ProductCostController::class, 'simulateSale'])->name('simulate-sale');
+            Route::get('/{product}', [\App\Http\Controllers\Admin\ProductCostController::class, 'show'])->name('show');
+            Route::get('/{product}/cost', [\App\Http\Controllers\Admin\ProductCostController::class, 'getCost'])->name('get-cost');
+            Route::get('/{product}/export-pdf', [\App\Http\Controllers\Admin\ProductCostController::class, 'exportProductPdf'])->name('product-export-pdf');
+        });
+
         // Permission Management Routes
         Route::prefix('admin/permissions')->name('admin.permissions.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\PermissionController::class, 'index'])->name('index');

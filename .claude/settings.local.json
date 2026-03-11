@@ -33,7 +33,13 @@
       "WebSearch",
       "WebFetch(domain:tiny.com.br)",
       "WebFetch(domain:docs.wati.io)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(if [ -f \"/home/admin/Documents/Project/BBkits/resources/js/Pages/Admin/PurchaseSuggestions/Index.jsx\" ])",
+      "Bash(then)",
+      "Bash(else)",
+      "Bash(fi)",
+      "Bash(__NEW_LINE_0c4bfb3bb2e6cad5__ if [ -f \"/home/admin/Documents/Project/BBkits/resources/js/Pages/Admin/PurchaseSuggestions/ReorderConfig.jsx\" ])",
+      "Bash(gh auth login:*)"
     ],
     "deny": [],
     "additionalDirectories": [
