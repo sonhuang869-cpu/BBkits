@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sale_id')->constrained('sales')->onDelete('cascade');
             $table->string('tiny_erp_id')->nullable()->index();
             $table->string('invoice_number');
             $table->string('series')->default('1');

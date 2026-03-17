@@ -11,20 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Update invoice foreign key relationship in sales table
+        // Add invoice_id to sales table if it doesn't exist
         Schema::table('sales', function (Blueprint $table) {
-            // Check if invoice_id column doesn't exist before adding it
             if (!Schema::hasColumn('sales', 'invoice_id')) {
-                $table->foreignId('invoice_id')->nullable()->constrained()->after('tiny_erp_sync_at');
+                $table->unsignedBigInteger('invoice_id')->nullable()->after('tiny_erp_sync_at');
             }
         });
 
-        // Update invoices table to reference sales instead of orders
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->dropForeign(['order_id']);
-            $table->renameColumn('order_id', 'sale_id');
-            $table->foreign('sale_id')->references('id')->on('sales')->onDelete('cascade');
-        });
+        // Add foreign key constraint after invoices table exists
+        if (Schema::hasTable('invoices') && Schema::hasColumn('sales', 'invoice_id')) {
+            Schema::table('sales', function (Blueprint $table) {
+                $table->foreign('invoice_id')->references('id')->on('invoices')->nullOnDelete();
+            });
+        }
     }
 
     /**
@@ -32,12 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->dropForeign(['sale_id']);
-            $table->renameColumn('sale_id', 'order_id');
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
-        });
-
         Schema::table('sales', function (Blueprint $table) {
             if (Schema::hasColumn('sales', 'invoice_id')) {
                 $table->dropForeign(['invoice_id']);
