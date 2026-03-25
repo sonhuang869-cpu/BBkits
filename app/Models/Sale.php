@@ -181,6 +181,56 @@ class Sale extends Model
         'delivery_estimate' => 'date',
     ];
 
+    /**
+     * Appended attributes for JSON serialization.
+     * These values are automatically calculated and included in API responses.
+     */
+    protected $appends = [
+        'total_with_shipping',
+        'total_paid_amount',
+        'total_pending_amount',
+        'remaining_amount',
+        'commission_base_amount',
+        'payment_progress',
+        'payment_status_label',
+    ];
+
+    // Accessor methods for appended attributes
+    public function getTotalWithShippingAttribute(): float
+    {
+        return $this->getTotalAmount();
+    }
+
+    public function getTotalPaidAmountAttribute(): float
+    {
+        return $this->getTotalPaidAmount();
+    }
+
+    public function getTotalPendingAmountAttribute(): float
+    {
+        return $this->getTotalPendingAmount();
+    }
+
+    public function getRemainingAmountAttribute(): float
+    {
+        return $this->getRemainingAmount();
+    }
+
+    public function getCommissionBaseAmountAttribute(): float
+    {
+        return $this->getCommissionBaseAmount();
+    }
+
+    public function getPaymentProgressAttribute(): float
+    {
+        return $this->getPaymentProgress();
+    }
+
+    public function getPaymentStatusLabelAttribute(): string
+    {
+        return $this->getPaymentStatus();
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

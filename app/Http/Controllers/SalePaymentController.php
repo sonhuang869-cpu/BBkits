@@ -105,8 +105,14 @@ class SalePaymentController extends Controller
             'approved_at' => now(),
         ]);
 
-        // Check if sale is now fully paid and update sale status
+        // Sync the legacy received_amount field for backward compatibility
         $sale = $payment->sale;
+        $totalPaidAmount = $sale->getTotalPaidAmount();
+        $sale->update([
+            'received_amount' => $totalPaidAmount,
+        ]);
+
+        // Check if sale is now fully paid and update sale status
         if ($sale->isFullyPaid()) {
             $sale->update([
                 'status' => 'aprovado',

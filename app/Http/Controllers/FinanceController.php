@@ -112,6 +112,10 @@ class FinanceController extends Controller
                     'approved_at' => now(),
                 ]);
 
+                // Sync received_amount for backward compatibility
+                $sale->refresh();
+                $sale->update(['received_amount' => $sale->getTotalPaidAmount()]);
+
                 // Create commission record if needed
                 $commissionService = app(\App\Services\CommissionService::class);
                 $commissionService->createCommissionForSale($sale->fresh());
@@ -151,8 +155,12 @@ class FinanceController extends Controller
                     'approved_by' => auth()->id(),
                     'approved_at' => now(),
                 ]);
+
+                // Sync received_amount for backward compatibility
+                $sale->refresh();
+                $sale->update(['received_amount' => $sale->getTotalPaidAmount()]);
             }
-            
+
             DB::commit();
 
             // Fire WhatsApp notification event

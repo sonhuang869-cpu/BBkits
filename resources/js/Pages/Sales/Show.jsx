@@ -1030,24 +1030,48 @@ export default function Show({ sale }) {
                                             </div>
                                         </div>
 
-                                        <div className="value-display">
+                                        {/* Total with Shipping */}
+                                        <div className="detail-item border-t pt-3">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-sm text-green-600 font-bold">✅ Valor Recebido</span>
-                                                <span className="text-2xl font-bold text-green-600">{formatCurrency(sale.received_amount)}</span>
+                                                <span className="text-sm text-gray-700 font-bold">💰 Total com Frete</span>
+                                                <span className="text-xl font-bold text-gray-900">{formatCurrency(sale.total_with_shipping || (parseFloat(sale.total_amount) + parseFloat(sale.shipping_amount || 0)))}</span>
                                             </div>
                                         </div>
 
-                                        {/* Pending Amount */}
-                                        {(parseFloat(sale.total_amount) + parseFloat(sale.shipping_amount || 0)) > parseFloat(sale.received_amount) && (
+                                        {/* Approved Payments */}
+                                        <div className="value-display">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-green-600 font-bold">✅ Valor Pago (Aprovado)</span>
+                                                <span className="text-2xl font-bold text-green-600">{formatCurrency(sale.total_paid_amount || 0)}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Pending Payments (awaiting approval) */}
+                                        {(sale.total_pending_amount || 0) > 0 && (
+                                            <div className="pending-approval-highlight bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-sm text-yellow-700 font-bold">⏳ Aguardando Aprovação</span>
+                                                    <span className="text-xl font-bold text-yellow-600">
+                                                        {formatCurrency(sale.total_pending_amount)}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs text-yellow-600 mt-2">
+                                                    (Pagamentos enviados, aguardando aprovação do financeiro)
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        {/* Remaining Amount */}
+                                        {(sale.remaining_amount || 0) > 0 && (
                                             <div className="pending-amount-highlight">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-sm text-orange-600 font-bold">⏳ Valor Pendente</span>
+                                                    <span className="text-sm text-orange-600 font-bold">❌ Valor Restante</span>
                                                     <span className="text-xl font-bold text-orange-600">
-                                                        {formatCurrency((parseFloat(sale.total_amount) + parseFloat(sale.shipping_amount || 0)) - parseFloat(sale.received_amount))}
+                                                        {formatCurrency(sale.remaining_amount)}
                                                     </span>
                                                 </div>
                                                 <p className="text-xs text-orange-500 mt-2">
-                                                    (Total com frete - valor recebido)
+                                                    (Total - Pago - Pendente de Aprovação)
                                                 </p>
                                             </div>
                                         )}
@@ -1055,10 +1079,10 @@ export default function Show({ sale }) {
                                         <div className="commission-highlight">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-sm text-blue-600 font-bold">📈 Base para Comissão</span>
-                                                <span className="text-xl font-bold text-blue-600">{formatCurrency(sale.total_amount)}</span>
+                                                <span className="text-xl font-bold text-blue-600">{formatCurrency(sale.commission_base_amount || sale.total_amount)}</span>
                                             </div>
                                             <p className="text-xs text-blue-500 mt-2">
-                                                (Valor total dos produtos - frete não incluído)
+                                                (Valor dos produtos pagos - frete não incluído na comissão)
                                             </p>
                                         </div>
                                     </div>

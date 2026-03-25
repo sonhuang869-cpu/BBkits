@@ -617,6 +617,17 @@ class SaleController extends Controller
                 'initial_payment_approved_at' => now()
             ]);
 
+            // Approve all pending payments for this sale
+            $sale->payments()->where('status', 'pending')->update([
+                'status' => 'approved',
+                'approved_by' => auth()->id(),
+                'approved_at' => now(),
+            ]);
+
+            // Sync received_amount for backward compatibility
+            $sale->refresh();
+            $sale->update(['received_amount' => $sale->getTotalPaidAmount()]);
+
             // Create commission record
             $commission = $this->commissionService->createCommissionForSale($sale->fresh());
 

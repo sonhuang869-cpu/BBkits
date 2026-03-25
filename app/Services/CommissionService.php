@@ -136,13 +136,14 @@ class CommissionService
         $commission = $user->getMonthlyCommissionTotal($month, $year);
         
         // Calculate commission base for accurate rate calculation
+        // Uses getCommissionBaseAmount() which properly calculates from SalePayment records
         $commissionBase = $user->sales()
             ->where('status', 'aprovado')
             ->whereYear('payment_date', $year)
             ->whereMonth('payment_date', $month)
             ->get()
             ->sum(function ($sale) {
-                return ($sale->received_amount ?: 0) - ($sale->shipping_amount ?: 0);
+                return $sale->getCommissionBaseAmount();
             });
         
         $progress = ($commissionBase / self::INDIVIDUAL_MINIMUM) * 100;
