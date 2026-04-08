@@ -130,7 +130,7 @@ export default function Index({ auth, products, categories, filters }) {
         formData.append('allows_embroidery', data.allows_embroidery ? '1' : '0');
         formData.append('is_active', data.is_active ? '1' : '0');
         formData.append('stock_quantity', data.stock_quantity || 0);
-        formData.append('_method', 'PUT');
+        // Note: Route /admin/products/{id}/update accepts POST directly, no _method needed
         if (data.image) {
             formData.append('image', data.image);
         }
@@ -153,11 +153,14 @@ export default function Index({ auth, products, categories, filters }) {
     };
     
     const handleDelete = () => {
-        destroy(`/admin/products/${selectedProduct.id}`, {
+        router.delete(`/admin/products/${selectedProduct.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setShowDeleteModal(false);
                 setSelectedProduct(null);
+            },
+            onError: () => {
+                setShowDeleteModal(false);
             },
         });
     };
