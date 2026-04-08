@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import Modal from '@/Components/Modal';
 import TextInput from '@/Components/TextInput';
@@ -9,13 +9,16 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 
 export default function Index({ auth, products, categories, filters }) {
-    const { flash } = usePage().props;
+    const { flash, errors: pageErrors } = usePage().props;
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [flashMessage, setFlashMessage] = useState(null);
+
+    // Merge form errors with page errors
+    const errors = { ...pageErrors };
 
     // Handle flash messages
     useEffect(() => {
@@ -26,7 +29,7 @@ export default function Index({ auth, products, categories, filters }) {
         }
     }, [flash]);
     
-    const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
+    const { data, setData, delete: destroy, processing, reset } = useForm({
         name: '',
         description: '',
         price: '',
@@ -80,40 +83,71 @@ export default function Index({ auth, products, categories, filters }) {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        const formData = {
-            ...data,
-            sizes: JSON.stringify(data.sizes),
-            colors: JSON.stringify(data.colors)
-        };
-        
-        post('/admin/products', formData, {
+
+        // Create FormData for file upload support
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description || '');
+        formData.append('price', data.price);
+        formData.append('category_id', data.category_id || '');
+        formData.append('sizes', JSON.stringify(data.sizes));
+        formData.append('colors', JSON.stringify(data.colors));
+        formData.append('allows_embroidery', data.allows_embroidery ? '1' : '0');
+        formData.append('is_active', data.is_active ? '1' : '0');
+        formData.append('stock_quantity', data.stock_quantity || 0);
+        if (data.image) {
+            formData.append('image', data.image);
+        }
+        if (data.image_url) {
+            formData.append('image_url', data.image_url);
+        }
+
+        router.post('/admin/products', formData, {
             preserveScroll: true,
-            forceFormData: !!data.image,
+            forceFormData: true,
             onSuccess: () => {
                 setShowAddModal(false);
                 reset();
                 setImagePreview(null);
             },
+            onError: (errors) => {
+                // Errors are handled by useForm
+            },
         });
     };
-    
+
     const handleUpdate = (e) => {
         e.preventDefault();
-        
-        // Always use POST with _method=PUT for consistency
-        post(`/admin/products/${selectedProduct.id}/update`, {
-            ...data,
-            sizes: JSON.stringify(data.sizes),
-            colors: JSON.stringify(data.colors),
-            _method: 'PUT'
-        }, {
+
+        // Create FormData for file upload support
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description || '');
+        formData.append('price', data.price);
+        formData.append('category_id', data.category_id || '');
+        formData.append('sizes', JSON.stringify(data.sizes));
+        formData.append('colors', JSON.stringify(data.colors));
+        formData.append('allows_embroidery', data.allows_embroidery ? '1' : '0');
+        formData.append('is_active', data.is_active ? '1' : '0');
+        formData.append('stock_quantity', data.stock_quantity || 0);
+        formData.append('_method', 'PUT');
+        if (data.image) {
+            formData.append('image', data.image);
+        }
+        if (data.image_url) {
+            formData.append('image_url', data.image_url);
+        }
+
+        router.post(`/admin/products/${selectedProduct.id}/update`, formData, {
             preserveScroll: true,
             forceFormData: true,
             onSuccess: () => {
                 setShowEditModal(false);
                 reset();
                 setImagePreview(null);
+            },
+            onError: (errors) => {
+                // Errors are handled by useForm
             },
         });
     };
