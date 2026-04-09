@@ -74,7 +74,16 @@ class SaleController extends Controller
 
     public function createExpanded()
     {
-        return Inertia::render('Sales/CreateExpanded');
+        // Load all active products with embroidery options (same as createWithProducts)
+        $products = Product::active()->orderBy('category')->orderBy('name')->get();
+        $fonts = EmbroideryFont::active()->ordered()->get();
+        $colors = EmbroideryColor::active()->ordered()->get();
+
+        return Inertia::render('Sales/CreateExpanded', [
+            'products' => $products,
+            'fonts' => $fonts,
+            'colors' => $colors,
+        ]);
     }
     
     public function createWithPreview()
