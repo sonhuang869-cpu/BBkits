@@ -31,9 +31,9 @@ export default function PaymentModal({ isOpen, onClose, sale }) {
         }
 
         console.log('Submitting payment for sale ID:', sale.id);
-        console.log('Route URL will be:', route('payments.store', sale.id));
+        console.log('Route URL will be:', route('payments.store', { sale: sale.id }));
 
-        post(route('payments.store', sale.id), {
+        post(route('payments.store', { sale: sale.id }), {
             forceFormData: true,
             onSuccess: () => {
                 console.log('Payment submitted successfully');
