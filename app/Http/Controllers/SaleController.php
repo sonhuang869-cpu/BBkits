@@ -983,7 +983,7 @@ class SaleController extends Controller
                 'sale_id' => $sale->id
             ]);
 
-            return back()->with('message', 'Venda cancelada com sucesso.');
+            return redirect()->route('sales.index')->with('message', 'Venda cancelada com sucesso.');
 
         } catch (\Exception $e) {
             Log::error('Error cancelling sale', [
@@ -1120,7 +1120,7 @@ class SaleController extends Controller
                 'sale_id' => $sale->id
             ]);
 
-            return back()->with('message', 'Venda cancelada com sucesso.');
+            return redirect()->route('sales.index')->with('message', 'Venda cancelada com sucesso.');
 
         } catch (\Exception $e) {
             Log::error('Error cancelling sale', [
