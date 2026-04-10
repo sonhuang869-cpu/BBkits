@@ -231,14 +231,19 @@ class SaleController extends Controller
 
         // Create initial payment record if there's a received amount
         if (isset($validated['received_amount']) && $validated['received_amount'] > 0) {
+            // Auto-approve small payments or if created by admin (consistent with SalePaymentController)
+            $autoApprove = $validated['received_amount'] <= 5000 || auth()->user()->isAdmin();
+
             \App\Models\SalePayment::create([
                 'sale_id' => $sale->id,
                 'amount' => $validated['received_amount'],
                 'payment_date' => $validated['payment_date'],
                 'payment_method' => $validated['payment_method'],
-                'status' => 'pending', // Will be approved by admin/finance
+                'status' => $autoApprove ? 'approved' : 'pending',
                 'proof_data' => $validated['receipt_data'] ?? null,
                 'notes' => 'Pagamento inicial registrado na criação da venda',
+                'approved_by' => $autoApprove ? auth()->id() : null,
+                'approved_at' => $autoApprove ? now() : null,
             ]);
         }
 
@@ -399,14 +404,19 @@ class SaleController extends Controller
             
             // Create initial payment record if there's a received amount
             if ($validated['received_amount'] > 0) {
+                // Auto-approve small payments or if created by admin (consistent with SalePaymentController)
+                $autoApprove = $validated['received_amount'] <= 5000 || auth()->user()->isAdmin();
+
                 SalePayment::create([
                     'sale_id' => $sale->id,
                     'amount' => $validated['received_amount'],
                     'payment_date' => $validated['payment_date'],
                     'payment_method' => $validated['payment_method'],
-                    'status' => 'pending', // Will be approved by admin/finance
+                    'status' => $autoApprove ? 'approved' : 'pending',
                     'proof_data' => $validated['receipt_data'] ?? null,
                     'notes' => 'Pagamento inicial registrado na criação da venda',
+                    'approved_by' => $autoApprove ? auth()->id() : null,
+                    'approved_at' => $autoApprove ? now() : null,
                 ]);
             }
             
