@@ -1006,47 +1006,70 @@ class SaleController extends Controller
             return back()->withErrors(['error' => 'Venda não encontrada.']);
         }
 
-        \Log::emergency('CANCEL BY SALE ID CALLED - Sale ID: ' . $saleId . ' - User: ' . auth()->user()->email);
+        $user = auth()->user();
+        \Log::emergency('CANCEL BY SALE ID CALLED - Sale ID: ' . $saleId . ' - User: ' . $user->email);
 
-        $validated = $request->validate([
-            'admin_password' => 'required|string',
-            'explanation' => 'required|string|min:10|max:1000',
-        ]);
+        // Check if seller can cancel their own pending sale without admin password
+        $isOwner = $sale->user_id === $user->id;
+        $isPending = in_array($sale->status, ['pendente', 'pending']);
+        $isAdmin = $user->role === 'admin';
+        $canCancelWithoutAdminPassword = ($isOwner && $isPending) || $isAdmin;
 
-        // Debug: Log the password attempt
-        Log::info('Cancel attempt', [
-            'sale_id' => $sale->id,
-            'password_length' => strlen($validated['admin_password']),
-            'explanation_length' => strlen($validated['explanation']),
-            'user_id' => auth()->id()
-        ]);
-
-        // Verify admin password against any admin user (not just current user)
-        $adminUsers = \App\Models\User::where('role', 'admin')->get();
-
-        Log::info('Admin users found', [
-            'count' => $adminUsers->count(),
-            'admins' => $adminUsers->pluck('email')->toArray()
-        ]);
-
-        $isValidAdminPassword = $adminUsers->contains(function ($admin) use ($validated) {
-            $isValid = Hash::check($validated['admin_password'], $admin->password);
-            Log::info('Password check', [
-                'admin_email' => $admin->email,
-                'password_valid' => $isValid
+        if ($canCancelWithoutAdminPassword) {
+            // Seller canceling own pending sale OR admin - only require explanation
+            $validated = $request->validate([
+                'explanation' => 'required|string|min:10|max:1000',
             ]);
-            return $isValid;
-        });
 
-        if (!$isValidAdminPassword) {
-            Log::warning('Invalid admin password attempt', [
+            Log::info('Seller/Admin cancel without admin password', [
                 'sale_id' => $sale->id,
+                'user_id' => $user->id,
+                'is_owner' => $isOwner,
+                'is_pending' => $isPending,
+                'is_admin' => $isAdmin,
+            ]);
+        } else {
+            // Non-owner or non-pending sale - require admin password
+            $validated = $request->validate([
+                'admin_password' => 'required|string',
+                'explanation' => 'required|string|min:10|max:1000',
+            ]);
+
+            // Debug: Log the password attempt
+            Log::info('Cancel attempt requiring admin password', [
+                'sale_id' => $sale->id,
+                'password_length' => strlen($validated['admin_password']),
+                'explanation_length' => strlen($validated['explanation']),
                 'user_id' => auth()->id()
             ]);
-            return back()->withErrors(['admin_password' => 'Senha do administrador incorreta.']);
+
+            // Verify admin password against any admin user (not just current user)
+            $adminUsers = \App\Models\User::where('role', 'admin')->get();
+
+            Log::info('Admin users found', [
+                'count' => $adminUsers->count(),
+                'admins' => $adminUsers->pluck('email')->toArray()
+            ]);
+
+            $isValidAdminPassword = $adminUsers->contains(function ($admin) use ($validated) {
+                $isValid = Hash::check($validated['admin_password'], $admin->password);
+                Log::info('Password check', [
+                    'admin_email' => $admin->email,
+                    'password_valid' => $isValid
+                ]);
+                return $isValid;
+            });
+
+            if (!$isValidAdminPassword) {
+                Log::warning('Invalid admin password attempt', [
+                    'sale_id' => $sale->id,
+                    'user_id' => auth()->id()
+                ]);
+                return back()->withErrors(['admin_password' => 'Senha do administrador incorreta.']);
+            }
         }
 
-        Log::info('Admin password verified, proceeding with deletion', [
+        Log::info('Proceeding with cancellation', [
             'sale_id' => $sale->id,
             'user_id' => auth()->id()
         ]);

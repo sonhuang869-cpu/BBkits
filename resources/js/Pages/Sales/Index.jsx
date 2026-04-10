@@ -17,21 +17,36 @@ export default function Index({ sales, auth }) {
         setShowCancelModal(true);
     };
 
+    // Check if current user can cancel without admin password
+    const canCancelWithoutAdminPassword = (sale) => {
+        if (!sale) return false;
+        const isOwner = sale.user_id === auth.user.id;
+        const isPending = ['pendente', 'pending'].includes(sale.status);
+        const isAdmin = auth.user.role === 'admin';
+        return (isOwner && isPending) || isAdmin;
+    };
+
     const handleCancelConfirm = ({ password, explanation }) => {
         if (saleToCancel) {
+            const requiresPassword = !canCancelWithoutAdminPassword(saleToCancel);
+
             console.log('Attempting to cancel sale:', {
                 saleId: saleToCancel.id,
                 url: `/sales/${saleToCancel.id}/cancel`,
+                requiresPassword: requiresPassword,
                 passwordLength: password ? password.length : 0,
                 explanationLength: explanation ? explanation.length : 0
             });
 
             setProcessing(true);
 
-            router.post(`/sales/${saleToCancel.id}/cancel`, {
-                admin_password: password,
-                explanation: explanation
-            }, {
+            // Only include admin_password if required
+            const requestData = { explanation: explanation };
+            if (requiresPassword && password) {
+                requestData.admin_password = password;
+            }
+
+            router.post(`/sales/${saleToCancel.id}/cancel`, requestData, {
                 onSuccess: () => {
                     toast.success('Venda cancelada com sucesso!');
                     setShowCancelModal(false);
@@ -566,6 +581,7 @@ export default function Index({ sales, auth }) {
                 onConfirm={handleCancelConfirm}
                 sale={saleToCancel}
                 processing={processing}
+                requiresAdminPassword={!canCancelWithoutAdminPassword(saleToCancel)}
             />
 
             {/* Font Awesome Icons */}

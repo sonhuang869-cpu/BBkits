@@ -6,7 +6,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 
-export default function SaleCancellationModal({ show, onClose, onConfirm, sale, processing }) {
+export default function SaleCancellationModal({ show, onClose, onConfirm, sale, processing, requiresAdminPassword = true }) {
     const [password, setPassword] = useState('');
     const [explanation, setExplanation] = useState('');
     const [errors, setErrors] = useState({});
@@ -14,10 +14,11 @@ export default function SaleCancellationModal({ show, onClose, onConfirm, sale, 
     const handleConfirm = () => {
         // Reset errors
         setErrors({});
-        
+
         // Validate fields
         const newErrors = {};
-        if (!password.trim()) {
+        // Only require password if requiresAdminPassword is true
+        if (requiresAdminPassword && !password.trim()) {
             newErrors.password = 'Senha do administrador é obrigatória';
         }
         if (!explanation.trim()) {
@@ -26,15 +27,15 @@ export default function SaleCancellationModal({ show, onClose, onConfirm, sale, 
         if (explanation.trim().length < 10) {
             newErrors.explanation = 'Explicação deve ter pelo menos 10 caracteres';
         }
-        
+
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
-        
+
         // Call the confirm handler with the additional data
         onConfirm({
-            password: password,
+            password: requiresAdminPassword ? password : null,
             explanation: explanation
         });
     };
@@ -90,29 +91,38 @@ export default function SaleCancellationModal({ show, onClose, onConfirm, sale, 
                                                     <p className="text-orange-600 bg-orange-50 p-2 rounded">
                                                         ⚠️ Esta ação irá cancelar a venda e remover os valores das estatísticas gerais e comissão da vendedora.
                                                     </p>
-                                                    <p className="text-blue-600 bg-blue-50 p-2 rounded">
-                                                        🔐 <strong>Senha de administrador necessária:</strong> Entre a senha do usuário administrador do sistema. Se você não souber a senha, contate o administrador (admin@bbkits.com) para autorizar este cancelamento.
-                                                    </p>
+                                                    {requiresAdminPassword && (
+                                                        <p className="text-blue-600 bg-blue-50 p-2 rounded">
+                                                            🔐 <strong>Senha de administrador necessária:</strong> Entre a senha do usuário administrador do sistema. Se você não souber a senha, contate o administrador (admin@bbkits.com) para autorizar este cancelamento.
+                                                        </p>
+                                                    )}
+                                                    {!requiresAdminPassword && (
+                                                        <p className="text-green-600 bg-green-50 p-2 rounded">
+                                                            ✅ <strong>Você pode cancelar esta venda:</strong> Como esta é sua venda e ainda está pendente, você pode cancelá-la diretamente.
+                                                        </p>
+                                                    )}
                                                 </div>
-                                                
+
                                                 <div className="space-y-4">
-                                                    <div>
-                                                        <InputLabel htmlFor="admin_password" value="Senha do Administrador *" />
-                                                        <TextInput
-                                                            id="admin_password"
-                                                            type="password"
-                                                            value={password}
-                                                            onChange={(e) => setPassword(e.target.value)}
-                                                            className="mt-1 block w-full"
-                                                            placeholder="Digite a senha do administrador do sistema"
-                                                        />
-                                                        {errors.password && (
-                                                            <p className="text-red-600 text-xs mt-1">{errors.password}</p>
-                                                        )}
-                                                        <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
-                                                            💡 <strong>Dica:</strong> Esta é a senha do usuário administrador cadastrado no sistema. Entre em contato com o administrador se não souber a senha.
+                                                    {requiresAdminPassword && (
+                                                        <div>
+                                                            <InputLabel htmlFor="admin_password" value="Senha do Administrador *" />
+                                                            <TextInput
+                                                                id="admin_password"
+                                                                type="password"
+                                                                value={password}
+                                                                onChange={(e) => setPassword(e.target.value)}
+                                                                className="mt-1 block w-full"
+                                                                placeholder="Digite a senha do administrador do sistema"
+                                                            />
+                                                            {errors.password && (
+                                                                <p className="text-red-600 text-xs mt-1">{errors.password}</p>
+                                                            )}
+                                                            <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
+                                                                💡 <strong>Dica:</strong> Esta é a senha do usuário administrador cadastrado no sistema. Entre em contato com o administrador se não souber a senha.
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    )}
                                                     
                                                     <div>
                                                         <InputLabel htmlFor="explanation" value="Motivo do Cancelamento *" />
