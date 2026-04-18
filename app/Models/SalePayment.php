@@ -21,12 +21,20 @@ class SalePayment extends Model
         'approved_by',
         'approved_at',
         'rejection_reason',
+        // BUG-15: Refund fields
+        'refunded_by',
+        'refunded_at',
+        'refund_date',
+        'refund_method',
+        'refund_notes',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'payment_date' => 'date',
         'approved_at' => 'datetime',
+        'refunded_at' => 'datetime',
+        'refund_date' => 'date',
     ];
 
     public function sale(): BelongsTo

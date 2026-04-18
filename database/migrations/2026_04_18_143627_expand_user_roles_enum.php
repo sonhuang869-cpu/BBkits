@@ -18,9 +18,14 @@ return new class extends Migration
         // For PostgreSQL, we need to handle enum differently
         // Convert enum to varchar for flexibility
 
-        if (DB::getDriverName() === 'pgsql') {
+        $driver = DB::getDriverName();
+
+        if ($driver === 'pgsql') {
             // PostgreSQL: Change column type from enum to varchar
             DB::statement('ALTER TABLE users ALTER COLUMN role TYPE VARCHAR(50)');
+        } elseif ($driver === 'sqlite') {
+            // SQLite: Column is already TEXT, no change needed
+            // SQLite doesn't have strict enum types, so VARCHAR/TEXT work as-is
         } else {
             // MySQL: Modify enum to include all roles
             DB::statement("ALTER TABLE users MODIFY COLUMN role VARCHAR(50) DEFAULT 'vendedora'");

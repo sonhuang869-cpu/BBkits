@@ -55,6 +55,9 @@ class SaleController extends Controller
             $sale->total_paid_amount = $sale->getTotalPaidAmount();
             $sale->total_pending_amount = $sale->getTotalPendingAmount();
             $sale->remaining_amount = $sale->getRemainingAmount();
+            // BUG-14/15: Add refund tracking for refused sales
+            $sale->refund_amount = $sale->getRefundAmount();
+            $sale->needs_refund = $sale->needsRefund();
             return $sale;
         });
 
@@ -584,6 +587,9 @@ class SaleController extends Controller
             $sale->total_paid_amount = $sale->getTotalPaidAmount();
             $sale->total_pending_amount = $sale->getTotalPendingAmount();
             $sale->remaining_amount = $sale->getRemainingAmount();
+            // BUG-14/15: Add refund tracking for refused sales
+            $sale->refund_amount = $sale->getRefundAmount();
+            $sale->needs_refund = $sale->needsRefund();
             return $sale;
         });
 

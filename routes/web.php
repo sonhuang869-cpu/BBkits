@@ -231,6 +231,7 @@ Route::middleware(['auth', 'approved'])->group(function () {
     Route::post('/sales/{sale}/payments', [SalePaymentController::class, 'store'])->name('payments.store');
     Route::put('/payments/{payment}/approve', [SalePaymentController::class, 'approve'])->name('payments.approve');
     Route::put('/payments/{payment}/reject', [SalePaymentController::class, 'reject'])->name('payments.reject');
+    Route::put('/payments/{payment}/refund', [SalePaymentController::class, 'refund'])->name('payments.refund'); // BUG-15
     Route::delete('/payments/{payment}', [SalePaymentController::class, 'destroy'])->name('payments.destroy');
 
     // Order Comments

@@ -404,6 +404,29 @@ class Sale extends Model
         return max(0, $this->getTotalAmount() - $this->getTotalPaidAmount() - $this->getTotalPendingAmount());
     }
 
+    /**
+     * BUG-14/15: Get the amount that needs to be refunded for refused/cancelled sales.
+     * This is the total paid amount that should be returned to the customer.
+     */
+    public function getRefundAmount(): float
+    {
+        // Only calculate refund for refused/cancelled sales
+        if (!in_array($this->status, ['recusado', 'cancelado', 'estornado'])) {
+            return 0;
+        }
+
+        // Refund = total paid amount (money that needs to go back to customer)
+        return $this->getTotalPaidAmount();
+    }
+
+    /**
+     * Check if this sale needs a refund (is refused/cancelled with payments).
+     */
+    public function needsRefund(): bool
+    {
+        return $this->getRefundAmount() > 0;
+    }
+
     public function isFullyPaid(): bool
     {
         return $this->getTotalPaidAmount() >= ($this->total_amount + $this->shipping_amount);
