@@ -30,6 +30,31 @@ class SaleController extends Controller
     protected $actionHistoryService;
     protected $stockReservationService;
 
+    /**
+     * BUG-17: Sanitize input to prevent stored XSS
+     * Strips HTML tags and encodes special characters
+     */
+    private function sanitizeInput(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        // Strip all HTML tags and encode special characters
+        return htmlspecialchars(strip_tags($value), ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
+     * BUG-17: Sanitize multiple fields in an array
+     */
+    private function sanitizeFields(array &$data, array $fields): void
+    {
+        foreach ($fields as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = $this->sanitizeInput($data[$field]);
+            }
+        }
+    }
+
     public function __construct(
         NotificationService $notificationService,
         CommissionService $commissionService,
@@ -199,6 +224,13 @@ class SaleController extends Controller
             'preferred_delivery_date' => 'nullable|date'
         ]);
 
+        // BUG-17: Sanitize text fields to prevent stored XSS
+        $this->sanitizeFields($validated, [
+            'client_name', 'client_email', 'child_name', 'notes',
+            'delivery_address', 'delivery_complement', 'delivery_neighborhood',
+            'delivery_city', 'mesa_livre_details', 'embroidery_text'
+        ]);
+
         if ($request->hasFile('payment_receipt')) {
             $file = $request->file('payment_receipt');
             $fileContent = file_get_contents($file->getRealPath());
@@ -301,8 +333,14 @@ class SaleController extends Controller
             // Child name - REQUIRED
             'child_name' => 'required|string|max:255',
             
-            // Products - REQUIRED (array of products)
-            'products' => 'required|array|min:1',
+            // BUG-07: Products - REQUIRED (at least one valid product)
+            'products' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                // Ensure at least one product has a valid product_id
+                $validProducts = collect($value)->filter(fn($p) => isset($p['product_id']) && is_numeric($p['product_id']));
+                if ($validProducts->isEmpty()) {
+                    $fail('Pelo menos um produto válido deve ser adicionado à venda.');
+                }
+            }],
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.size' => 'nullable|string|max:50',
@@ -363,8 +401,25 @@ class SaleController extends Controller
             'preferred_delivery_date' => 'nullable|date'
         ]);
 
+        // BUG-17: Sanitize text fields to prevent stored XSS
+        $this->sanitizeFields($validated, [
+            'client_name', 'client_email', 'child_name', 'notes',
+            'delivery_address', 'delivery_complement', 'delivery_neighborhood',
+            'delivery_city', 'mesa_livre_details'
+        ]);
+
+        // Sanitize embroidery_text in each product
+        if (isset($validated['products'])) {
+            foreach ($validated['products'] as &$product) {
+                if (isset($product['embroidery_text'])) {
+                    $product['embroidery_text'] = $this->sanitizeInput($product['embroidery_text']);
+                }
+            }
+            unset($product); // Unset reference
+        }
+
         DB::beginTransaction();
-        
+
         try {
             // Handle payment receipt
             if ($request->hasFile('payment_receipt')) {

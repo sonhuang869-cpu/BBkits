@@ -132,7 +132,8 @@ export default function Login({ status, canResetPassword }) {
                                 Acesse sua conta e continue vendendo
                             </p>
 
-                            <form onSubmit={submit} className="space-y-6">
+                            {/* BUG-21: Added method="POST" and action="/login" for secure fallback if JS fails */}
+                            <form onSubmit={submit} method="POST" action="/login" className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
                                     <input

@@ -42,7 +42,8 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+            // BUG-22: Added 5-minute decay time for better brute force protection
+            RateLimiter::hit($this->throttleKey(), 300); // 300 seconds = 5 minutes
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
@@ -53,13 +54,17 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Ensure the login request is not rate limited.
+     * BUG-22: Ensure the login request is not rate limited.
+     * Reduced from 5 to 3 attempts for better security.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        // BUG-22: Reduced max attempts from 5 to 3 for better brute force protection
+        $maxAttempts = 3;
+
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $maxAttempts)) {
             return;
         }
 

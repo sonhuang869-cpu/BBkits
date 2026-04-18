@@ -344,6 +344,13 @@ class AdminController extends Controller
 
     public function approveUser(User $user)
     {
+        // BUG-02: Require email verification before approval
+        if (!$user->hasVerifiedEmail()) {
+            return redirect()->back()->withErrors([
+                'error' => 'O usuário precisa verificar o email antes de ser aprovado. Email não verificado: ' . $user->email
+            ]);
+        }
+
         $user->update([
             'approved' => true,
             'approved_at' => now(),

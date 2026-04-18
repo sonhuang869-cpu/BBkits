@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -136,6 +136,14 @@ class User extends Authenticatable
     public function isApproved(): bool
     {
         return $this->approved || $this->isAdmin() || $this->isFinanceiro() || $this->isFinanceAdmin() || $this->isProductionAdmin() || $this->isManager();
+    }
+
+    /**
+     * BUG-02: Check if user has verified their email
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        return !is_null($this->email_verified_at);
     }
 
     public function getMonthlyCommissionTotal(int $month, int $year): float
