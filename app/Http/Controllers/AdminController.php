@@ -326,7 +326,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:manager,financeiro,production_admin,admin'
+            'role' => 'required|string|in:vendedora,manager,financeiro,finance_admin,production_admin,admin'
         ]);
 
         User::create([
