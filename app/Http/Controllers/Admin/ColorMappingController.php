@@ -56,6 +56,7 @@ class ColorMappingController extends Controller
                 'stats' => $stats,
             ]);
         } catch (\Exception $e) {
+            // BUG-A13: Log detailed error but don't expose SQL to user
             \Log::error('Color Mapping Index Error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
@@ -71,7 +72,7 @@ class ColorMappingController extends Controller
                     'total_product_colors' => 0,
                     'unconfigured_colors' => 0,
                 ],
-                'error' => 'Erro ao carregar mapeamentos: ' . $e->getMessage(),
+                'error' => 'Erro ao carregar mapeamentos. Por favor, tente novamente ou contate o suporte.',
             ]);
         }
     }

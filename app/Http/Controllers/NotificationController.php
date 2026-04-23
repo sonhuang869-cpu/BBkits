@@ -41,8 +41,19 @@ class NotificationController extends Controller
 
     public function markAsRead($id)
     {
+        // BUG-V06: Verify notification belongs to the authenticated user
+        $notification = \App\Models\Notification::find($id);
+
+        if (!$notification) {
+            return response()->json(['error' => 'Notificação não encontrada.'], 404);
+        }
+
+        if ($notification->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Você não tem permissão para marcar esta notificação.'], 403);
+        }
+
         $this->notificationService->markAsRead($id, auth()->id());
-        
+
         return response()->json(['success' => true]);
     }
 

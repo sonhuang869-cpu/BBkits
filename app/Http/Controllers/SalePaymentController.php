@@ -12,6 +12,14 @@ class SalePaymentController extends Controller
 {
     public function index(Sale $sale)
     {
+        // BUG-V08: Verify user has permission to view payments for this sale
+        $user = auth()->user();
+
+        // Vendedoras can only view payments for their own sales
+        if ($user->role === 'vendedora' && $sale->user_id !== $user->id) {
+            abort(403, 'Você não tem permissão para ver pagamentos desta venda.');
+        }
+
         $payments = $sale->payments()->with('approvedBy')->orderBy('payment_date', 'desc')->get();
 
         // UNIFIED CALCULATIONS - IDENTICAL TO ALL OTHER PAGES
@@ -48,6 +56,16 @@ class SalePaymentController extends Controller
 
     public function store(Request $request, Sale $sale)
     {
+        // BUG-V08: Verify user has permission to add payments to this sale
+        $user = auth()->user();
+
+        // Vendedoras can only add payments to their own sales
+        if ($user->role === 'vendedora' && $sale->user_id !== $user->id) {
+            return back()->withErrors([
+                'error' => 'Você não tem permissão para registrar pagamentos nesta venda.'
+            ]);
+        }
+
         // BUG-04: Block payments on refused/cancelled sales
         $blockedStatuses = ['recusado', 'cancelado', 'estornado'];
         if (in_array($sale->status, $blockedStatuses)) {

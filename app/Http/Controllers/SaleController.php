@@ -180,12 +180,26 @@ class SaleController extends Controller
 
     public function kanban()
     {
-        $sales = Sale::with(['user', 'comments'])
-            ->withCount('comments')
-            ->orderBy('updated_at', 'desc')
-            ->get();
+        $user = auth()->user();
 
-        $users = \App\Models\User::select('id', 'name', 'role')->get();
+        // BUG-V01: Filter sales based on user role
+        // Vendedoras can only see their own sales
+        $salesQuery = Sale::with(['user', 'comments'])
+            ->withCount('comments')
+            ->orderBy('updated_at', 'desc');
+
+        if ($user->role === 'vendedora') {
+            $salesQuery->where('user_id', $user->id);
+        }
+
+        $sales = $salesQuery->get();
+
+        // BUG-V02: Only admins/financeiros can see all users
+        // Vendedoras should not see user list at all
+        $users = [];
+        if ($user->isAdmin() || $user->isFinanceiro()) {
+            $users = \App\Models\User::select('id', 'name', 'role')->get();
+        }
 
         return Inertia::render('KanbanBoard', [
             'sales' => $sales,
@@ -1159,12 +1173,26 @@ class SaleController extends Controller
         }
 
         $user = auth()->user();
-        \Log::emergency('CANCEL BY SALE ID CALLED - Sale ID: ' . $saleId . ' - User: ' . $user->email);
+        \Log::info('Cancel request - Sale ID: ' . $saleId . ' - User: ' . $user->email);
+
+        // BUG-V05: Verify authorization - vendedora can only cancel their OWN sales
+        $isOwner = $sale->user_id === $user->id;
+        $isAdmin = $user->role === 'admin';
+        $isFinanceiro = $user->role === 'financeiro';
+
+        // Only owner, admin, or financeiro can cancel
+        if (!$isOwner && !$isAdmin && !$isFinanceiro) {
+            Log::warning('Unauthorized cancel attempt', [
+                'sale_id' => $sale->id,
+                'sale_owner_id' => $sale->user_id,
+                'requester_id' => $user->id,
+                'requester_role' => $user->role
+            ]);
+            abort(403, 'Você não tem permissão para cancelar esta venda.');
+        }
 
         // Check if seller can cancel their own pending sale without admin password
-        $isOwner = $sale->user_id === $user->id;
         $isPending = in_array($sale->status, ['pendente', 'pending']);
-        $isAdmin = $user->role === 'admin';
         $canCancelWithoutAdminPassword = ($isOwner && $isPending) || $isAdmin;
 
         if ($canCancelWithoutAdminPassword) {

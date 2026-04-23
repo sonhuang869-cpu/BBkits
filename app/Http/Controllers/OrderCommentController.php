@@ -11,6 +11,14 @@ class OrderCommentController extends Controller
 {
     public function store(Request $request, Sale $sale)
     {
+        // BUG-V07 & BUG-V09: Verify user has access to add comments to this sale
+        $user = Auth::user();
+
+        // Vendedoras can only add comments to their own sales
+        if ($user->role === 'vendedora' && $sale->user_id !== $user->id) {
+            abort(403, 'Você não tem permissão para comentar nesta venda.');
+        }
+
         $validated = $request->validate([
             'comment' => 'required|string|max:1000',
             'department' => 'required|in:finance,production,admin,sales,general',
@@ -38,6 +46,14 @@ class OrderCommentController extends Controller
 
     public function index(Sale $sale)
     {
+        // BUG-V07: Verify user has access to this sale's comments
+        $user = Auth::user();
+
+        // Vendedoras can only see comments on their own sales
+        if ($user->role === 'vendedora' && $sale->user_id !== $user->id) {
+            abort(403, 'Você não tem permissão para ver comentários desta venda.');
+        }
+
         $comments = $sale->comments()
             ->with(['user', 'mentionedUser'])
             ->latest()

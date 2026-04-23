@@ -23,11 +23,46 @@ class SalePolicy
 
     public function create(User $user): bool
     {
-        return $user->isVendedora();
+        // Vendedoras can create sales, admin can also create on behalf of sellers
+        return $user->isVendedora() || $user->isAdmin();
+    }
+
+    /**
+     * Determine whether the user can view comments for a sale.
+     */
+    public function viewComments(User $user, Sale $sale): bool
+    {
+        // Owner, admin, or financeiro can view comments
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
+    }
+
+    /**
+     * Determine whether the user can add comments to a sale.
+     */
+    public function addComment(User $user, Sale $sale): bool
+    {
+        // Owner, admin, or financeiro can add comments
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
+    }
+
+    /**
+     * Determine whether the user can add payments to a sale.
+     */
+    public function addPayment(User $user, Sale $sale): bool
+    {
+        // Owner, admin, or financeiro can add payments
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
     }
 
     public function update(User $user, Sale $sale): bool
     {
+        // BUG-V10: Vendedora can edit their own pending sales
+        // Admin can edit any sale at any status
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        // Owner can edit their own pending sales
         return $user->id === $sale->user_id && $sale->isPending();
     }
 
@@ -39,8 +74,9 @@ class SalePolicy
 
     public function cancel(User $user, Sale $sale): bool
     {
-        // Any authenticated user can request cancellation (admin password will be verified in controller)
-        return true;
+        // BUG-V05: Only owner, admin, or financeiro can cancel
+        // Admin password will be verified in controller for non-owner/non-admin
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
     }
 
     public function approve(User $user): bool

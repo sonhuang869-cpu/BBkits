@@ -183,12 +183,11 @@ class GamificationService
             ->map(function ($user) {
                 $salesCount = $user->sales->count();
                 $totalRevenue = $user->sales->sum('received_amount');
-                
+
+                // BUG-V04: Don't expose email in ranking - only name
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
                     'sales_count' => $salesCount,
                     'total_revenue' => $totalRevenue
                 ];
@@ -201,14 +200,13 @@ class GamificationService
             $position = $index + 1;
             $user = User::find($performer['id']);
             $level = $this->getUserLevel($user);
-            
+
+            // BUG-V04: Don't expose email in ranking
             return [
                 'position' => $position,
                 'user' => [
                     'id' => $performer['id'],
-                    'name' => $performer['name'],
-                    'email' => $performer['email'],
-                    'role' => $performer['role']
+                    'name' => $performer['name']
                 ],
                 'monthly_total' => $performer['total_revenue'],
                 'monthly_sales_count' => $performer['sales_count'],
