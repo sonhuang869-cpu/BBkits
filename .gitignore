@@ -36,3 +36,4 @@ Thumbs.db
 auth.json
 *.log
 .claude/
+githubInfo.txt
