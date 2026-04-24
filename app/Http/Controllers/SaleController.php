@@ -388,6 +388,9 @@ class SaleController extends Controller
 
     public function storeWithProducts(Request $request)
     {
+        // BUG-V03: Add explicit authorization check
+        $this->authorize('create', Sale::class);
+
         $validated = $request->validate([
             // Client info - REQUIRED
             'client_name' => 'required|string|max:255',
@@ -554,7 +557,7 @@ class SaleController extends Controller
                     'payment_date' => $validated['payment_date'],
                     'payment_method' => $validated['payment_method'],
                     'status' => $autoApprove ? 'approved' : 'pending',
-                    'proof_data' => $validated['receipt_data'] ?? null,
+                    'receipt_path' => $validated['payment_receipt'] ?? null, // BUG-V03: Use correct field name
                     'notes' => 'Pagamento inicial registrado na criação da venda',
                     'approved_by' => $autoApprove ? auth()->id() : null,
                     'approved_at' => $autoApprove ? now() : null,
@@ -601,14 +604,32 @@ class SaleController extends Controller
 
             return redirect()->route('sales.index')->with('message', 'Venda com produtos registrada com sucesso!');
             
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            Log::error('Database error creating sale with products', [
+                'user_id' => auth()->id(),
+                'user_role' => auth()->user()->role,
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+            ]);
+
+            // BUG-V03: User-friendly error message, don't expose SQL details
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao salvar no banco de dados. Verifique os dados e tente novamente.']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating sale with products', [
+                'user_id' => auth()->id(),
+                'user_role' => auth()->user()->role,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
-            return redirect()->back()->withErrors(['error' => 'Erro ao criar venda: ' . $e->getMessage()]);
+
+            // BUG-V03: User-friendly error message, don't expose technical details
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao criar venda. Por favor, verifique todos os campos e tente novamente.']);
         }
     }
 
@@ -1314,12 +1335,13 @@ class SaleController extends Controller
     }
 
     // Public client page
+    // BUG-A06: Fixed to only expose client-safe fields, not internal data
     public function clientPage($token)
     {
         $sale = Sale::where('unique_token', $token)->firstOrFail();
 
-        // Load payments relationship explicitly
-        $sale->load('payments');
+        // Load only necessary relationships
+        $sale->load(['saleProducts.product', 'embroideryDesign', 'payments']);
 
         // UNIFIED CALCULATIONS - IDENTICAL TO ALL OTHER PAGES
         $totalWithShipping = $sale->getTotalAmount();
@@ -1327,16 +1349,58 @@ class SaleController extends Controller
         $pendingAmount = $sale->getTotalPendingAmount();
         $remainingAmount = $sale->getRemainingAmount();
 
+        // BUG-A06: Create limited DTO - only expose client-safe fields
+        // DO NOT expose: admin_notes, user info, admin IDs, CPF, internal tokens, processing_token, etc.
+        $safeProducts = $sale->saleProducts->map(function ($sp) {
+            return [
+                'product_name' => $sp->product->name ?? 'Produto',
+                'quantity' => $sp->quantity,
+                'size' => $sp->size,
+                'unit_price' => $sp->unit_price,
+                'embroidery_text' => $sp->embroidery_text,
+                'embroidery_position' => $sp->embroidery_position,
+                'embroidery_color' => $sp->embroidery_color,
+                'embroidery_font' => $sp->embroidery_font,
+            ];
+        });
+
+        // Only expose fields that the client should see
+        $safeSale = [
+            'id' => $sale->id,
+            'unique_token' => $sale->unique_token,
+            'client_name' => $sale->client_name,
+            'child_name' => $sale->child_name,
+            'status' => $sale->status,
+            'order_status' => $sale->order_status,
+            'total_amount' => $sale->total_amount,
+            'shipping_amount' => $sale->shipping_amount,
+            'payment_method' => $sale->payment_method,
+            'tracking_code' => $sale->tracking_code,
+            'shipped_at' => $sale->shipped_at,
+            'created_at' => $sale->created_at,
+            // Delivery address (client's own data, needed for form)
+            'delivery_address' => $sale->delivery_address,
+            'delivery_number' => $sale->delivery_number,
+            'delivery_complement' => $sale->delivery_complement,
+            'delivery_neighborhood' => $sale->delivery_neighborhood,
+            'delivery_city' => $sale->delivery_city,
+            'delivery_state' => $sale->delivery_state,
+            'delivery_zipcode' => $sale->delivery_zipcode,
+            // Embroidery design info (safe to show)
+            'embroidery_design' => $sale->embroideryDesign ? [
+                'name' => $sale->embroideryDesign->name,
+                'image_url' => $sale->embroideryDesign->image_url,
+            ] : null,
+            // Products with limited fields only
+            'sale_products' => $safeProducts,
+            // Payment summary (no individual payment details)
+            'total_paid' => $approvedPaidAmount,
+            'total_pending' => $pendingAmount,
+            'remaining_amount' => $remainingAmount,
+        ];
 
         return Inertia::render('Sales/ClientPage', [
-            'sale' => $sale->load([
-                'user',
-                'productionAdmin',
-                'financeAdmin',
-                'saleProducts.product',  // Load product details
-                'embroideryDesign',      // Load embroidery design details
-                'payments'               // Load payments for correct financial calculations
-            ]),
+            'sale' => $safeSale,
             'orderStatus' => $sale->getOrderStatusLabel(),
             'orderStatusColor' => $sale->getOrderStatusColor(),
             'paidAmount' => $approvedPaidAmount,
