@@ -173,7 +173,10 @@ class GamificationService
         $currentYear = Carbon::now()->year;
         $currentMonth = Carbon::now()->month;
 
+        // BUG-A03: Only include active and verified vendedoras
         $topPerformers = User::where('role', 'vendedora')
+            ->where('approved', true)
+            ->whereNotNull('email_verified_at')
             ->with(['sales' => function ($query) use ($currentYear, $currentMonth) {
                 $query->where('status', 'aprovado')
                       ->whereYear('payment_date', $currentYear)

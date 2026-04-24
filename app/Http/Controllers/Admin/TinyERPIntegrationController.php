@@ -391,22 +391,32 @@ class TinyERPIntegrationController extends Controller
 
     /**
      * Test connection to Tiny ERP
+     * BUG-A12: Fixed to not expose sensitive error details
      */
     public function testConnection()
     {
         try {
             $isConnected = $this->getTinyERPService()->testConnection();
-            $status = $this->getTinyERPService()->getStatus();
 
+            // BUG-A12: Only return connection status, not raw API response
             return response()->json([
                 'connected' => $isConnected,
-                'status' => $status,
+                'message' => $isConnected
+                    ? 'Conexão com Tiny ERP estabelecida com sucesso.'
+                    : 'Não foi possível conectar ao Tiny ERP. Verifique as configurações.',
             ]);
 
         } catch (\Exception $e) {
+            // BUG-A12: Log detailed error server-side only
+            \Log::error('TinyERP connection test failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Return generic error message to client
             return response()->json([
                 'connected' => false,
-                'error' => $e->getMessage(),
+                'message' => 'Erro ao testar conexão com Tiny ERP. Verifique as configurações e tente novamente.',
             ], 500);
         }
     }

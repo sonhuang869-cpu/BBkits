@@ -19,9 +19,11 @@ class Sale extends Model
         static::creating(function ($sale) {
             if (empty($sale->unique_token)) {
                 do {
-                    $token = 'BB' . strtoupper(Str::random(8));
+                    // BUG-A07: Use cryptographically secure random token without fixed prefix
+                    // 12 alphanumeric characters = 62^12 = ~3.2 quintillion combinations
+                    $token = strtoupper(Str::random(12));
                 } while (self::where('unique_token', $token)->exists());
-                
+
                 $sale->unique_token = $token;
             }
         });
