@@ -26,22 +26,42 @@ class OrderCommentController extends Controller
             'is_internal' => 'boolean'
         ]);
 
-        $comment = OrderComment::create([
-            'sale_id' => $sale->id,
-            'user_id' => Auth::id(),
-            'department' => $validated['department'],
-            'comment' => $validated['comment'],
-            'is_internal' => $validated['is_internal'] ?? true,
-            'mention_user_id' => $validated['mention_user_id']
-        ]);
+        // BUG-V09: Add try-catch to prevent 500 errors
+        try {
+            $comment = OrderComment::create([
+                'sale_id' => $sale->id,
+                'user_id' => Auth::id(),
+                'department' => $validated['department'],
+                'comment' => $validated['comment'],
+                'is_internal' => $validated['is_internal'] ?? true,
+                'mention_user_id' => $validated['mention_user_id'] ?? null
+            ]);
 
-        // Send notification to mentioned user if exists
-        if ($comment->mention_user_id) {
-            $notificationService = app(\App\Services\NotificationService::class);
-            $notificationService->notifyUserMentioned($comment);
+            // Send notification to mentioned user if exists (non-blocking)
+            if ($comment->mention_user_id) {
+                try {
+                    $notificationService = app(\App\Services\NotificationService::class);
+                    $notificationService->notifyUserMentioned($comment);
+                } catch (\Exception $e) {
+                    // Log notification error but don't fail the comment creation
+                    \Log::warning('Failed to send comment mention notification', [
+                        'comment_id' => $comment->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            return back()->with('success', 'Comentário adicionado com sucesso!');
+
+        } catch (\Exception $e) {
+            \Log::error('Failed to create comment', [
+                'sale_id' => $sale->id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return back()->withErrors(['error' => 'Erro ao adicionar comentário. Tente novamente.']);
         }
-
-        return back()->with('success', 'Comentário adicionado com sucesso!');
     }
 
     public function index(Sale $sale)

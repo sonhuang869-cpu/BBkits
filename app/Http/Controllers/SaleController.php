@@ -184,7 +184,7 @@ class SaleController extends Controller
 
         // BUG-V01: Filter sales based on user role
         // Vendedoras can only see their own sales
-        $salesQuery = Sale::with(['user', 'comments'])
+        $salesQuery = Sale::with(['user:id,name', 'comments'])
             ->withCount('comments')
             ->orderBy('updated_at', 'desc');
 
@@ -194,6 +194,45 @@ class SaleController extends Controller
 
         $sales = $salesQuery->get();
 
+        // BUG-A04 & BUG-A05: Filter sensitive fields for Kanban
+        // DO NOT expose: unique_token, CPF, full address, admin_notes, receipt data
+        $safeSales = $sales->map(function ($sale) use ($user) {
+            $safeData = [
+                'id' => $sale->id,
+                'client_name' => $sale->client_name,
+                'child_name' => $sale->child_name,
+                'status' => $sale->status,
+                'order_status' => $sale->order_status,
+                'total_amount' => $sale->total_amount,
+                'shipping_amount' => $sale->shipping_amount,
+                'payment_method' => $sale->payment_method,
+                'created_at' => $sale->created_at,
+                'updated_at' => $sale->updated_at,
+                'comments_count' => $sale->comments_count,
+                // User info (limited)
+                'user_id' => $sale->user_id,
+                'user' => $sale->user ? [
+                    'id' => $sale->user->id,
+                    'name' => $sale->user->name,
+                ] : null,
+                // Only show city/state for location context (not full address - LGPD)
+                'delivery_city' => $sale->delivery_city,
+                'delivery_state' => $sale->delivery_state,
+                // Tracking info (public)
+                'tracking_code' => $sale->tracking_code,
+                'shipped_at' => $sale->shipped_at,
+            ];
+
+            // Admin/Financeiro can see more details (but still not CPF or tokens)
+            if ($user->isAdmin() || $user->isFinanceiro()) {
+                $safeData['received_amount'] = $sale->received_amount;
+                $safeData['notes'] = $sale->notes;
+                // Still don't expose: unique_token, client_cpf, admin_notes, processing_token
+            }
+
+            return $safeData;
+        });
+
         // BUG-V02: Only admins/financeiros can see all users
         // Vendedoras should not see user list at all
         $users = [];
@@ -202,7 +241,7 @@ class SaleController extends Controller
         }
 
         return Inertia::render('KanbanBoard', [
-            'sales' => $sales,
+            'sales' => $safeSales,
             'users' => $users
         ]);
     }

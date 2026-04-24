@@ -307,11 +307,11 @@ class AdminController extends Controller
 
     public function users()
     {
-        // Show all users except vendedoras for admin management
+        // BUG-A15: Increased pagination from 20 to 50, show all users
         $users = User::whereIn('role', ['admin', 'manager', 'financeiro', 'finance_admin', 'production_admin', 'vendedora'])
             ->with(['approvedBy'])
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(50); // Increased from 20 to show more users per page
 
         return Inertia::render('Admin/Users/Index', compact('users'));
     }

@@ -613,16 +613,8 @@ Route::middleware(['auth', 'approved'])->group(function () {
             'destroy' => 'admin.material-categories.destroy',
         ]);
 
-        // Materials CRUD Routes
-        Route::resource('admin/materials', \App\Http\Controllers\Admin\MaterialsController::class)->names([
-            'index' => 'admin.materials.index',
-            'create' => 'admin.materials.create',
-            'store' => 'admin.materials.store',
-            'show' => 'admin.materials.show',
-            'edit' => 'admin.materials.edit',
-            'update' => 'admin.materials.update',
-            'destroy' => 'admin.materials.destroy',
-        ]);
+        // BUG-A14: Removed duplicate Route::resource for admin/materials
+        // The resource routes are already defined at line 357-365
 
         // Material Image Routes
         Route::post('/admin/materials/{material}/upload-image', [\App\Http\Controllers\Admin\MaterialsController::class, 'uploadImage'])->name('admin.materials.upload-image');
