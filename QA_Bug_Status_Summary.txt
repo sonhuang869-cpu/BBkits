@@ -1,0 +1,55 @@
+BBKits QA Bug Status Summary
+=============================
+Date: 2026-04-24
+Total bugs found from all client reports: 25 bugs
+
+
+FIXED: 13 bugs
+--------------
+
+Fixed in this session:
+- BUG-V01: Kanban exposes all sales to vendedora
+- BUG-V02: Kanban exposes 24 system users
+- BUG-V04/A02: Dashboard ranking exposes vendor emails
+- BUG-V05/A11: Vendedora can cancel others' sales
+- BUG-V06: Vendor can mark others' notifications as read
+- BUG-V07: Vendor can read comments from any sale
+- BUG-V08: Vendor can add payment to others' sale
+- BUG-V10: Vendedora cannot edit own sale
+- BUG-A13: SQL error exposure in Color Mapping
+
+Already fixed in previous sessions:
+- BUG-A08: XSS sanitization
+- BUG-A09: Sales with R$0.00 validation
+- BUG-15: Refund tracking
+- BUG-22: Rate limiting
+
+
+NOT FIXED: 12 bugs
+------------------
+
+CRITICAL (3):
+- BUG-A01: User 26 has admin privileges (needs to delete this user from database)
+- BUG-A06: Public order page /pedido/{token} exposes 119 internal fields (needs to create a limited DTO)
+- BUG-V03: Sale creation returns 500 for vendedora (needs production logs to debug)
+
+HIGH (5):
+- BUG-A04: Kanban exposes unique_token of all sales
+- BUG-A05: Kanban exposes CPF, address and sensitive data (LGPD violation)
+- BUG-A14: 8 Admin routes return 404 (dead features)
+- BUG-A15: User listing shows only 20 of 33+ users
+- BUG-V09: Comments system returns 500
+
+MEDIUM (3):
+- BUG-A03: Top Performers includes inactive/unverified vendedoras
+- BUG-A07: Sale token uses fixed "BB" prefix
+- BUG-A12: TinyERP test connection exposes error details
+
+LOW (1):
+- BUG-A10: Pagination URLs use HTTP instead of HTTPS
+
+
+PROGRESS: 13 of 25 bugs fixed (52%)
+===================================
+
+GitHub Repository: https://github.com/sonhuang869-cpu/BBkits

@@ -638,15 +638,28 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                     <NavLink
                                         href="/sales"
-                                        active={window.location.pathname.includes("/sales")}
+                                        active={window.location.pathname === "/sales"}
                                         className={`nav-link flex items-center gap-0.5 lg:gap-1 xl:gap-2 ${
-                                            window.location.pathname.includes("/sales") ? "active" : ""
+                                            window.location.pathname === "/sales" ? "active" : ""
                                         }`}
                                     >
                                         <svg className="nav-icon icon-hover" viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M7 4V2C7 1.45 7.45 1 8 1h8c.55 0 1 .45 1 1v2h5c.55 0 1 .45 1 1s-.45 1-1 1h-1v11c0 1.66-1.34 3-3 3H6c-1.66 0-3-1.34-3-3V6H2c-.55 0-1-.45-1-1s.45-1 1-1h5Zm2-1v1h6V3H9Zm6.5 15L19 14.5l-1.41-1.41L15 15.67l-1.59-1.58L12 15.5 15.5 18Z" />
                                         </svg>
                                         <span className="nav-text">Vendas</span>
+                                    </NavLink>
+
+                                    <NavLink
+                                        href="/sales/kanban"
+                                        active={window.location.pathname === "/sales/kanban"}
+                                        className={`nav-link flex items-center gap-0.5 lg:gap-1 xl:gap-2 ${
+                                            window.location.pathname === "/sales/kanban" ? "active" : ""
+                                        }`}
+                                    >
+                                        <svg className="nav-icon icon-hover" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H5V5h7v12zm3-7h4v2h-4v-2zm0-3h4v2h-4V7zm0 6h4v2h-4v-2z"/>
+                                        </svg>
+                                        <span className="nav-text">Kanban</span>
                                     </NavLink>
 
                                     {/* Finance Admin Navigation */}
@@ -1085,7 +1098,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                             <ResponsiveNavLink
                                 href="/sales"
-                                active={window.location.pathname.includes("/sales")}
+                                active={window.location.pathname === "/sales"}
                                 className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
                             >
                                 <svg
@@ -1102,6 +1115,21 @@ export default function AuthenticatedLayout({ header, children }) {
                                     />
                                 </svg>
                                 Minhas Vendas
+                            </ResponsiveNavLink>
+
+                            <ResponsiveNavLink
+                                href="/sales/kanban"
+                                active={window.location.pathname === "/sales/kanban"}
+                                className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl"
+                            >
+                                <svg
+                                    className="w-4 h-4 icon-hover"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H5V5h7v12zm3-7h4v2h-4v-2zm0-3h4v2h-4V7zm0 6h4v2h-4v-2z"/>
+                                </svg>
+                                Kanban
                             </ResponsiveNavLink>
 
                             {/* Finance Admin Mobile Navigation */}

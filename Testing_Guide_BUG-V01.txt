@@ -1,0 +1,70 @@
+Testing Guide: BUG-V01
+======================
+Kanban exposes all sales to vendedora
+
+
+WHAT THE CLIENT REPORTED:
+-------------------------
+When a vendedora logs in and opens the Kanban page, they could see ALL 16 sales
+from ALL sellers (user_ids 1, 3, 5), not just their own sales.
+This is a data isolation failure.
+
+
+WHAT WAS FIXED:
+---------------
+Now vendedoras can only see their own sales on Kanban.
+Admins/financeiros can still see all sales.
+
+
+HOW TO TEST:
+------------
+
+Step 1: Open your browser
+   Go to: https://bbkit.onrender.com
+
+Step 2: Login as VENDEDORA
+   - Email: bbkits@hotmail.com
+   - Password: 12345678
+   - Click "Entrar" button
+
+Step 3: Click "Kanban" in the navigation menu
+   - Look at the top navigation bar
+   - You will see: Dashboard | Vendas | Kanban
+   - Click "Kanban"
+
+Step 4: Check the Kanban board
+   - Count how many sales cards appear
+   - You should ONLY see YOUR OWN sales
+   - You should NOT see sales from other sellers
+
+Step 5: Login as ADMIN to compare
+   - Click your name in top right corner
+   - Click "Sair" (logout)
+   - Login as admin:
+     Email: admin@bbkits.com
+     Password: (admin password)
+   - Click "Kanban" in navigation
+   - Admin should see ALL sales from all sellers
+
+
+EXPECTED RESULT:
+----------------
+- Vendedora sees ONLY their own sales (1-2 sales)
+- Admin sees ALL sales (16 sales)
+
+
+NAVIGATION:
+-----------
+Top menu -> Click "Kanban" button
+
+
+TEST STATUS:
+------------
+[ ] PASSED
+[ ] FAILED
+
+Notes:
+_____________________________________________________
+_____________________________________________________
+_____________________________________________________
+
