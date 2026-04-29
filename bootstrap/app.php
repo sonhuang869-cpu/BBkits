@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -64,6 +65,30 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'message' => 'Recurso não encontrado.'
                 ], 404);
+            }
+        });
+
+        // BUG-N01: Handle authentication exceptions (invalid tokens, etc.)
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Não autenticado.'
+                ], 401);
+            }
+        });
+
+        // Catch-all for API errors to prevent 500 exposing server details
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            if ($request->is('api/*') && !config('app.debug')) {
+                \Log::error('API Error', [
+                    'message' => $e->getMessage(),
+                    'url' => $request->fullUrl(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+
+                return response()->json([
+                    'message' => 'Erro interno do servidor.'
+                ], 500);
             }
         });
     })->create();
