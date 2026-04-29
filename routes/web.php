@@ -38,8 +38,9 @@ Route::get('/.htaccess', fn() => abort(404));
 Route::get('/build/manifest.json', fn() => abort(404));
 Route::get('/build/.vite/manifest.json', fn() => abort(404));
 
-// BUG-N09: Override Laravel's /up health check to return 404
-Route::get('/up', fn() => abort(404));
+// BUG-N09: Override Laravel's /up health check - simple OK response (no sensitive info)
+// Render.com may use this for health checks, so we return OK but hide details
+Route::get('/up', fn() => response('OK', 200)->header('Content-Type', 'text/plain'));
 
 Route::get('/', function () {
     // BUG-N03: Removed version info from public page
