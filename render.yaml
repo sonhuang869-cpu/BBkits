@@ -10,6 +10,7 @@ services:
     runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
     envVars:
       - key: APP_KEY
         generateValue: true
