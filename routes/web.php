@@ -21,40 +21,31 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Health check endpoint for debugging
+// BUG-N03: Simplified health check - no longer exposes sensitive info
 Route::get('/health', function () {
     try {
-        $dbConnected = \DB::connection()->getPdo() ? 'OK' : 'Failed';
-        return response()->json([
-            'status' => 'healthy',
-            'database' => $dbConnected,
-            'php_version' => PHP_VERSION,
-            'laravel_version' => Application::VERSION,
-            'extensions' => [
-                'pdo_sqlite' => extension_loaded('pdo_sqlite'),
-                'sqlite3' => extension_loaded('sqlite3'),
-            ],
-            'env' => [
-                'APP_ENV' => config('app.env'),
-                'DB_CONNECTION' => config('database.default'),
-                'DB_DATABASE' => config('database.connections.sqlite.database'),
-            ]
-        ]);
-    } catch (Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ], 500);
+        \DB::connection()->getPdo();
+        return response()->json(['status' => 'ok']);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error'], 503);
     }
 });
 
+// BUG-N06: Block .htaccess access
+Route::get('/.htaccess', fn() => abort(404));
+
+// BUG-N08: Block build manifest access (expose only to authenticated admins if needed)
+Route::get('/build/manifest.json', fn() => abort(404));
+Route::get('/build/.vite/manifest.json', fn() => abort(404));
+
+// BUG-N09: Override Laravel's /up health check to return 404
+Route::get('/up', fn() => abort(404));
+
 Route::get('/', function () {
+    // BUG-N03: Removed version info from public page
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
     ]);
 });
 

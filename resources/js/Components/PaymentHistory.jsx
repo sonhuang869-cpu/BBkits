@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
-import { Calendar, CreditCard, Check, Clock, X, Eye, Trash2 } from 'lucide-react';
+import { Calendar, CreditCard, Check, Clock, X, Eye, Trash2, RotateCcw } from 'lucide-react';
 import { useForm, router } from '@inertiajs/react';
 
 export default function PaymentHistory({ sale, payments, onAddPayment, paymentSummary }) {
     const [showRejectModal, setShowRejectModal] = useState(false);
+    const [showRefundModal, setShowRefundModal] = useState(false);
     const [selectedPayment, setSelectedPayment] = useState(null);
 
     const { data, setData, put, processing, errors, reset } = useForm({
         rejection_reason: '',
+    });
+
+    // BUG-15: Separate form for refund
+    const refundForm = useForm({
+        refund_date: new Date().toISOString().split('T')[0],
+        refund_method: 'pix',
+        refund_notes: '',
     });
 
     const getStatusBadge = (status) => {
@@ -15,8 +23,29 @@ export default function PaymentHistory({ sale, payments, onAddPayment, paymentSu
             'pending': { label: 'Pendente', class: 'bg-yellow-100 text-yellow-800', icon: Clock },
             'approved': { label: 'Aprovado', class: 'bg-green-100 text-green-800', icon: Check },
             'rejected': { label: 'Rejeitado', class: 'bg-red-100 text-red-800', icon: X },
+            'refunded': { label: 'Estornado', class: 'bg-purple-100 text-purple-800', icon: RotateCcw },
         };
         return statusMap[status] || { label: status, class: 'bg-gray-100 text-gray-800', icon: Clock };
+    };
+
+    // BUG-15: Check if sale needs refund (cancelled/rejected with approved payments)
+    const saleNeedsRefund = ['recusado', 'cancelado'].includes(sale.status);
+
+    // BUG-15: Handle refund
+    const handleRefund = (payment) => {
+        setSelectedPayment(payment);
+        setShowRefundModal(true);
+    };
+
+    const submitRefund = (e) => {
+        e.preventDefault();
+        refundForm.put(`/payments/${selectedPayment.id}/refund`, {
+            onSuccess: () => {
+                refundForm.reset();
+                setShowRefundModal(false);
+                setSelectedPayment(null);
+            }
+        });
     };
 
     const handleApprove = (payment) => {
@@ -218,11 +247,43 @@ export default function PaymentHistory({ sale, payments, onAddPayment, paymentSu
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             )}
+
+                                            {/* BUG-15: Refund button for approved payments on cancelled/rejected sales */}
+                                            {payment.status === 'approved' && saleNeedsRefund && (
+                                                <button
+                                                    onClick={() => handleRefund(payment)}
+                                                    className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                                                    title="Estornar pagamento"
+                                                >
+                                                    <RotateCcw className="w-4 h-4" />
+                                                </button>
+                                            )}
+
+                                            {/* Show refund info for refunded payments */}
+                                            {payment.status === 'refunded' && payment.refund_date && (
+                                                <span className="text-xs text-purple-600">
+                                                    Estornado em {new Date(payment.refund_date).toLocaleDateString('pt-BR')}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             );
                         })}
+                    </div>
+                )}
+
+                {/* BUG-15: Refund alert for cancelled/rejected sales */}
+                {saleNeedsRefund && payments.some(p => p.status === 'approved') && (
+                    <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                        <div className="flex items-center gap-2 text-purple-800">
+                            <RotateCcw className="w-5 h-5" />
+                            <span className="font-medium">Atenção: Esta venda foi {sale.status === 'recusado' ? 'recusada' : 'cancelada'}</span>
+                        </div>
+                        <p className="text-sm text-purple-700 mt-1">
+                            Existem pagamentos aprovados que podem precisar de estorno.
+                            Use o botão <RotateCcw className="w-3 h-3 inline" /> para registrar o estorno de cada pagamento.
+                        </p>
                     </div>
                 )}
             </div>
@@ -264,6 +325,96 @@ export default function PaymentHistory({ sale, payments, onAddPayment, paymentSu
                                         className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
                                     >
                                         {processing ? 'Rejeitando...' : 'Rejeitar'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* BUG-15: Refund Modal */}
+            {showRefundModal && selectedPayment && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg w-full max-w-md">
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <RotateCcw className="w-5 h-5 text-purple-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold">Registrar Estorno</h3>
+                                    <p className="text-sm text-gray-600">
+                                        Valor: R$ {parseFloat(selectedPayment.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={submitRefund}>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Data do Estorno *
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={refundForm.data.refund_date}
+                                            onChange={(e) => refundForm.setData('refund_date', e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Método do Estorno *
+                                        </label>
+                                        <select
+                                            value={refundForm.data.refund_method}
+                                            onChange={(e) => refundForm.setData('refund_method', e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                            required
+                                        >
+                                            <option value="pix">PIX</option>
+                                            <option value="transferencia">Transferência Bancária</option>
+                                            <option value="dinheiro">Dinheiro</option>
+                                            <option value="credito_loja">Crédito na Loja</option>
+                                            <option value="outro">Outro</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Observações
+                                        </label>
+                                        <textarea
+                                            value={refundForm.data.refund_notes}
+                                            onChange={(e) => refundForm.setData('refund_notes', e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                            rows="3"
+                                            placeholder="Informações adicionais sobre o estorno..."
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end space-x-4 mt-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowRefundModal(false);
+                                            setSelectedPayment(null);
+                                            refundForm.reset();
+                                        }}
+                                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={refundForm.processing}
+                                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                                    >
+                                        {refundForm.processing ? 'Processando...' : 'Confirmar Estorno'}
                                     </button>
                                 </div>
                             </form>

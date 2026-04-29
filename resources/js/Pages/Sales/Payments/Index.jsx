@@ -157,6 +157,28 @@ export default function PaymentIndex() {
                             </div>
                         </div>
 
+                        {/* BUG-15: Refund Alert for cancelled/rejected sales */}
+                        {['recusado', 'cancelado'].includes(sale.status) && paymentSummary.paid_amount > 0 && (
+                            <div className="mb-8 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-purple-800">
+                                            Venda {sale.status === 'recusado' ? 'Recusada' : 'Cancelada'} - Estorno Necessário
+                                        </h4>
+                                        <p className="text-sm text-purple-700">
+                                            Esta venda possui {formatCurrency(paymentSummary.paid_amount)} em pagamentos aprovados que podem precisar de estorno.
+                                            Use o botão de estorno ao lado de cada pagamento aprovado para registrar a devolução.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Payment History */}
                         <PaymentHistory
                             sale={sale}

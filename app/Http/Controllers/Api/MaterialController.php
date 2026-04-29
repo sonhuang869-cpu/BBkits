@@ -12,7 +12,8 @@ class MaterialController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth:sanctum', 'materials.access:view'])->only(['index', 'show']);
+        // BUG-N01: Added 'stats' to middleware - was missing authentication
+        $this->middleware(['auth:sanctum', 'materials.access:view'])->only(['index', 'show', 'stats']);
         $this->middleware(['auth:sanctum', 'materials.access:edit'])->only(['store', 'update', 'adjustStock']);
         $this->middleware(['auth:sanctum', 'materials.access:delete'])->only(['destroy']);
     }
@@ -191,23 +192,39 @@ class MaterialController extends Controller
         ]);
     }
 
+    /**
+     * BUG-N01: Fixed - Added try-catch, null handling, and authentication
+     */
     public function stats(): JsonResponse
     {
-        $stats = [
-            'total_materials' => Material::count(),
-            'active_materials' => Material::where('current_stock', '>', 0)
-                                          ->whereRaw('current_stock > minimum_stock')
-                                          ->count(),
-            'low_stock_materials' => Material::whereRaw('current_stock <= minimum_stock')
-                                            ->where('current_stock', '>', 0)
-                                            ->count(),
-            'out_of_stock_materials' => Material::where('current_stock', '<=', 0)->count(),
-            'total_stock_value' => Material::sum(\DB::raw('current_stock * purchase_price')),
-        ];
+        try {
+            $stats = [
+                'total_materials' => Material::count(),
+                'active_materials' => Material::where('current_stock', '>', 0)
+                    ->whereColumn('current_stock', '>', 'minimum_stock')
+                    ->count(),
+                'low_stock_materials' => Material::where('current_stock', '>', 0)
+                    ->whereColumn('current_stock', '<=', 'minimum_stock')
+                    ->count(),
+                'out_of_stock_materials' => Material::where('current_stock', '<=', 0)->count(),
+                'total_stock_value' => Material::selectRaw('COALESCE(SUM(COALESCE(current_stock, 0) * COALESCE(purchase_price, 0)), 0) as total')
+                    ->value('total') ?? 0,
+            ];
 
-        return response()->json([
-            'success' => true,
-            'data' => $stats
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $stats
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Material stats error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao calcular estatísticas de materiais.'
+            ], 500);
+        }
     }
 }
