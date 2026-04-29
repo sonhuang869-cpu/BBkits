@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class LoginRequest extends FormRequest
 {
@@ -54,10 +55,11 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * BUG-22: Ensure the login request is not rate limited.
+     * BUG-22, BUG-N02: Ensure the login request is not rate limited.
      * Reduced from 5 to 3 attempts for better security.
+     * Returns HTTP 429 when rate limited for proper brute-force protection.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException
      */
     public function ensureIsNotRateLimited(): void
     {
@@ -72,12 +74,14 @@ class LoginRequest extends FormRequest
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
-        throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+        // BUG-N02: Throw 429 Too Many Requests instead of validation error
+        throw new TooManyRequestsHttpException(
+            $seconds,
+            trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
-            ]),
-        ]);
+            ])
+        );
     }
 
     /**
