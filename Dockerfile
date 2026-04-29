@@ -94,6 +94,9 @@ CMD set -e && \
     (php artisan storage:link || echo "Storage link exists") && \
     echo "=== Running Migrations ===" && \
     (php artisan migrate --force || echo "Migration completed or skipped") && \
+    echo "=== Running Security Audits ===" && \
+    (php artisan users:audit-roles --fix 2>&1 || echo "User audit skipped") && \
+    (php artisan data:sanitize-legacy --fix 2>&1 || echo "Data sanitization skipped") && \
     echo "=== Clearing Caches ===" && \
     (php artisan config:clear 2>&1 || true) && \
     echo "Skipping cache:clear (not needed for fresh start)" && \
