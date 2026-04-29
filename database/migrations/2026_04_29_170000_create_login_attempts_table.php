@@ -15,11 +15,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip if table already exists (idempotent migration)
+        if (Schema::hasTable('login_attempts')) {
+            return;
+        }
+
         Schema::create('login_attempts', function (Blueprint $table) {
             $table->id();
             $table->string('key', 64)->index();
-            $table->timestamp('created_at');
-            $table->timestamp('expires_at')->index();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('expires_at')->nullable()->index();
         });
     }
 
