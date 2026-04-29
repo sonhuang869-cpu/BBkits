@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Laravel\Sanctum\Exceptions\MissingAbilityException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -77,13 +79,45 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // Handle Sanctum's missing ability exception
+        $exceptions->render(function (MissingAbilityException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Não autorizado.'
+                ], 403);
+            }
+        });
+
+        // Handle unauthorized HTTP exceptions
+        $exceptions->render(function (UnauthorizedHttpException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Não autenticado.'
+                ], 401);
+            }
+        });
+
         // Catch-all for API errors to prevent 500 exposing server details
         $exceptions->render(function (\Throwable $e, Request $request) {
             if ($request->is('api/*') && !config('app.debug')) {
+                // Check if it's an auth-related error
+                $message = strtolower($e->getMessage());
+                $isAuthError = str_contains($message, 'unauthenticated') ||
+                               str_contains($message, 'unauthorized') ||
+                               str_contains($message, 'token') ||
+                               str_contains($message, 'bearer') ||
+                               str_contains($message, 'credential');
+
+                if ($isAuthError) {
+                    return response()->json([
+                        'message' => 'Não autenticado.'
+                    ], 401);
+                }
+
                 \Log::error('API Error', [
                     'message' => $e->getMessage(),
                     'url' => $request->fullUrl(),
-                    'trace' => $e->getTraceAsString()
+                    'exception' => get_class($e)
                 ]);
 
                 return response()->json([
