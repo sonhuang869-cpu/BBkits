@@ -95,9 +95,9 @@ CMD set -e && \
     echo "=== Running Migrations ===" && \
     (php artisan migrate --force || echo "Migration completed or skipped") && \
     echo "=== Clearing Caches ===" && \
-    (php artisan config:clear 2>/dev/null || echo "Config cache clear skipped") && \
-    (php artisan cache:clear 2>/dev/null || echo "Cache clear skipped - will use fresh cache") && \
-    (php artisan view:clear 2>/dev/null || echo "View cache clear skipped") && \
+    (php artisan config:clear 2>&1 || true) && \
+    echo "Skipping cache:clear (not needed for fresh start)" && \
+    (php artisan view:clear 2>&1 || true) && \
     echo "=== Testing Application Health ===" && \
     php artisan --version && \
     echo "=== Starting Web Server ===" && \
