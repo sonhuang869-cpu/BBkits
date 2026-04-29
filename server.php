@@ -9,6 +9,31 @@ $uri = urldecode(
     parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? ''
 );
 
+// BUG-N06, N08: Block access to sensitive files
+$blockedPaths = [
+    '/.htaccess',
+    '/.env',
+    '/.git',
+    '/build/manifest.json',
+    '/build/.vite/manifest.json',
+    '/.user.ini',
+];
+
+foreach ($blockedPaths as $blocked) {
+    if (strpos($uri, $blocked) === 0 || $uri === $blocked) {
+        http_response_code(404);
+        echo '<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>';
+        exit;
+    }
+}
+
+// Block any dotfile access (except known safe ones)
+if (preg_match('/^\/\.[^\/]+/', $uri) && !in_array($uri, ['/favicon.ico'])) {
+    http_response_code(404);
+    echo '<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>';
+    exit;
+}
+
 // Define the document root
 $publicPath = __DIR__ . '/public';
 

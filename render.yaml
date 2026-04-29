@@ -51,7 +51,7 @@ services:
       - key: BROADCAST_DRIVER
         value: log
       - key: CACHE_DRIVER
-        value: file
+        value: database
       - key: QUEUE_CONNECTION
         value: sync
       - key: SESSION_DRIVER
