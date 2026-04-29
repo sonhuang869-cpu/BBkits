@@ -42,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'inventory.access' => \App\Http\Middleware\InventoryAccess::class,
             'api.auth' => \App\Http\Middleware\ApiAuthentication::class,
             'api.rate' => \App\Http\Middleware\ApiRateLimit::class,
+            'login.rate' => \App\Http\Middleware\LoginRateLimit::class, // BUG-N02
         ]);
     })
     ->withCommands([

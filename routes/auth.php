@@ -16,14 +16,14 @@ Route::middleware('guest')->group(function () {
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store'])
-        ->middleware('throttle:login'); // BUG-N02: Uses named rate limiter
+        ->middleware('login.rate'); // BUG-N02: Database-based rate limiting
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
-    // BUG-N02: Added explicit throttle middleware - uses named 'login' rate limiter
+    // BUG-N02: Database-based rate limiting - 5 attempts per minute per IP
     Route::post('login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware('throttle:login');
+        ->middleware('login.rate');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
@@ -37,7 +37,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.reset');
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->middleware('throttle:login')
+        ->middleware('login.rate')
         ->name('password.store');
 });
 
