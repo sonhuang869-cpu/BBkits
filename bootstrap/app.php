@@ -32,6 +32,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
 
+        // BUG-D03: Enable Sanctum stateful authentication for API routes
+        // This allows web session cookies to authenticate API requests
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'approved' => \App\Http\Middleware\EnsureUserIsApproved::class,

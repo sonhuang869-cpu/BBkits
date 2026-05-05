@@ -43,7 +43,8 @@ return [
     'tiny_erp' => [
         'base_url' => env('TINY_ERP_BASE_URL', 'https://api.tiny.com.br/api2'),
         'token' => env('TINY_ERP_TOKEN'),
-        
+        'webhook_secret' => env('TINY_ERP_WEBHOOK_SECRET'), // BUG-D02: For validating incoming webhooks
+
         // Sender information for shipping labels
         'sender_address' => env('TINY_ERP_SENDER_ADDRESS', 'Rua BBKits, 123'),
         'sender_number' => env('TINY_ERP_SENDER_NUMBER', '123'),
@@ -71,7 +72,8 @@ return [
         'base_url' => env('WATI_BASE_URL', 'https://live-server-113671.wati.io/api/v1'),
         'access_token' => env('WATI_ACCESS_TOKEN'),
         'instance_id' => env('WATI_INSTANCE_ID'),
-        
+        'webhook_secret' => env('WATI_WEBHOOK_SECRET'), // BUG-D02: For validating incoming webhooks
+
         // Message templates
         'templates' => [
             'order_confirmation' => env('WATI_TEMPLATE_ORDER_CONFIRMATION', 'order_confirmation'),

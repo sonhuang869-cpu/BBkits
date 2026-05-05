@@ -77,3 +77,6 @@ services:
         value: hello@bbkits.com
       - key: MAIL_FROM_NAME
         value: BBKits
+      # BUG-D03: Sanctum stateful domains for SPA API authentication
+      - key: SANCTUM_STATEFUL_DOMAINS
+        value: bbkit.onrender.com,localhost,127.0.0.1

@@ -56,20 +56,35 @@ class SalePaymentController extends Controller
 
     public function store(Request $request, Sale $sale)
     {
+        // BUG-D05: Helper to return proper response based on request type
+        $errorResponse = function ($errors, $code = 422) use ($request) {
+            if ($request->expectsJson() || $request->header('X-Inertia')) {
+                return response()->json(['message' => 'Erro de validação.', 'errors' => $errors], $code);
+            }
+            return back()->withErrors($errors);
+        };
+
+        $successResponse = function ($message, $data = []) use ($request) {
+            if ($request->expectsJson() || $request->header('X-Inertia')) {
+                return response()->json(array_merge(['message' => $message, 'success' => true], $data));
+            }
+            return back()->with('success', $message);
+        };
+
         // BUG-V08: Verify user has permission to add payments to this sale
         $user = auth()->user();
 
         // Vendedoras can only add payments to their own sales
         if ($user->role === 'vendedora' && $sale->user_id !== $user->id) {
-            return back()->withErrors([
+            return $errorResponse([
                 'error' => 'Você não tem permissão para registrar pagamentos nesta venda.'
-            ]);
+            ], 403);
         }
 
         // BUG-04: Block payments on refused/cancelled sales
         $blockedStatuses = ['recusado', 'cancelado', 'estornado'];
         if (in_array($sale->status, $blockedStatuses)) {
-            return back()->withErrors([
+            return $errorResponse([
                 'error' => 'Não é possível registrar pagamentos em vendas ' . $sale->status . 's.'
             ]);
         }
@@ -85,7 +100,7 @@ class SalePaymentController extends Controller
         // Check if payment amount doesn't exceed remaining amount
         $remainingAmount = $sale->getRemainingAmount();
         if ($request->amount > $remainingAmount) {
-            return back()->withErrors([
+            return $errorResponse([
                 'amount' => "O valor do pagamento (R$ {$request->amount}) não pode ser maior que o valor restante (R$ {$remainingAmount})"
             ]);
         }
@@ -101,7 +116,7 @@ class SalePaymentController extends Controller
         $status = $autoApprove ? 'approved' : 'pending';
 
         // Create payment record
-        SalePayment::create([
+        $payment = SalePayment::create([
             'sale_id' => $sale->id,
             'amount' => $request->amount,
             'payment_date' => $request->payment_date,
@@ -113,11 +128,11 @@ class SalePaymentController extends Controller
             'approved_at' => $autoApprove ? now() : null,
         ]);
 
-        $message = $autoApprove 
-            ? 'Pagamento registrado e aprovado automaticamente!' 
+        $message = $autoApprove
+            ? 'Pagamento registrado e aprovado automaticamente!'
             : 'Pagamento registrado com sucesso e enviado para aprovação.';
-        
-        return back()->with('success', $message);
+
+        return $successResponse($message, ['payment' => $payment]);
     }
 
     public function approve(SalePayment $payment)

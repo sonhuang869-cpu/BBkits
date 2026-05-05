@@ -42,6 +42,13 @@ Route::get('/build/.vite/manifest.json', fn() => abort(404));
 // Render.com may use this for health checks, so we return OK but hide details
 Route::get('/up', fn() => response('OK', 200)->header('Content-Type', 'text/plain'));
 
+// BUG-D02: Public webhook routes for external services (no session auth required)
+// These use token/signature validation instead of session authentication
+Route::prefix('webhooks')->name('webhooks.')->group(function () {
+    Route::post('/tiny-erp', [\App\Http\Controllers\WebhookController::class, 'tinyErp'])->name('tiny-erp');
+    Route::post('/wati', [\App\Http\Controllers\WebhookController::class, 'wati'])->name('wati');
+});
+
 Route::get('/', function () {
     // BUG-N03: Removed version info from public page
     return Inertia::render('Welcome', [

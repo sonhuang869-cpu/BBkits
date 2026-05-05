@@ -446,47 +446,74 @@ class EmbroideryController extends Controller
 
     public function apiCalculateEmbroideryPrice(Request $request)
     {
-        $validated = $request->validate([
-            'embroidery_type' => 'required|in:text,design,both',
-            'font_id' => 'nullable|exists:embroidery_fonts,id',
-            'color_id' => 'nullable|exists:embroidery_colors,id',
-            'design_id' => 'nullable|exists:embroidery_designs,id',
-            'position' => 'nullable|string',
-            'text' => 'nullable|string|max:255'
-        ]);
+        try {
+            $validated = $request->validate([
+                'embroidery_type' => 'required|in:text,design,both',
+                'font_id' => 'nullable|integer|exists:embroidery_fonts,id',
+                'color_id' => 'nullable|integer|exists:embroidery_colors,id',
+                'design_id' => 'nullable|integer|exists:embroidery_designs,id',
+                'position' => 'nullable|string',
+                'text' => 'nullable|string|max:255'
+            ]);
 
-        $totalCost = 0;
-        $fontCost = 0;
-        $colorCost = 0;
-        $designCost = 0;
+            $totalCost = 0;
+            $fontCost = 0;
+            $colorCost = 0;
+            $designCost = 0;
 
-        // Calculate font cost for text embroidery
-        if (($validated['embroidery_type'] === 'text' || $validated['embroidery_type'] === 'both') && $validated['font_id']) {
-            $font = EmbroideryFont::find($validated['font_id']);
-            $fontCost = $font->additional_cost;
-            $totalCost += $fontCost;
+            // Calculate font cost for text embroidery
+            $embroideryType = $validated['embroidery_type'] ?? 'text';
+            $fontId = $validated['font_id'] ?? null;
+            $colorId = $validated['color_id'] ?? null;
+            $designId = $validated['design_id'] ?? null;
+
+            if (($embroideryType === 'text' || $embroideryType === 'both') && $fontId) {
+                $font = EmbroideryFont::find($fontId);
+                if ($font) {
+                    $fontCost = (float) ($font->additional_cost ?? 0);
+                    $totalCost += $fontCost;
+                }
+            }
+
+            // Calculate color cost (applies to both text and design)
+            if ($colorId) {
+                $color = EmbroideryColor::find($colorId);
+                if ($color) {
+                    $colorCost = (float) ($color->additional_cost ?? 0);
+                    $totalCost += $colorCost;
+                }
+            }
+
+            // Calculate design cost for design embroidery
+            if (($embroideryType === 'design' || $embroideryType === 'both') && $designId) {
+                $design = EmbroideryDesign::find($designId);
+                if ($design) {
+                    $designCost = (float) ($design->additional_cost ?? 0);
+                    $totalCost += $designCost;
+                }
+            }
+
+            return response()->json([
+                'total_cost' => $totalCost,
+                'font_cost' => $fontCost,
+                'color_cost' => $colorCost,
+                'design_cost' => $designCost,
+                'position_cost' => 0 // Placeholder for future position-based pricing
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Dados de validação inválidos.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Embroidery price calculation error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'message' => 'Erro ao calcular preço do bordado.',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
-
-        // Calculate color cost (applies to both text and design)
-        if ($validated['color_id']) {
-            $color = EmbroideryColor::find($validated['color_id']);
-            $colorCost = $color->additional_cost;
-            $totalCost += $colorCost;
-        }
-
-        // Calculate design cost for design embroidery
-        if (($validated['embroidery_type'] === 'design' || $validated['embroidery_type'] === 'both') && $validated['design_id']) {
-            $design = EmbroideryDesign::find($validated['design_id']);
-            $designCost = $design->additional_cost;
-            $totalCost += $designCost;
-        }
-
-        return response()->json([
-            'total_cost' => $totalCost,
-            'font_cost' => $fontCost,
-            'color_cost' => $colorCost,
-            'design_cost' => $designCost,
-            'position_cost' => 0 // Placeholder for future position-based pricing
-        ]);
     }
 }

@@ -25,7 +25,8 @@ class PasswordResetLinkController extends Controller
     /**
      * Handle an incoming password reset link request.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * BUG-D04: Always return same response regardless of email existence
+     * to prevent email enumeration attacks (OWASP ASVS V3.2 compliance)
      */
     public function store(Request $request): RedirectResponse
     {
@@ -33,19 +34,15 @@ class PasswordResetLinkController extends Controller
             'email' => 'required|email',
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
+        // Attempt to send the password reset link
+        // We ignore the result to prevent email enumeration
+        Password::sendResetLink(
             $request->only('email')
         );
 
-        if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
-        }
-
-        throw ValidationException::withMessages([
-            'email' => [trans($status)],
-        ]);
+        // BUG-D04: Always return the same generic success message
+        // regardless of whether the email exists in the system
+        // This prevents attackers from enumerating valid emails
+        return back()->with('status', 'Se o e-mail informado estiver cadastrado, você receberá um link para redefinir sua senha.');
     }
 }
