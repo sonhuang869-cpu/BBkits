@@ -38,6 +38,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
 
+        // BUG-D02: Exclude webhook routes from CSRF verification
+        // External services (Tiny ERP, WATI) cannot provide CSRF tokens
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/*',
+        ]);
+
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'approved' => \App\Http\Middleware\EnsureUserIsApproved::class,
