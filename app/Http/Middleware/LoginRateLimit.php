@@ -62,10 +62,32 @@ class LoginRateLimit
 
     /**
      * Resolve request signature (IP-based for login).
+     * Uses CF-Connecting-IP for Cloudflare, falls back to X-Forwarded-For, then $request->ip()
      */
     protected function resolveRequestSignature(Request $request): string
     {
-        return 'login_rate_limit:' . sha1($request->ip());
+        $ip = $this->getClientIp($request);
+        return 'login_rate_limit:' . sha1($ip);
+    }
+
+    /**
+     * Get the real client IP address behind Cloudflare/proxies.
+     */
+    protected function getClientIp(Request $request): string
+    {
+        // Cloudflare's header for the original client IP
+        if ($request->header('CF-Connecting-IP')) {
+            return $request->header('CF-Connecting-IP');
+        }
+
+        // Standard proxy header (first IP in the chain is the client)
+        if ($request->header('X-Forwarded-For')) {
+            $ips = explode(',', $request->header('X-Forwarded-For'));
+            return trim($ips[0]);
+        }
+
+        // Fallback to Laravel's ip() method
+        return $request->ip();
     }
 
     /**
