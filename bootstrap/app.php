@@ -8,6 +8,8 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Laravel\Sanctum\Exceptions\MissingAbilityException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -58,6 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api.auth' => \App\Http\Middleware\ApiAuthentication::class,
             'api.rate' => \App\Http\Middleware\ApiRateLimit::class,
             'login.rate' => \App\Http\Middleware\LoginRateLimit::class, // BUG-N02
+            'admin.only' => \App\Http\Middleware\EnsureUserIsAdminOnly::class, // BUG-D09
         ]);
     })
     ->withCommands([
@@ -106,6 +109,24 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'message' => 'Não autenticado.'
                 ], 401);
+            }
+        });
+
+        // BUG-D07/D08: Handle authorization exceptions with Portuguese messages
+        $exceptions->render(function (AuthorizationException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*') || $request->header('X-Inertia')) {
+                return response()->json([
+                    'message' => 'Você não tem permissão para realizar esta ação.'
+                ], 403);
+            }
+        });
+
+        // Handle AccessDeniedHttpException (from abort(403))
+        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*') || $request->header('X-Inertia')) {
+                return response()->json([
+                    'message' => 'Você não tem permissão para realizar esta ação.'
+                ], 403);
             }
         });
 

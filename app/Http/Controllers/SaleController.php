@@ -246,8 +246,15 @@ class SaleController extends Controller
         ]);
     }
 
+    /**
+     * BUG-D06: Authorization check MUST happen BEFORE validation.
+     * This prevents information disclosure about sale existence via validation errors.
+     */
     public function updateStatus(Request $request, Sale $sale)
     {
+        // BUG-D06: Authorization FIRST, before validation
+        $this->authorize('updateStatus', $sale);
+
         $validated = $request->validate([
             'order_status' => 'required|in:pending_payment,payment_approved,in_production,photo_sent,photo_approved,pending_final_payment,ready_for_shipping,shipped,under_review'
         ]);

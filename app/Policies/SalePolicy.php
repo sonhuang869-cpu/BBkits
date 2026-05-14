@@ -85,6 +85,15 @@ class SalePolicy
     }
 
     /**
+     * BUG-D06: Determine whether the user can update the status of a sale.
+     * Only admin or financeiro can update status (not regular vendedoras).
+     */
+    public function updateStatus(User $user, Sale $sale): bool
+    {
+        return $user->isAdmin() || $user->isFinanceiro();
+    }
+
+    /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, Sale $sale): bool

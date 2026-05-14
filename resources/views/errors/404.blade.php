@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>403 - Acesso Negado</title>
+    <title>404 - Página Não Encontrada</title>
     <style nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -15,17 +15,17 @@
             min-height: 100vh;
         }
         .container { text-align: center; padding: 2.5rem; }
-        h1 { font-size: 2.25rem; font-weight: bold; color: #dc2626; margin-bottom: 1rem; }
-        p { color: #4b5563; margin-bottom: 1.5rem; }
+        h1 { font-size: 2.25rem; font-weight: bold; color: #4b5563; margin-bottom: 1rem; }
+        p { color: #6b7280; margin-bottom: 1.5rem; }
         a { color: #2563eb; text-decoration: underline; }
         a:hover { color: #1d4ed8; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>403 - Acesso Negado</h1>
-        <p>Você não tem permissão para acessar esta página.</p>
-        <a href="{{ url()->previous() }}">Voltar</a>
+        <h1>404 - Página Não Encontrada</h1>
+        <p>O recurso solicitado não foi encontrado.</p>
+        <a href="{{ url('/') }}">Voltar para o início</a>
     </div>
 </body>
 </html>

@@ -4,11 +4,13 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Vite;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * BUG-N05: Add security headers to all responses
  * BUG-N07: Remove X-Powered-By header
+ * BUG-D12: Use nonce-based CSP instead of unsafe-inline/unsafe-eval
  */
 class SecurityHeaders
 {
@@ -17,6 +19,11 @@ class SecurityHeaders
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // BUG-D12: Generate CSP nonce before processing the request
+        // This allows Vite to inject the nonce into script/style tags
+        $nonce = $this->generateNonce();
+        Vite::useCspNonce($nonce);
+
         $response = $next($request);
 
         // BUG-N07: Remove X-Powered-By header
@@ -34,12 +41,12 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
-        // CSP - Content Security Policy
-        // Allow Inertia/React scripts and styles
+        // BUG-D12: CSP - Content Security Policy with nonces (no unsafe-inline/unsafe-eval)
+        // The nonce allows only scripts/styles that have the matching nonce attribute
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Required for Inertia/React
-            "style-src 'self' 'unsafe-inline' https://fonts.bunny.net https://fonts.googleapis.com",
+            "script-src 'self' 'nonce-{$nonce}'",
+            "style-src 'self' 'nonce-{$nonce}' https://fonts.bunny.net https://fonts.googleapis.com",
             "font-src 'self' https://fonts.bunny.net https://fonts.gstatic.com",
             "img-src 'self' data: blob: https:",
             "connect-src 'self'",
@@ -54,5 +61,13 @@ class SecurityHeaders
         $response->headers->remove('Server');
 
         return $response;
+    }
+
+    /**
+     * Generate a cryptographically secure random nonce.
+     */
+    private function generateNonce(): string
+    {
+        return base64_encode(random_bytes(16));
     }
 }

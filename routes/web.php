@@ -333,36 +333,44 @@ Route::middleware(['auth', 'approved'])->group(function () {
             Route::get('/{resourceType}/{resourceId}', [\App\Http\Controllers\Admin\ActionHistoryController::class, 'show'])->name('show');
         });
 
-        // Backup Management Routes
-        Route::prefix('admin/backups')->name('admin.backups.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\BackupController::class, 'index'])->name('index');
-            Route::post('/create', [\App\Http\Controllers\Admin\BackupController::class, 'create'])->name('create');
-            Route::get('/stats', [\App\Http\Controllers\Admin\BackupController::class, 'stats'])->name('stats');
-            Route::get('/test', [\App\Http\Controllers\Admin\BackupController::class, 'test'])->name('test');
-            Route::post('/cleanup', [\App\Http\Controllers\Admin\BackupController::class, 'cleanup'])->name('cleanup');
-            Route::get('/download/{backupName}', [\App\Http\Controllers\Admin\BackupController::class, 'download'])->name('download');
-            Route::delete('/{backupName}', [\App\Http\Controllers\Admin\BackupController::class, 'destroy'])->name('delete');
-        });
+        // BUG-D09: Admin-only routes - sensitive routes that should NOT allow 'financeiro' role
+        // User management and backup management are restricted to admin only
+        Route::middleware('admin.only')->group(function () {
+            // Backup Management Routes
+            Route::prefix('admin/backups')->name('admin.backups.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\BackupController::class, 'index'])->name('index');
+                Route::post('/create', [\App\Http\Controllers\Admin\BackupController::class, 'create'])->name('create');
+                Route::get('/stats', [\App\Http\Controllers\Admin\BackupController::class, 'stats'])->name('stats');
+                Route::get('/test', [\App\Http\Controllers\Admin\BackupController::class, 'test'])->name('test');
+                Route::post('/cleanup', [\App\Http\Controllers\Admin\BackupController::class, 'cleanup'])->name('cleanup');
+                Route::get('/download/{backupName}', [\App\Http\Controllers\Admin\BackupController::class, 'download'])->name('download');
+                Route::delete('/{backupName}', [\App\Http\Controllers\Admin\BackupController::class, 'destroy'])->name('delete');
+            });
 
-        Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users.index');
-        Route::post('/admin/users', [AdminController::class, 'createUser'])->name('admin.users.store');
-        Route::put('/admin/users/{user}/approve', [AdminController::class, 'approveUser'])->name('admin.users.approve');
-        Route::put('/admin/users/{user}/reject', [AdminController::class, 'rejectUser'])->name('admin.users.reject');
+            // User Management Routes
+            Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users.index');
+            Route::post('/admin/users', [AdminController::class, 'createUser'])->name('admin.users.store');
+            Route::put('/admin/users/{user}/approve', [AdminController::class, 'approveUser'])->name('admin.users.approve');
+            Route::put('/admin/users/{user}/reject', [AdminController::class, 'rejectUser'])->name('admin.users.reject');
+        });
         Route::put('/admin/sales/{sale}/correct', [SaleController::class, 'correct'])->name('admin.sales.correct');
         Route::put('/admin/sales/{sale}/cancel', [SaleController::class, 'cancel'])->name('admin.sales.cancel');
 
-        // Materials & Inventory Management Routes
-        // Materials Management Routes
-        Route::resource('admin/materials', \App\Http\Controllers\Admin\MaterialsController::class)->names([
-            'index' => 'admin.materials.index',
-            'create' => 'admin.materials.create',
-            'store' => 'admin.materials.store',
-            'show' => 'admin.materials.show',
-            'edit' => 'admin.materials.edit',
-            'update' => 'admin.materials.update',
-            'destroy' => 'admin.materials.destroy',
-        ]);
-        Route::post('/admin/materials/{material}/adjust-stock', [\App\Http\Controllers\Admin\MaterialsController::class, 'adjustStock'])->name('admin.materials.adjust-stock');
+        // BUG-D09: Materials management - admin only (not financeiro)
+        Route::middleware('admin.only')->group(function () {
+            // Materials & Inventory Management Routes
+            // Materials Management Routes
+            Route::resource('admin/materials', \App\Http\Controllers\Admin\MaterialsController::class)->names([
+                'index' => 'admin.materials.index',
+                'create' => 'admin.materials.create',
+                'store' => 'admin.materials.store',
+                'show' => 'admin.materials.show',
+                'edit' => 'admin.materials.edit',
+                'update' => 'admin.materials.update',
+                'destroy' => 'admin.materials.destroy',
+            ]);
+            Route::post('/admin/materials/{material}/adjust-stock', [\App\Http\Controllers\Admin\MaterialsController::class, 'adjustStock'])->name('admin.materials.adjust-stock');
+        });
 
         // Inventory Transaction Routes
         Route::prefix('admin/inventory')->name('admin.inventory.')->group(function () {
@@ -423,12 +431,15 @@ Route::middleware(['auth', 'approved'])->group(function () {
         Route::put('/admin/customization/values/{value}', [EmbroideryController::class, 'updateCustomizationValue'])->name('admin.customization.values.update');
         Route::delete('/admin/customization/values/{value}', [EmbroideryController::class, 'destroyCustomizationValue'])->name('admin.customization.values.destroy');
 
-        // Products Management
-        Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
-        Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
-        Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
-        Route::post('/admin/products/{product}/update', [ProductController::class, 'update'])->name('admin.products.update-with-file');
-        Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+        // BUG-D09: Products management - admin only (not financeiro)
+        Route::middleware('admin.only')->group(function () {
+            // Products Management
+            Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
+            Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
+            Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
+            Route::post('/admin/products/{product}/update', [ProductController::class, 'update'])->name('admin.products.update-with-file');
+            Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+        });
 
         // BOM (Bill of Materials) Management Routes
         Route::prefix('admin/bom')->name('admin.bom.')->group(function () {
@@ -615,21 +626,24 @@ Route::middleware(['auth', 'approved'])->group(function () {
         // BUG-A14: Removed duplicate Route::resource for admin/materials
         // The resource routes are already defined at line 357-365
 
-        // Material Image Routes
-        Route::post('/admin/materials/{material}/upload-image', [\App\Http\Controllers\Admin\MaterialsController::class, 'uploadImage'])->name('admin.materials.upload-image');
-        Route::delete('/admin/materials/{material}/delete-image', [\App\Http\Controllers\Admin\MaterialsController::class, 'deleteImage'])->name('admin.materials.delete-image');
+        // BUG-D09: Additional materials routes - admin only (not financeiro)
+        Route::middleware('admin.only')->group(function () {
+            // Material Image Routes
+            Route::post('/admin/materials/{material}/upload-image', [\App\Http\Controllers\Admin\MaterialsController::class, 'uploadImage'])->name('admin.materials.upload-image');
+            Route::delete('/admin/materials/{material}/delete-image', [\App\Http\Controllers\Admin\MaterialsController::class, 'deleteImage'])->name('admin.materials.delete-image');
 
-        // Low Stock Alerts Routes
-        Route::get('/admin/materials/low-stock-alerts', [\App\Http\Controllers\Admin\MaterialsController::class, 'lowStockAlerts'])->name('admin.materials.low-stock-alerts');
-        Route::get('/admin/materials/low-stock-alerts-page', [\App\Http\Controllers\Admin\MaterialsController::class, 'lowStockAlertsPage'])->name('admin.materials.low-stock-alerts-page');
+            // Low Stock Alerts Routes
+            Route::get('/admin/materials/low-stock-alerts', [\App\Http\Controllers\Admin\MaterialsController::class, 'lowStockAlerts'])->name('admin.materials.low-stock-alerts');
+            Route::get('/admin/materials/low-stock-alerts-page', [\App\Http\Controllers\Admin\MaterialsController::class, 'lowStockAlertsPage'])->name('admin.materials.low-stock-alerts-page');
 
-        // Material Import/Export Routes
-        Route::prefix('admin/materials')->name('admin.materials.')->group(function () {
-            Route::get('/import-export', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'index'])->name('import-export');
-            Route::get('/export-template', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'exportTemplate'])->name('export-template');
-            Route::post('/export', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'export'])->name('export');
-            Route::post('/import', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'import'])->name('import');
-            Route::get('/validate-units', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'validateUnits'])->name('validate-units');
+            // Material Import/Export Routes
+            Route::prefix('admin/materials')->name('admin.materials.')->group(function () {
+                Route::get('/import-export', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'index'])->name('import-export');
+                Route::get('/export-template', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'exportTemplate'])->name('export-template');
+                Route::post('/export', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'export'])->name('export');
+                Route::post('/import', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'import'])->name('import');
+                Route::get('/validate-units', [\App\Http\Controllers\Admin\MaterialImportExportController::class, 'validateUnits'])->name('validate-units');
+            });
         });
 
         // Notification Routes
@@ -692,3 +706,18 @@ Route::middleware(['auth', 'approved'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// BUG-D11: Handle non-existent storage files - return proper 404 instead of Inertia shell
+Route::get('/storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+    if (!file_exists($fullPath)) {
+        abort(404);
+    }
+    // If file exists, let the web server handle it (this route is only hit if symlink is not working)
+    return response()->file($fullPath);
+})->where('path', '.*');
+
+// BUG-D11: Fallback route for any unmatched routes - return proper 404
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
