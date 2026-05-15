@@ -16,7 +16,7 @@ class ManagerMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->user()->role !== 'manager' && auth()->user()->role !== 'admin') {
-            abort(403, 'Access denied');
+            abort(403, 'Acesso negado.');
         }
         
         return $next($request);

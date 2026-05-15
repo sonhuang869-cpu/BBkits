@@ -16,7 +16,7 @@ class AdminController extends Controller
     public function dashboard(Request $request)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
 
         try {
@@ -295,7 +295,7 @@ class AdminController extends Controller
     public function generateTeamReport(Request $request)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
         
         $month = $request->get('month');

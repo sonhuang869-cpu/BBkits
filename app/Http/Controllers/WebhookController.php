@@ -26,7 +26,7 @@ class WebhookController extends Controller
                     'ip' => $request->ip(),
                     'headers' => $request->headers->all(),
                 ]);
-                return response()->json(['error' => 'Invalid signature'], 401);
+                return response()->json(['error' => 'Assinatura inválida.'], 401);
             }
 
             $webhookData = $request->all();
@@ -46,7 +46,7 @@ class WebhookController extends Controller
                 'ip' => $request->ip(),
             ]);
 
-            return response()->json(['error' => 'Webhook processing failed'], 500);
+            return response()->json(['error' => 'Falha no processamento do webhook.'], 500);
         }
     }
 
@@ -63,7 +63,7 @@ class WebhookController extends Controller
                     'ip' => $request->ip(),
                     'headers' => $request->headers->all(),
                 ]);
-                return response()->json(['error' => 'Invalid signature'], 401);
+                return response()->json(['error' => 'Assinatura inválida.'], 401);
             }
 
             $webhookData = $request->all();
@@ -83,7 +83,7 @@ class WebhookController extends Controller
                 'ip' => $request->ip(),
             ]);
 
-            return response()->json(['error' => 'Webhook processing failed'], 500);
+            return response()->json(['error' => 'Falha no processamento do webhook.'], 500);
         }
     }
 

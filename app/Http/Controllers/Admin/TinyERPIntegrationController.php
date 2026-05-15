@@ -103,14 +103,14 @@ class TinyERPIntegrationController extends Controller
             // Check if sale already has an invoice
             if ($sale->invoice) {
                 return response()->json([
-                    'error' => 'Sale already has an invoice generated'
+                    'error' => 'Venda já possui nota fiscal gerada'
                 ], 400);
             }
 
             // Check if sale is in correct status
             if (!in_array($sale->order_status, ['payment_approved', 'in_production', 'ready_for_shipping'])) {
                 return response()->json([
-                    'error' => 'Sale must be payment approved to generate invoice'
+                    'error' => 'Venda deve ter pagamento aprovado para gerar nota fiscal'
                 ], 400);
             }
 
@@ -156,11 +156,11 @@ class TinyERPIntegrationController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Invoice generated successfully',
+                    'message' => 'Nota fiscal gerada com sucesso.',
                     'invoice' => $invoice,
                 ]);
             } else {
-                throw new \Exception('Failed to generate invoice in Tiny ERP: ' . json_encode($result));
+                throw new \Exception('Falha ao gerar nota fiscal no Tiny ERP: ' . json_encode($result));
             }
 
         } catch (\Exception $e) {
@@ -172,7 +172,7 @@ class TinyERPIntegrationController extends Controller
             ]);
 
             return response()->json([
-                'error' => 'Failed to generate invoice: ' . $e->getMessage()
+                'error' => 'Falha ao gerar nota fiscal: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -186,14 +186,14 @@ class TinyERPIntegrationController extends Controller
             // Validate that sale has delivery address
             if (empty($sale->delivery_address) || empty($sale->delivery_city)) {
                 return response()->json([
-                    'error' => 'Sale must have delivery address'
+                    'error' => 'Venda deve ter endereço de entrega.'
                 ], 400);
             }
 
             // Check sale status
             if (!in_array($sale->order_status, ['ready_for_shipping'])) {
                 return response()->json([
-                    'error' => 'Sale must be ready for shipping to generate label'
+                    'error' => 'Venda deve estar pronta para envio para gerar etiqueta.'
                 ], 400);
             }
 
@@ -241,14 +241,14 @@ class TinyERPIntegrationController extends Controller
 
                     return response()->json([
                         'success' => true,
-                        'message' => 'Shipping label generated successfully',
+                        'message' => 'Etiqueta de envio gerada com sucesso.',
                         'label_url' => $labelResult['retorno']['etiqueta_url'],
                         'tracking_code' => $labelResult['retorno']['codigo_rastreamento'] ?? null,
                     ]);
                 }
             }
 
-            throw new \Exception('Failed to generate shipping label: ' . json_encode($result));
+            throw new \Exception('Falha ao gerar etiqueta de envio: ' . json_encode($result));
 
         } catch (\Exception $e) {
             Log::error('Shipping label generation failed', [
@@ -257,7 +257,7 @@ class TinyERPIntegrationController extends Controller
             ]);
 
             return response()->json([
-                'error' => 'Failed to generate shipping label: ' . $e->getMessage()
+                'error' => 'Falha ao gerar etiqueta de envio: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -292,11 +292,11 @@ class TinyERPIntegrationController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Tracking information updated successfully',
+                    'message' => 'Informações de rastreamento atualizadas com sucesso.',
                 ]);
             }
 
-            throw new \Exception('Failed to update tracking: ' . json_encode($result));
+            throw new \Exception('Falha ao atualizar rastreamento: ' . json_encode($result));
 
         } catch (\Exception $e) {
             Log::error('Tracking update failed', [
@@ -305,7 +305,7 @@ class TinyERPIntegrationController extends Controller
             ]);
 
             return response()->json([
-                'error' => 'Failed to update tracking: ' . $e->getMessage()
+                'error' => 'Falha ao atualizar rastreamento: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -320,7 +320,7 @@ class TinyERPIntegrationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Sale synced successfully',
+                'message' => 'Venda sincronizada com sucesso.',
                 'tiny_erp_id' => $result,
             ]);
 
@@ -331,7 +331,7 @@ class TinyERPIntegrationController extends Controller
             ]);
 
             return response()->json([
-                'error' => 'Failed to sync sale: ' . $e->getMessage()
+                'error' => 'Falha ao sincronizar venda: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -362,7 +362,7 @@ class TinyERPIntegrationController extends Controller
         return response()->json([
             'success' => $successCount,
             'errors' => $errors,
-            'message' => "Synced {$successCount} sales" . (count($errors) > 0 ? " with " . count($errors) . " errors" : ""),
+            'message' => "{$successCount} vendas sincronizadas" . (count($errors) > 0 ? " com " . count($errors) . " erros" : ""),
         ]);
     }
 
@@ -385,7 +385,7 @@ class TinyERPIntegrationController extends Controller
                 'data' => $request->all(),
             ]);
 
-            return response()->json(['error' => 'Webhook processing failed'], 500);
+            return response()->json(['error' => 'Falha no processamento do webhook'], 500);
         }
     }
 
@@ -482,7 +482,7 @@ class TinyERPIntegrationController extends Controller
             return $tinyErpId;
         }
 
-        throw new \Exception('Failed to sync sale to Tiny ERP: ' . json_encode($result));
+        throw new \Exception('Falha ao sincronizar venda com Tiny ERP: ' . json_encode($result));
     }
 
     private function mapSaleStatusToTiny(string $status): string
@@ -535,11 +535,11 @@ class TinyERPIntegrationController extends Controller
     private function getActivityDescription(string $type, array $data): string
     {
         return match ($type) {
-            'sale_synced' => "Sale #{$data['sale_id']} synced to Tiny ERP (ID: {$data['tiny_erp_id']})",
-            'invoice_generated' => "Invoice generated for sale #{$data['sale_id']} (Invoice ID: {$data['invoice_id']})",
-            'shipping_label_generated' => "Shipping label generated for sale #{$data['sale_id']}",
-            'tracking_updated' => "Tracking code updated for sale #{$data['sale_id']}: {$data['tracking_code']}",
-            default => "Unknown activity: {$type}",
+            'sale_synced' => "Venda #{$data['sale_id']} sincronizada com Tiny ERP (ID: {$data['tiny_erp_id']})",
+            'invoice_generated' => "Nota fiscal gerada para venda #{$data['sale_id']} (ID Nota: {$data['invoice_id']})",
+            'shipping_label_generated' => "Etiqueta de envio gerada para venda #{$data['sale_id']}",
+            'tracking_updated' => "Código de rastreamento atualizado para venda #{$data['sale_id']}: {$data['tracking_code']}",
+            default => "Atividade desconhecida: {$type}",
         };
     }
 }

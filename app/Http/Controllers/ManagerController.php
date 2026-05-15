@@ -13,7 +13,7 @@ class ManagerController extends Controller
     {
         // Check permission
         if (!auth()->user()->canViewOrders()) {
-            abort(403, 'Access denied');
+            abort(403, 'Acesso negado.');
         }
 
         $query = Sale::with(['user', 'productCategory', 'embroideryDesign', 'approvedPayments', 'payments'])
@@ -74,7 +74,7 @@ class ManagerController extends Controller
     {
         // Check permission
         if (!auth()->user()->canPrintOrders()) {
-            abort(403, 'Access denied');
+            abort(403, 'Acesso negado.');
         }
 
         $sale->load(['user', 'productCategory', 'embroideryDesign', 'payments']);
@@ -88,7 +88,7 @@ class ManagerController extends Controller
     {
         // Check permission
         if (!auth()->user()->canSendToProduction()) {
-            abort(403, 'Access denied');
+            abort(403, 'Acesso negado.');
         }
 
         // Validate that order can be sent to production

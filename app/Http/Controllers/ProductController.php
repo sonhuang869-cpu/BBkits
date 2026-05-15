@@ -12,8 +12,9 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        // BUG-D09: Admin only (not financeiro) - routes protected by admin.only middleware
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Não autorizado.');
         }
 
         $query = Product::with('productCategory');
@@ -56,8 +57,9 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        // BUG-D09: Admin only (not financeiro) - routes protected by admin.only middleware
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -111,8 +113,9 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        // BUG-D09: Admin only (not financeiro) - routes protected by admin.only middleware
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -161,8 +164,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        // BUG-D09: Admin only (not financeiro) - routes protected by admin.only middleware
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Não autorizado.');
         }
 
         // Check if product is being used in any sales

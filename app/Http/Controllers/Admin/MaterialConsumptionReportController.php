@@ -108,7 +108,7 @@ class MaterialConsumptionReportController extends Controller
                     'user_id' => $userId,
                     'group_by' => $groupBy,
                 ],
-                'error_message' => 'Unable to load consumption data. Please check the system logs.'
+                'error_message' => 'Não foi possível carregar os dados de consumo. Por favor, verifique os logs do sistema.'
             ]);
         }
     }
@@ -117,14 +117,14 @@ class MaterialConsumptionReportController extends Controller
     {
         // Implementation for PDF export would go here
         // This would generate a PDF version of the consumption report
-        return response()->json(['message' => 'PDF export functionality to be implemented']);
+        return response()->json(['message' => 'Funcionalidade de exportação PDF a ser implementada']);
     }
 
     public function exportExcel(Request $request)
     {
         // Implementation for Excel export would go here
         // This would generate an Excel version of the consumption report
-        return response()->json(['message' => 'Excel export functionality to be implemented']);
+        return response()->json(['message' => 'Funcionalidade de exportação Excel a ser implementada']);
     }
 
     private function getOverallConsumptionStats($dateFrom, $dateTo, $materialId = null, $userId = null)

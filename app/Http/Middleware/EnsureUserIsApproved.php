@@ -14,7 +14,7 @@ class EnsureUserIsApproved
 
         if (!$user) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Unauthenticated.'], 401);
+                return response()->json(['message' => 'Não autenticado.'], 401);
             }
             return redirect()->route('login');
         }

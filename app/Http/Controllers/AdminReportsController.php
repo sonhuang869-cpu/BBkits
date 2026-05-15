@@ -15,7 +15,7 @@ class AdminReportsController extends Controller
     public function index(Request $request)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
 
         $month = $request->input('month', Carbon::now()->month);

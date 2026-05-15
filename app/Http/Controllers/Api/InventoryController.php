@@ -103,7 +103,7 @@ class InventoryController extends Controller
         if ($newStock < 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Insufficient stock for this operation'
+                'message' => 'Estoque insuficiente para esta operação.'
             ], 422);
         }
 
@@ -124,7 +124,7 @@ class InventoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Inventory transaction created successfully',
+            'message' => 'Transação de estoque criada com sucesso.',
             'data' => [
                 'transaction' => $transaction,
                 'old_stock' => $oldStock,
@@ -192,7 +192,7 @@ class InventoryController extends Controller
                 \DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Some adjustments failed due to insufficient stock',
+                    'message' => 'Alguns ajustes falharam devido a estoque insuficiente.',
                     'errors' => $errors
                 ], 422);
             }
@@ -201,7 +201,7 @@ class InventoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Bulk adjustment completed successfully',
+                'message' => 'Ajuste em lote concluído com sucesso.',
                 'data' => $results
             ]);
 
@@ -209,7 +209,7 @@ class InventoryController extends Controller
             \DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Bulk adjustment failed: ' . $e->getMessage()
+                'message' => 'Falha no ajuste em lote: ' . $e->getMessage()
             ], 500);
         }
     }

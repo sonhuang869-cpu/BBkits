@@ -175,13 +175,13 @@ class WATIIntegrationController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'WATI connection successful',
+                    'message' => 'Conexão WATI estabelecida com sucesso',
                     'templates_count' => count($templates),
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'WATI connection failed',
+                    'message' => 'Falha na conexão WATI',
                 ]);
             }
 
@@ -190,7 +190,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'WATI connection error: ' . $e->getMessage(),
+                'message' => 'Erro de conexão WATI: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -215,7 +215,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Test message sent successfully',
+                'message' => 'Mensagem de teste enviada com sucesso.',
                 'result' => $result,
             ]);
 
@@ -228,7 +228,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send test message: ' . $e->getMessage(),
+                'message' => 'Falha ao enviar mensagem de teste: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -260,7 +260,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'WhatsApp notification queued successfully',
+                'message' => 'Notificação WhatsApp agendada com sucesso.',
             ]);
 
         } catch (\Exception $e) {
@@ -272,7 +272,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send notification: ' . $e->getMessage(),
+                'message' => 'Falha ao enviar notificação: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -325,14 +325,14 @@ class WATIIntegrationController extends Controller
             if (!$log) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Notification log not found',
+                    'message' => 'Registro de notificação não encontrado.',
                 ], 404);
             }
 
             if ($log->status !== 'failed') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Only failed notifications can be retried',
+                    'message' => 'Apenas notificações com falha podem ser reenviadas.',
                 ], 400);
             }
 
@@ -340,7 +340,7 @@ class WATIIntegrationController extends Controller
             if (!$sale) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Sale not found',
+                    'message' => 'Venda não encontrada.',
                 ], 404);
             }
 
@@ -365,7 +365,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Notification retry queued successfully',
+                'message' => 'Reenvio de notificação agendado com sucesso.',
             ]);
 
         } catch (\Exception $e) {
@@ -376,7 +376,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to retry notification: ' . $e->getMessage(),
+                'message' => 'Falha ao reenviar notificação: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -416,7 +416,7 @@ class WATIIntegrationController extends Controller
         return response()->json([
             'success' => $successCount,
             'errors' => $errors,
-            'message' => "Queued {$successCount} notifications" . (count($errors) > 0 ? " with " . count($errors) . " errors" : ""),
+            'message' => "{$successCount} notificações agendadas" . (count($errors) > 0 ? " com " . count($errors) . " erros" : ""),
         ]);
     }
 
@@ -439,7 +439,7 @@ class WATIIntegrationController extends Controller
                 'data' => $request->all(),
             ]);
 
-            return response()->json(['error' => 'Webhook processing failed'], 500);
+            return response()->json(['error' => 'Falha no processamento do webhook'], 500);
         }
     }
 
@@ -461,7 +461,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to get templates: ' . $e->getMessage(),
+                'message' => 'Falha ao obter templates: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -491,7 +491,7 @@ class WATIIntegrationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to get contact: ' . $e->getMessage(),
+                'message' => 'Falha ao obter contato: ' . $e->getMessage(),
             ], 500);
         }
     }

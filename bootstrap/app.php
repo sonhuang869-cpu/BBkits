@@ -77,12 +77,15 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->view('errors.404', [], 404);
         });
 
+        // BUG-D11: Handle NotFoundHttpException for both API and web requests
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'message' => 'Recurso não encontrado.'
                 ], 404);
             }
+            // For web requests (including /storage/* paths), return 404 error page
+            return response()->view('errors.404', [], 404);
         });
 
         // BUG-N01: Handle authentication exceptions (invalid tokens, etc.)
@@ -113,21 +116,32 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // BUG-D07/D08: Handle authorization exceptions with Portuguese messages
+        // Always return Portuguese messages for consistency
         $exceptions->render(function (AuthorizationException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*') || $request->header('X-Inertia')) {
                 return response()->json([
                     'message' => 'Você não tem permissão para realizar esta ação.'
                 ], 403);
             }
+            // For web requests, abort with Portuguese message
+            abort(403, 'Você não tem permissão para realizar esta ação.');
         });
 
         // Handle AccessDeniedHttpException (from abort(403))
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+            $message = $e->getMessage() ?: 'Você não tem permissão para realizar esta ação.';
+            // Translate common English messages to Portuguese
+            if ($message === 'This action is unauthorized.' || $message === 'Unauthorized') {
+                $message = 'Você não tem permissão para realizar esta ação.';
+            }
+
             if ($request->expectsJson() || $request->is('api/*') || $request->header('X-Inertia')) {
                 return response()->json([
-                    'message' => 'Você não tem permissão para realizar esta ação.'
+                    'message' => $message
                 ], 403);
             }
+            // For web requests, return Portuguese error view
+            return response()->view('errors.403', ['message' => $message], 403);
         });
 
         // Catch-all for API errors to prevent 500 exposing server details

@@ -80,10 +80,16 @@ class ExternalController extends Controller
                     }
 
                 } catch (\Exception $e) {
-                    $results['errors'][] = [
+                    // Log the actual error server-side for debugging
+                    \Log::warning('Material sync item error', [
                         'index' => $index,
                         'external_id' => $materialData['external_id'] ?? null,
                         'error' => $e->getMessage()
+                    ]);
+                    $results['errors'][] = [
+                        'index' => $index,
+                        'external_id' => $materialData['external_id'] ?? null,
+                        'error' => 'Falha ao processar item'
                     ];
                 }
             }
@@ -92,15 +98,17 @@ class ExternalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Materials sync completed',
+                'message' => 'Sincronização de materiais concluída.',
                 'data' => $results
             ]);
 
         } catch (\Exception $e) {
             \DB::rollBack();
+            // Log the actual error server-side
+            \Log::error('Material sync failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Materials sync failed: ' . $e->getMessage()
+                'message' => 'Falha na sincronização de materiais. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -154,10 +162,16 @@ class ExternalController extends Controller
                     }
 
                 } catch (\Exception $e) {
-                    $results['errors'][] = [
+                    // Log the actual error server-side for debugging
+                    \Log::warning('Supplier sync item error', [
                         'index' => $index,
                         'external_id' => $supplierData['external_id'] ?? null,
                         'error' => $e->getMessage()
+                    ]);
+                    $results['errors'][] = [
+                        'index' => $index,
+                        'external_id' => $supplierData['external_id'] ?? null,
+                        'error' => 'Falha ao processar item'
                     ];
                 }
             }
@@ -166,15 +180,17 @@ class ExternalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Suppliers sync completed',
+                'message' => 'Sincronização de fornecedores concluída.',
                 'data' => $results
             ]);
 
         } catch (\Exception $e) {
             \DB::rollBack();
+            // Log the actual error server-side
+            \Log::error('Supplier sync failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Suppliers sync failed: ' . $e->getMessage()
+                'message' => 'Falha na sincronização de fornecedores. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -240,7 +256,7 @@ class ExternalController extends Controller
                         $results['errors'][] = [
                             'index' => $index,
                             'external_id' => $movement['material_external_id'],
-                            'error' => 'Material not found'
+                            'error' => 'Material não encontrado.'
                         ];
                         continue;
                     }
@@ -252,7 +268,7 @@ class ExternalController extends Controller
                         $results['errors'][] = [
                             'index' => $index,
                             'external_id' => $movement['material_external_id'],
-                            'error' => 'Insufficient stock for this operation'
+                            'error' => 'Estoque insuficiente para esta operação.'
                         ];
                         continue;
                     }
@@ -274,10 +290,16 @@ class ExternalController extends Controller
                     $results['processed']++;
 
                 } catch (\Exception $e) {
-                    $results['errors'][] = [
+                    // Log the actual error server-side for debugging
+                    \Log::warning('Stock movement item error', [
                         'index' => $index,
                         'external_id' => $movement['material_external_id'] ?? null,
                         'error' => $e->getMessage()
+                    ]);
+                    $results['errors'][] = [
+                        'index' => $index,
+                        'external_id' => $movement['material_external_id'] ?? null,
+                        'error' => 'Falha ao processar item'
                     ];
                 }
             }
@@ -286,15 +308,17 @@ class ExternalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Stock movements processed',
+                'message' => 'Movimentações de estoque processadas.',
                 'data' => $results
             ]);
 
         } catch (\Exception $e) {
             \DB::rollBack();
+            // Log the actual error server-side
+            \Log::error('Stock movement processing failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Stock movements processing failed: ' . $e->getMessage()
+                'message' => 'Falha no processamento das movimentações de estoque. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -315,7 +339,7 @@ class ExternalController extends Controller
         if (!$material) {
             return response()->json([
                 'success' => false,
-                'message' => 'Material not found'
+                'message' => 'Material não encontrado.'
             ], 404);
         }
 
@@ -341,7 +365,7 @@ class ExternalController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Stock updated successfully',
+            'message' => 'Estoque atualizado com sucesso.',
             'data' => [
                 'material_id' => $material->id,
                 'old_stock' => $oldStock,

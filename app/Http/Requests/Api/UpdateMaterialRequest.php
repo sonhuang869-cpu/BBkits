@@ -54,11 +54,11 @@ class UpdateMaterialRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'external_id.unique' => 'A material with this external ID already exists.',
-            'reference.unique' => 'A material with this reference already exists.',
-            'supplier_id.exists' => 'The selected supplier does not exist.',
-            'minimum_stock.min' => 'Minimum stock cannot be negative.',
-            'purchase_price.min' => 'Purchase price cannot be negative.',
+            'external_id.unique' => 'Já existe um material com este ID externo.',
+            'reference.unique' => 'Já existe um material com esta referência.',
+            'supplier_id.exists' => 'O fornecedor selecionado não existe.',
+            'minimum_stock.min' => 'O estoque mínimo não pode ser negativo.',
+            'purchase_price.min' => 'O preço de compra não pode ser negativo.',
         ];
     }
 
@@ -70,7 +70,7 @@ class UpdateMaterialRequest extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => 'Falha na validação',
                 'errors' => $validator->errors(),
             ], 422)
         );
@@ -84,7 +84,7 @@ class UpdateMaterialRequest extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'success' => false,
-                'message' => 'You do not have permission to update materials.',
+                'message' => 'Você não tem permissão para atualizar materiais.',
                 'error' => 'insufficient_permissions'
             ], 403)
         );

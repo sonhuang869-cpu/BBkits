@@ -103,7 +103,7 @@ class MaterialController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Material created successfully',
+            'message' => 'Material criado com sucesso.',
             'data' => $material
         ], 201);
     }
@@ -125,7 +125,7 @@ class MaterialController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Material updated successfully',
+            'message' => 'Material atualizado com sucesso.',
             'data' => $material
         ]);
     }
@@ -137,12 +137,12 @@ class MaterialController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Material deleted successfully'
+                'message' => 'Material excluído com sucesso.'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cannot delete material: it may have associated transactions'
+                'message' => 'Não é possível excluir material: pode haver transações associadas.'
             ], 422);
         }
     }
@@ -162,7 +162,7 @@ class MaterialController extends Controller
         if ($newStock < 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Insufficient stock for this operation'
+                'message' => 'Estoque insuficiente para esta operação.'
             ], 422);
         }
 
@@ -182,7 +182,7 @@ class MaterialController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Stock adjusted successfully',
+            'message' => 'Estoque ajustado com sucesso.',
             'data' => [
                 'material' => $material,
                 'old_stock' => $oldStock,

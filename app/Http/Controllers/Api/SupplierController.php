@@ -89,7 +89,7 @@ class SupplierController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Supplier created successfully',
+            'message' => 'Fornecedor criado com sucesso.',
             'data' => $supplier
         ], 201);
     }
@@ -109,7 +109,7 @@ class SupplierController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Supplier updated successfully',
+            'message' => 'Fornecedor atualizado com sucesso.',
             'data' => $supplier
         ]);
     }
@@ -119,7 +119,7 @@ class SupplierController extends Controller
         if ($supplier->materials()->count() > 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cannot delete supplier: it has associated materials'
+                'message' => 'Não é possível excluir fornecedor: possui materiais associados.'
             ], 422);
         }
 
@@ -127,7 +127,7 @@ class SupplierController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Supplier deleted successfully'
+            'message' => 'Fornecedor excluído com sucesso.'
         ]);
     }
 

@@ -17,7 +17,7 @@ class EnsureUserCanManageProduction
         }
 
         if (!$user->canManageProduction()) {
-            abort(403, 'Access denied. You do not have permission to manage production.');
+            abort(403, 'Acesso negado. Você não tem permissão para gerenciar produção.');
         }
 
         return $next($request);

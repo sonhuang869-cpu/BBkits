@@ -21,7 +21,7 @@ class FinanceController extends Controller
 
         $this->middleware(function ($request, $next) {
             if (!auth()->user()->canApprovePayments()) {
-                abort(403, 'Unauthorized');
+                abort(403, 'Não autorizado.');
             }
             return $next($request);
         });

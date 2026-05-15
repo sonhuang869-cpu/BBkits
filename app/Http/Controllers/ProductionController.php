@@ -28,7 +28,7 @@ class ProductionController extends Controller
 
         $this->middleware(function ($request, $next) {
             if (!auth()->user()->canManageProduction()) {
-                abort(403, 'Unauthorized');
+                abort(403, 'Não autorizado.');
             }
             return $next($request);
         });

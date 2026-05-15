@@ -767,7 +767,7 @@ class SaleController extends Controller
     public function adminIndex()
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
         
         $sales = Sale::with(['user', 'approvedBy', 'rejectedBy'])
@@ -794,7 +794,7 @@ class SaleController extends Controller
     public function approve(Sale $sale)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
         
         try {
@@ -915,7 +915,7 @@ class SaleController extends Controller
     public function checkStock(Sale $sale)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
 
         $stockCheck = $this->stockReservationService->canReserveSale($sale);
@@ -933,7 +933,7 @@ class SaleController extends Controller
     public function reject(Request $request, Sale $sale)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
         
         try {
@@ -984,7 +984,7 @@ class SaleController extends Controller
     public function approveWithQueue(Sale $sale)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
         
         try {
@@ -1012,7 +1012,7 @@ class SaleController extends Controller
     public function rejectWithQueue(Request $request, Sale $sale)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
         
         try {

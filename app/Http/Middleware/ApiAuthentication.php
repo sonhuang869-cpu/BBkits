@@ -17,7 +17,7 @@ class ApiAuthentication
         if (!$request->bearerToken() && !$request->header('X-API-Key')) {
             return response()->json([
                 'success' => false,
-                'message' => 'API authentication required',
+                'message' => 'Autenticação da API obrigatória.',
                 'error' => 'missing_authentication'
             ], 401);
         }
@@ -30,7 +30,7 @@ class ApiAuthentication
             if (!$this->isValidApiKey($apiKey)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid API key',
+                    'message' => 'Chave de API inválida.',
                     'error' => 'invalid_api_key'
                 ], 401);
             }

@@ -86,7 +86,7 @@ class OrderCommentController extends Controller
     {
         // Only allow the author to edit their comment
         if ($comment->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -102,7 +102,7 @@ class OrderCommentController extends Controller
     {
         // Only allow the author or admin to delete comment
         if ($comment->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
-            abort(403, 'Unauthorized');
+            abort(403, 'Não autorizado.');
         }
 
         $comment->delete();

@@ -268,7 +268,7 @@ class ActionHistoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Successfully deleted {$deletedCount} old action history records",
+            'message' => "{$deletedCount} registros antigos de histórico de ações excluídos com sucesso.",
             'deleted_count' => $deletedCount,
         ]);
     }
@@ -287,7 +287,7 @@ class ActionHistoryController extends Controller
             $resource = $modelClass::find($resourceId);
 
             if (!$resource) {
-                return ['status' => 'deleted', 'name' => 'Resource not found'];
+                return ['status' => 'deleted', 'name' => 'Recurso não encontrado'];
             }
 
             // Get appropriate display name based on resource type
@@ -305,7 +305,7 @@ class ActionHistoryController extends Controller
             ];
 
         } catch (\Exception $e) {
-            return ['status' => 'error', 'name' => 'Error loading resource'];
+            return ['status' => 'error', 'name' => 'Erro ao carregar recurso'];
         }
     }
 

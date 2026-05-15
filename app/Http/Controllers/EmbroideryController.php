@@ -14,8 +14,8 @@ class EmbroideryController extends Controller
 {
     public function dashboard()
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $stats = [
@@ -38,8 +38,8 @@ class EmbroideryController extends Controller
 
     public function fonts(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $query = EmbroideryFont::query();
@@ -67,8 +67,8 @@ class EmbroideryController extends Controller
 
     public function storeFont(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -88,8 +88,8 @@ class EmbroideryController extends Controller
 
     public function updateFont(Request $request, EmbroideryFont $font)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -109,8 +109,8 @@ class EmbroideryController extends Controller
 
     public function destroyFont(EmbroideryFont $font)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $font->delete();
@@ -120,8 +120,8 @@ class EmbroideryController extends Controller
 
     public function colors(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $query = EmbroideryColor::query();
@@ -150,8 +150,8 @@ class EmbroideryController extends Controller
 
     public function storeColor(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -176,8 +176,8 @@ class EmbroideryController extends Controller
 
     public function updateColor(Request $request, EmbroideryColor $color)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -202,8 +202,8 @@ class EmbroideryController extends Controller
 
     public function destroyColor(EmbroideryColor $color)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $color->delete();
@@ -213,8 +213,8 @@ class EmbroideryController extends Controller
 
     public function positions(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $query = EmbroideryPosition::query();
@@ -242,8 +242,8 @@ class EmbroideryController extends Controller
 
     public function storePosition(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -264,8 +264,8 @@ class EmbroideryController extends Controller
 
     public function updatePosition(Request $request, EmbroideryPosition $position)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -286,8 +286,8 @@ class EmbroideryController extends Controller
 
     public function destroyPosition(EmbroideryPosition $position)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $position->delete();
@@ -297,8 +297,8 @@ class EmbroideryController extends Controller
 
     public function designs(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $query = EmbroideryDesign::query();
@@ -334,8 +334,8 @@ class EmbroideryController extends Controller
 
     public function storeDesign(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -359,8 +359,8 @@ class EmbroideryController extends Controller
 
     public function updateDesign(Request $request, EmbroideryDesign $design)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
@@ -384,8 +384,8 @@ class EmbroideryController extends Controller
 
     public function destroyDesign(EmbroideryDesign $design)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
-            abort(403, 'Unauthorized');
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
         }
 
         $design->delete();

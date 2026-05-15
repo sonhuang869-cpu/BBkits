@@ -85,7 +85,7 @@ class ApiRateLimit extends ThrottleRequests
 
         return response()->json([
             'success' => false,
-            'message' => 'Too many API requests. Please try again later.',
+            'message' => 'Muitas requisições de API. Por favor, tente novamente mais tarde.',
             'error' => 'rate_limit_exceeded',
             'retry_after' => $retryAfter,
             'max_attempts' => $maxAttempts,
