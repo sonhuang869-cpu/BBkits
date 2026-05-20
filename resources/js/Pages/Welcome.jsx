@@ -139,7 +139,8 @@ export default function Welcome({ auth }) {
                     box-shadow: var(--shadow-md);
                 }
 
-                .floating-shapes {
+                /* Premium Animated Background */
+                .animated-bg {
                     position: absolute;
                     top: 0;
                     left: 0;
@@ -149,21 +150,188 @@ export default function Welcome({ auth }) {
                     pointer-events: none;
                 }
 
-                .shape {
+                /* Gradient Mesh Layer */
+                .gradient-mesh {
                     position: absolute;
-                    background: rgba(212, 165, 116, 0.08);
-                    border-radius: 50%;
-                    animation: float 20s infinite ease-in-out;
+                    width: 200%;
+                    height: 200%;
+                    top: -50%;
+                    left: -50%;
+                    background:
+                        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(212, 165, 116, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse 60% 80% at 80% 20%, rgba(13, 148, 136, 0.1) 0%, transparent 50%),
+                        radial-gradient(ellipse 50% 60% at 40% 80%, rgba(30, 58, 95, 0.12) 0%, transparent 50%),
+                        radial-gradient(ellipse 70% 40% at 70% 60%, rgba(212, 165, 116, 0.08) 0%, transparent 50%);
+                    animation: meshMove 30s ease-in-out infinite;
                 }
 
-                @keyframes float {
+                @keyframes meshMove {
+                    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+                    25% { transform: translate(5%, 3%) rotate(2deg); }
+                    50% { transform: translate(0, 5%) rotate(0deg); }
+                    75% { transform: translate(-5%, 2%) rotate(-2deg); }
+                }
+
+                /* Floating Orbs */
+                .orb {
+                    position: absolute;
+                    border-radius: 50%;
+                    filter: blur(40px);
+                    opacity: 0.6;
+                    animation: orbFloat 20s ease-in-out infinite;
+                }
+
+                .orb-1 {
+                    width: 400px;
+                    height: 400px;
+                    background: linear-gradient(135deg, rgba(212, 165, 116, 0.3) 0%, rgba(232, 196, 160, 0.1) 100%);
+                    top: -10%;
+                    right: -10%;
+                    animation-delay: 0s;
+                }
+
+                .orb-2 {
+                    width: 300px;
+                    height: 300px;
+                    background: linear-gradient(135deg, rgba(13, 148, 136, 0.2) 0%, rgba(30, 58, 95, 0.15) 100%);
+                    bottom: 10%;
+                    left: -5%;
+                    animation-delay: -7s;
+                }
+
+                .orb-3 {
+                    width: 250px;
+                    height: 250px;
+                    background: linear-gradient(135deg, rgba(30, 58, 95, 0.25) 0%, rgba(71, 85, 105, 0.1) 100%);
+                    top: 40%;
+                    right: 20%;
+                    animation-delay: -14s;
+                }
+
+                @keyframes orbFloat {
                     0%, 100% {
-                        transform: translateY(0) rotate(0deg);
+                        transform: translate(0, 0) scale(1);
                         opacity: 0.5;
                     }
+                    25% {
+                        transform: translate(30px, -20px) scale(1.05);
+                        opacity: 0.7;
+                    }
                     50% {
-                        transform: translateY(-30px) rotate(180deg);
-                        opacity: 0.8;
+                        transform: translate(-20px, 30px) scale(0.95);
+                        opacity: 0.6;
+                    }
+                    75% {
+                        transform: translate(-30px, -10px) scale(1.02);
+                        opacity: 0.5;
+                    }
+                }
+
+                /* Wave Animation */
+                .wave-container {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 200px;
+                    overflow: hidden;
+                }
+
+                .wave {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 200%;
+                    height: 100%;
+                    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.05' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,133.3C672,117,768,139,864,165.3C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+                    animation: wave 25s linear infinite;
+                }
+
+                .wave-2 {
+                    bottom: 10px;
+                    opacity: 0.5;
+                    animation: wave 20s linear reverse infinite;
+                    animation-delay: -5s;
+                }
+
+                .wave-3 {
+                    bottom: 20px;
+                    opacity: 0.3;
+                    animation: wave 30s linear infinite;
+                    animation-delay: -10s;
+                }
+
+                @keyframes wave {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+
+                /* Particle Stars */
+                .particles {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                .particle {
+                    position: absolute;
+                    width: 4px;
+                    height: 4px;
+                    background: rgba(212, 165, 116, 0.6);
+                    border-radius: 50%;
+                    animation: particleFloat 15s ease-in-out infinite;
+                    box-shadow: 0 0 10px rgba(212, 165, 116, 0.3);
+                }
+
+                @keyframes particleFloat {
+                    0%, 100% {
+                        transform: translateY(0) translateX(0);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 1;
+                    }
+                    90% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(-100vh) translateX(50px);
+                        opacity: 0;
+                    }
+                }
+
+                /* Glowing Lines */
+                .glow-lines {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                }
+
+                .glow-line {
+                    position: absolute;
+                    width: 2px;
+                    height: 100px;
+                    background: linear-gradient(to bottom, transparent, rgba(212, 165, 116, 0.4), transparent);
+                    animation: glowMove 8s linear infinite;
+                    opacity: 0.5;
+                }
+
+                @keyframes glowMove {
+                    0% {
+                        transform: translateY(-100px) rotate(45deg);
+                        opacity: 0;
+                    }
+                    50% {
+                        opacity: 0.5;
+                    }
+                    100% {
+                        transform: translateY(100vh) rotate(45deg);
+                        opacity: 0;
                     }
                 }
 
@@ -242,22 +410,55 @@ export default function Welcome({ auth }) {
             `}</style>
 
             <div className="min-h-screen hero-gradient relative overflow-hidden">
-                {/* Floating shapes */}
-                <div className="floating-shapes">
-                    {Array.from({ length: 8 }, (_, i) => (
-                        <div
-                            key={i}
-                            className="shape"
-                            style={{
-                                left: `${Math.random() * 100}%`,
-                                top: `${Math.random() * 100}%`,
-                                width: `${Math.random() * 150 + 50}px`,
-                                height: `${Math.random() * 150 + 50}px`,
-                                animationDelay: `${Math.random() * 10}s`,
-                                animationDuration: `${Math.random() * 10 + 15}s`,
-                            }}
-                        />
-                    ))}
+                {/* Premium Animated Background */}
+                <div className="animated-bg">
+                    {/* Gradient Mesh */}
+                    <div className="gradient-mesh" />
+
+                    {/* Floating Orbs */}
+                    <div className="orb orb-1" />
+                    <div className="orb orb-2" />
+                    <div className="orb orb-3" />
+
+                    {/* Wave Animation */}
+                    <div className="wave-container">
+                        <div className="wave" />
+                        <div className="wave wave-2" />
+                        <div className="wave wave-3" />
+                    </div>
+
+                    {/* Particles */}
+                    <div className="particles">
+                        {Array.from({ length: 20 }, (_, i) => (
+                            <div
+                                key={i}
+                                className="particle"
+                                style={{
+                                    left: `${Math.random() * 100}%`,
+                                    top: `${Math.random() * 100}%`,
+                                    animationDelay: `${Math.random() * 15}s`,
+                                    animationDuration: `${Math.random() * 10 + 10}s`,
+                                    width: `${Math.random() * 4 + 2}px`,
+                                    height: `${Math.random() * 4 + 2}px`,
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Glowing Lines */}
+                    <div className="glow-lines">
+                        {Array.from({ length: 5 }, (_, i) => (
+                            <div
+                                key={i}
+                                className="glow-line"
+                                style={{
+                                    left: `${20 + i * 15}%`,
+                                    animationDelay: `${i * 1.5}s`,
+                                    animationDuration: `${6 + i}s`,
+                                }}
+                            />
+                        ))}
+                    </div>
                 </div>
 
                 <div className="container mx-auto px-4 py-8 relative z-10">

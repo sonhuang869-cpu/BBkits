@@ -79,7 +79,8 @@ export default function AuthenticatedLayout({ header, children }) {
                     overflow: hidden;
                 }
 
-                .floating-shapes {
+                /* Premium Animated Background */
+                .animated-bg-container {
                     position: fixed;
                     top: 0;
                     left: 0;
@@ -90,21 +91,202 @@ export default function AuthenticatedLayout({ header, children }) {
                     z-index: 0;
                 }
 
-                .shape {
+                /* Gradient Mesh Layer */
+                .gradient-mesh {
                     position: absolute;
-                    background: rgba(30, 58, 95, 0.03);
-                    border-radius: 50%;
-                    animation: float 25s infinite ease-in-out;
+                    width: 200%;
+                    height: 200%;
+                    top: -50%;
+                    left: -50%;
+                    background:
+                        radial-gradient(ellipse 60% 40% at 15% 30%, rgba(212, 165, 116, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse 50% 60% at 85% 70%, rgba(13, 148, 136, 0.04) 0%, transparent 50%),
+                        radial-gradient(ellipse 40% 50% at 50% 50%, rgba(30, 58, 95, 0.05) 0%, transparent 50%);
+                    animation: meshFloat 40s ease-in-out infinite;
                 }
 
-                @keyframes float {
+                @keyframes meshFloat {
+                    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+                    25% { transform: translate(3%, 2%) rotate(1deg) scale(1.02); }
+                    50% { transform: translate(0, 4%) rotate(0deg) scale(1); }
+                    75% { transform: translate(-3%, 1%) rotate(-1deg) scale(0.98); }
+                }
+
+                /* Floating Orbs - Subtle */
+                .float-orb {
+                    position: absolute;
+                    border-radius: 50%;
+                    filter: blur(60px);
+                    opacity: 0.4;
+                    animation: orbDrift 25s ease-in-out infinite;
+                }
+
+                .float-orb-1 {
+                    width: 500px;
+                    height: 500px;
+                    background: linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(232, 196, 160, 0.05) 100%);
+                    top: -15%;
+                    right: -15%;
+                    animation-delay: 0s;
+                }
+
+                .float-orb-2 {
+                    width: 400px;
+                    height: 400px;
+                    background: linear-gradient(135deg, rgba(13, 148, 136, 0.1) 0%, rgba(30, 58, 95, 0.08) 100%);
+                    bottom: -10%;
+                    left: -10%;
+                    animation-delay: -8s;
+                }
+
+                .float-orb-3 {
+                    width: 350px;
+                    height: 350px;
+                    background: linear-gradient(135deg, rgba(30, 58, 95, 0.12) 0%, rgba(71, 85, 105, 0.06) 100%);
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    animation-delay: -16s;
+                }
+
+                @keyframes orbDrift {
                     0%, 100% {
-                        transform: translateY(0) rotate(0deg);
+                        transform: translate(0, 0) scale(1);
                         opacity: 0.3;
                     }
-                    50% {
-                        transform: translateY(-20px) rotate(180deg);
+                    33% {
+                        transform: translate(40px, -30px) scale(1.05);
                         opacity: 0.5;
+                    }
+                    66% {
+                        transform: translate(-30px, 40px) scale(0.95);
+                        opacity: 0.4;
+                    }
+                }
+
+                /* Subtle Grid Pattern */
+                .grid-pattern {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-image:
+                        linear-gradient(rgba(30, 58, 95, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(30, 58, 95, 0.03) 1px, transparent 1px);
+                    background-size: 50px 50px;
+                    animation: gridPulse 10s ease-in-out infinite;
+                }
+
+                @keyframes gridPulse {
+                    0%, 100% { opacity: 0.5; }
+                    50% { opacity: 0.8; }
+                }
+
+                /* Particle Dots */
+                .particle-container {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                .particle-dot {
+                    position: absolute;
+                    width: 3px;
+                    height: 3px;
+                    background: rgba(212, 165, 116, 0.4);
+                    border-radius: 50%;
+                    animation: particleRise 20s ease-in-out infinite;
+                    box-shadow: 0 0 6px rgba(212, 165, 116, 0.2);
+                }
+
+                @keyframes particleRise {
+                    0%, 100% {
+                        transform: translateY(0) translateX(0) scale(1);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 0.6;
+                    }
+                    50% {
+                        transform: translateY(-50vh) translateX(20px) scale(1.2);
+                        opacity: 0.4;
+                    }
+                    90% {
+                        opacity: 0.6;
+                    }
+                    100% {
+                        transform: translateY(-100vh) translateX(0) scale(1);
+                        opacity: 0;
+                    }
+                }
+
+                /* Glowing Accent Lines */
+                .accent-line {
+                    position: absolute;
+                    width: 1px;
+                    height: 150px;
+                    background: linear-gradient(
+                        to bottom,
+                        transparent,
+                        rgba(212, 165, 116, 0.3),
+                        rgba(212, 165, 116, 0.5),
+                        rgba(212, 165, 116, 0.3),
+                        transparent
+                    );
+                    animation: lineTravel 12s linear infinite;
+                    opacity: 0;
+                }
+
+                @keyframes lineTravel {
+                    0% {
+                        transform: translateY(-150px) rotate(30deg);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 0.6;
+                    }
+                    90% {
+                        opacity: 0.6;
+                    }
+                    100% {
+                        transform: translateY(100vh) rotate(30deg);
+                        opacity: 0;
+                    }
+                }
+
+                /* Morphing Shape */
+                .morph-shape {
+                    position: absolute;
+                    width: 600px;
+                    height: 600px;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: linear-gradient(135deg, rgba(30, 58, 95, 0.03) 0%, rgba(212, 165, 116, 0.02) 100%);
+                    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+                    animation: morphing 20s ease-in-out infinite;
+                    filter: blur(40px);
+                }
+
+                @keyframes morphing {
+                    0%, 100% {
+                        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+                        transform: translate(-50%, -50%) rotate(0deg);
+                    }
+                    25% {
+                        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+                        transform: translate(-50%, -50%) rotate(90deg);
+                    }
+                    50% {
+                        border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%;
+                        transform: translate(-50%, -50%) rotate(180deg);
+                    }
+                    75% {
+                        border-radius: 60% 40% 60% 50% / 70% 30% 60% 50%;
+                        transform: translate(-50%, -50%) rotate(270deg);
                     }
                 }
 
@@ -466,20 +648,49 @@ export default function AuthenticatedLayout({ header, children }) {
             `}</style>
 
             <div className="min-h-screen premium-bg">
-                {/* Floating shapes */}
-                <div className="floating-shapes">
-                    {Array.from({ length: 12 }, (_, i) => (
+                {/* Premium Animated Background */}
+                <div className="animated-bg-container">
+                    {/* Gradient Mesh */}
+                    <div className="gradient-mesh" />
+
+                    {/* Grid Pattern */}
+                    <div className="grid-pattern" />
+
+                    {/* Morphing Shape */}
+                    <div className="morph-shape" />
+
+                    {/* Floating Orbs */}
+                    <div className="float-orb float-orb-1" />
+                    <div className="float-orb float-orb-2" />
+                    <div className="float-orb float-orb-3" />
+
+                    {/* Particle Dots */}
+                    <div className="particle-container">
+                        {Array.from({ length: 15 }, (_, i) => (
+                            <div
+                                key={i}
+                                className="particle-dot"
+                                style={{
+                                    left: `${5 + Math.random() * 90}%`,
+                                    top: `${Math.random() * 100}%`,
+                                    animationDelay: `${Math.random() * 20}s`,
+                                    animationDuration: `${15 + Math.random() * 10}s`,
+                                    width: `${2 + Math.random() * 3}px`,
+                                    height: `${2 + Math.random() * 3}px`,
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Accent Lines */}
+                    {Array.from({ length: 4 }, (_, i) => (
                         <div
                             key={i}
-                            className="shape"
+                            className="accent-line"
                             style={{
-                                left: Math.random() * 100 + "%",
-                                top: Math.random() * 100 + "%",
-                                width: Math.random() * 120 + 40 + "px",
-                                height: Math.random() * 120 + 40 + "px",
-                                animationDelay: Math.random() * 15 + "s",
-                                animationDuration:
-                                    Math.random() * 15 + 20 + "s",
+                                left: `${15 + i * 20}%`,
+                                animationDelay: `${i * 3}s`,
+                                animationDuration: `${10 + i * 2}s`,
                             }}
                         />
                     ))}
