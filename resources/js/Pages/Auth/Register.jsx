@@ -87,7 +87,8 @@ export default function Register() {
                     pointer-events: none;
                 }
 
-                .floating-shapes {
+                /* Premium Animated Background */
+                .animated-bg {
                     position: absolute;
                     top: 0;
                     left: 0;
@@ -97,21 +98,148 @@ export default function Register() {
                     pointer-events: none;
                 }
 
-                .shape {
+                /* Gradient Mesh Layer */
+                .gradient-mesh {
                     position: absolute;
-                    background: rgba(212, 165, 116, 0.08);
-                    border-radius: 50%;
-                    animation: float 20s infinite ease-in-out;
+                    width: 200%;
+                    height: 200%;
+                    top: -50%;
+                    left: -50%;
+                    background:
+                        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(212, 165, 116, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse 60% 80% at 80% 20%, rgba(13, 148, 136, 0.1) 0%, transparent 50%),
+                        radial-gradient(ellipse 50% 60% at 40% 80%, rgba(30, 58, 95, 0.12) 0%, transparent 50%);
+                    animation: meshMove 30s ease-in-out infinite;
                 }
 
-                @keyframes float {
+                @keyframes meshMove {
+                    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+                    25% { transform: translate(5%, 3%) rotate(2deg); }
+                    50% { transform: translate(0, 5%) rotate(0deg); }
+                    75% { transform: translate(-5%, 2%) rotate(-2deg); }
+                }
+
+                /* Floating Orbs */
+                .orb {
+                    position: absolute;
+                    border-radius: 50%;
+                    filter: blur(40px);
+                    opacity: 0.6;
+                    animation: orbFloat 20s ease-in-out infinite;
+                }
+
+                .orb-1 {
+                    width: 350px;
+                    height: 350px;
+                    background: linear-gradient(135deg, rgba(212, 165, 116, 0.3) 0%, rgba(232, 196, 160, 0.1) 100%);
+                    top: -10%;
+                    right: -10%;
+                    animation-delay: 0s;
+                }
+
+                .orb-2 {
+                    width: 280px;
+                    height: 280px;
+                    background: linear-gradient(135deg, rgba(13, 148, 136, 0.2) 0%, rgba(30, 58, 95, 0.15) 100%);
+                    bottom: 5%;
+                    left: -8%;
+                    animation-delay: -7s;
+                }
+
+                .orb-3 {
+                    width: 200px;
+                    height: 200px;
+                    background: linear-gradient(135deg, rgba(30, 58, 95, 0.25) 0%, rgba(71, 85, 105, 0.1) 100%);
+                    top: 50%;
+                    right: 15%;
+                    animation-delay: -14s;
+                }
+
+                @keyframes orbFloat {
                     0%, 100% {
-                        transform: translateY(0) rotate(0deg);
+                        transform: translate(0, 0) scale(1);
                         opacity: 0.5;
                     }
+                    25% {
+                        transform: translate(30px, -20px) scale(1.05);
+                        opacity: 0.7;
+                    }
                     50% {
-                        transform: translateY(-30px) rotate(180deg);
-                        opacity: 0.8;
+                        transform: translate(-20px, 30px) scale(0.95);
+                        opacity: 0.6;
+                    }
+                    75% {
+                        transform: translate(-30px, -10px) scale(1.02);
+                        opacity: 0.5;
+                    }
+                }
+
+                /* Particle Stars */
+                .particles {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                .particle {
+                    position: absolute;
+                    width: 4px;
+                    height: 4px;
+                    background: rgba(212, 165, 116, 0.6);
+                    border-radius: 50%;
+                    animation: particleFloat 15s ease-in-out infinite;
+                    box-shadow: 0 0 10px rgba(212, 165, 116, 0.3);
+                }
+
+                @keyframes particleFloat {
+                    0%, 100% {
+                        transform: translateY(0) translateX(0);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 1;
+                    }
+                    90% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(-100vh) translateX(50px);
+                        opacity: 0;
+                    }
+                }
+
+                /* Glowing Lines */
+                .glow-lines {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                }
+
+                .glow-line {
+                    position: absolute;
+                    width: 2px;
+                    height: 100px;
+                    background: linear-gradient(to bottom, transparent, rgba(212, 165, 116, 0.4), transparent);
+                    animation: glowMove 8s linear infinite;
+                    opacity: 0.5;
+                }
+
+                @keyframes glowMove {
+                    0% {
+                        transform: translateY(-100px) rotate(45deg);
+                        opacity: 0;
+                    }
+                    50% {
+                        opacity: 0.5;
+                    }
+                    100% {
+                        transform: translateY(100vh) rotate(45deg);
+                        opacity: 0;
                     }
                 }
 
@@ -171,22 +299,48 @@ export default function Register() {
             `}</style>
 
             <div className="min-h-screen register-bg flex flex-col py-12 px-4">
-                {/* Floating shapes */}
-                <div className="floating-shapes">
-                    {Array.from({ length: 6 }, (_, i) => (
-                        <div
-                            key={i}
-                            className="shape"
-                            style={{
-                                left: `${Math.random() * 100}%`,
-                                top: `${Math.random() * 100}%`,
-                                width: `${Math.random() * 120 + 40}px`,
-                                height: `${Math.random() * 120 + 40}px`,
-                                animationDelay: `${Math.random() * 10}s`,
-                                animationDuration: `${Math.random() * 10 + 15}s`,
-                            }}
-                        />
-                    ))}
+                {/* Premium Animated Background */}
+                <div className="animated-bg">
+                    {/* Gradient Mesh */}
+                    <div className="gradient-mesh" />
+
+                    {/* Floating Orbs */}
+                    <div className="orb orb-1" />
+                    <div className="orb orb-2" />
+                    <div className="orb orb-3" />
+
+                    {/* Particles */}
+                    <div className="particles">
+                        {Array.from({ length: 15 }, (_, i) => (
+                            <div
+                                key={i}
+                                className="particle"
+                                style={{
+                                    left: `${Math.random() * 100}%`,
+                                    top: `${Math.random() * 100}%`,
+                                    animationDelay: `${Math.random() * 15}s`,
+                                    animationDuration: `${Math.random() * 10 + 10}s`,
+                                    width: `${Math.random() * 4 + 2}px`,
+                                    height: `${Math.random() * 4 + 2}px`,
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Glowing Lines */}
+                    <div className="glow-lines">
+                        {Array.from({ length: 4 }, (_, i) => (
+                            <div
+                                key={i}
+                                className="glow-line"
+                                style={{
+                                    left: `${20 + i * 20}%`,
+                                    animationDelay: `${i * 2}s`,
+                                    animationDuration: `${6 + i}s`,
+                                }}
+                            />
+                        ))}
+                    </div>
                 </div>
 
                 {/* Logo positioned at top-left */}
