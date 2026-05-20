@@ -40,37 +40,46 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <>
-            {/* Add the same premium styles from Welcome page */}
+            {/* Clean & Professional Theme - Navy & Soft Gold */}
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-                
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
                 :root {
-                    --primary-color: #D4A574;
-                    --secondary-color: #F5E6D3;
-                    --accent-color: #E8B4CB;
-                    --accent-dark: #C8869B;
-                    --text-dark: #2C2C2C;
-                    --text-light: #666;
+                    --primary-color: #1E3A5F;
+                    --primary-light: #2D4A6F;
+                    --primary-dark: #152C4A;
+                    --secondary-color: #475569;
+                    --accent-color: #D4A574;
+                    --accent-light: #E8C4A0;
+                    --accent-dark: #B8956A;
+                    --success-color: #0D9488;
+                    --text-dark: #1F2937;
+                    --text-light: #6B7280;
+                    --text-muted: #9CA3AF;
                     --white: #FFFFFF;
-                    --gradient: linear-gradient(135deg, #D4A574 0%, #E8B4CB 100%);
-                    --gradient-soft: linear-gradient(135deg, #F5E6D3 0%, #FFFFFF 100%);
-                    --gradient-hero: linear-gradient(135deg, rgba(212, 165, 116, 0.95) 0%, rgba(232, 180, 203, 0.95) 100%);
-                    --shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-                    --shadow-hover: 0 25px 50px rgba(0, 0, 0, 0.2);
-                    --shadow-glow: 0 0 30px rgba(212, 165, 116, 0.3);
+                    --background: #FAFAFA;
+                    --background-alt: #F8F6F4;
+                    --gradient: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 50%, #475569 100%);
+                    --gradient-accent: linear-gradient(135deg, #D4A574 0%, #E8C4A0 100%);
+                    --gradient-soft: linear-gradient(135deg, #F8F6F4 0%, #FFFFFF 100%);
+                    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                    --shadow-gold: 0 0 20px rgba(212, 165, 116, 0.3);
                 }
 
                 * {
-                    font-family: 'Poppins', sans-serif;
+                    font-family: 'Inter', sans-serif;
                 }
 
                 .premium-bg {
-                    background: linear-gradient(135deg, #F5E6D3 0%, #FFFFFF 30%, #F0F9FF 70%, #FDF2F8 100%);
+                    background: linear-gradient(135deg, #F8F6F4 0%, #FFFFFF 30%, #FAFAFA 70%, #F8F6F4 100%);
                     position: relative;
                     overflow: hidden;
                 }
 
-                .floating-particles {
+                .floating-shapes {
                     position: fixed;
                     top: 0;
                     left: 0;
@@ -81,201 +90,129 @@ export default function AuthenticatedLayout({ header, children }) {
                     z-index: 0;
                 }
 
-                .particle {
+                .shape {
                     position: absolute;
-                    background: rgba(212, 165, 116, 0.1);
+                    background: rgba(30, 58, 95, 0.03);
                     border-radius: 50%;
-                    animation: float 15s infinite linear;
+                    animation: float 25s infinite ease-in-out;
                 }
 
                 @keyframes float {
-                    0% {
-                        transform: translateY(100vh) rotate(0deg);
-                        opacity: 0;
-                    }
-                    10% {
+                    0%, 100% {
+                        transform: translateY(0) rotate(0deg);
                         opacity: 0.3;
                     }
-                    90% {
-                        opacity: 0.3;
-                    }
-                    100% {
-                        transform: translateY(-100px) rotate(360deg);
-                        opacity: 0;
+                    50% {
+                        transform: translateY(-20px) rotate(180deg);
+                        opacity: 0.5;
                     }
                 }
 
                 .navbar-glass {
-                    background: rgba(255, 255, 255, 0.95);
+                    background: rgba(255, 255, 255, 0.98);
                     backdrop-filter: blur(20px);
-                    border-bottom: 1px solid rgba(212, 165, 116, 0.2);
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-                    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-bottom: 1px solid rgba(30, 58, 95, 0.08);
+                    box-shadow: var(--shadow-sm);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .navbar-scrolled {
-                    background: rgba(255, 255, 255, 0.98);
+                    background: rgba(255, 255, 255, 1);
                     backdrop-filter: blur(25px);
                     box-shadow: var(--shadow);
-                    border-bottom: 2px solid var(--primary-color);
+                    border-bottom: 2px solid var(--accent-color);
                 }
 
                 .logo-container {
-                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                     position: relative;
                 }
 
-                .logo-container::before {
-                    content: '';
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    width: 0;
-                    height: 0;
-                    background: var(--gradient);
-                    border-radius: 50%;
-                    transform: translate(-50%, -50%);
-                    opacity: 0;
-                    transition: all 0.4s ease;
-                    z-index: -1;
-                }
-
-                .logo-container:hover::before {
-                    width: 120%;
-                    height: 120%;
-                    opacity: 0.1;
-                }
-
                 .logo-container:hover {
-                    transform: scale(1.1) rotate(5deg);
-                    filter: drop-shadow(0 0 20px rgba(212, 165, 116, 0.4));
+                    transform: scale(1.05);
                 }
 
                 .nav-link {
                     position: relative;
                     padding: 6px 10px;
-                    border-radius: 12px;
+                    border-radius: 10px;
                     font-weight: 500;
                     font-size: 0.75rem;
                     color: var(--text-dark);
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                     overflow: hidden;
                     white-space: nowrap;
                 }
-                
+
                 @media (min-width: 640px) {
                     .nav-link {
                         padding: 6px 12px;
                         font-size: 0.8125rem;
                     }
                 }
-                
+
                 @media (min-width: 768px) {
                     .nav-link {
                         padding: 8px 14px;
                         font-size: 0.875rem;
-                        border-radius: 14px;
+                        border-radius: 12px;
                     }
                 }
-                
+
                 @media (min-width: 1024px) {
                     .nav-link {
                         padding: 10px 16px;
                         font-size: 0.9375rem;
-                        font-weight: 600;
-                        border-radius: 15px;
+                        font-weight: 500;
                     }
                 }
-                
+
                 @media (min-width: 1280px) {
                     .nav-link {
-                        padding: 12px 20px;
-                        font-size: 1rem;
+                        padding: 10px 18px;
+                        font-size: 0.9375rem;
                     }
-                }
-
-                .nav-link::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: -100%;
-                    width: 100%;
-                    height: 100%;
-                    background: var(--gradient-soft);
-                    transition: left 0.5s ease;
-                    z-index: -1;
-                }
-
-                .nav-link:hover::before,
-                .nav-link.active::before {
-                    left: 0;
                 }
 
                 .nav-link:hover {
+                    background: rgba(30, 58, 95, 0.06);
                     color: var(--primary-color);
-                    transform: translateY(-2px);
-                    box-shadow: 0 5px 15px rgba(212, 165, 116, 0.2);
-                }
-                
-                @media (min-width: 1024px) {
-                    .nav-link:hover {
-                        transform: translateY(-3px);
-                        box-shadow: 0 10px 25px rgba(212, 165, 116, 0.2);
-                    }
+                    transform: translateY(-1px);
                 }
 
                 .nav-link.active {
-                    color: var(--primary-color);
-                    background: var(--gradient-soft);
-                    box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+                    background: var(--gradient);
+                    color: white;
+                    box-shadow: var(--shadow);
                 }
 
                 .user-dropdown {
                     background: var(--gradient-soft);
-                    border: 2px solid transparent;
-                    background-clip: padding-box;
+                    border: 1px solid rgba(30, 58, 95, 0.1);
                     border-radius: 12px;
                     padding: 4px 8px;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                     position: relative;
-                    overflow: hidden;
                 }
-                
+
                 @media (min-width: 768px) {
                     .user-dropdown {
                         padding: 6px 12px;
-                        border-radius: 16px;
+                        border-radius: 14px;
                     }
                 }
-                
+
                 @media (min-width: 1024px) {
                     .user-dropdown {
                         padding: 8px 16px;
-                        border-radius: 20px;
+                        border-radius: 16px;
                     }
                 }
 
-                .user-dropdown::before {
-                    content: '';
-                    position: absolute;
-                    top: -2px;
-                    left: -2px;
-                    right: -2px;
-                    bottom: -2px;
-                    background: var(--gradient);
-                    border-radius: inherit;
-                    z-index: -1;
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
-                }
-
-                .user-dropdown:hover::before {
-                    opacity: 1;
-                }
-
                 .user-dropdown:hover {
-                    transform: translateY(-2px) scale(1.05);
-                    box-shadow: var(--shadow-hover);
+                    transform: translateY(-1px);
+                    box-shadow: var(--shadow);
+                    border-color: var(--accent-color);
                 }
 
                 .user-avatar {
@@ -285,22 +222,22 @@ export default function AuthenticatedLayout({ header, children }) {
                     align-items: center;
                     justify-content: center;
                     color: white;
-                    font-weight: bold;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3);
+                    font-weight: 600;
+                    transition: all 0.2s ease;
+                    box-shadow: var(--shadow-sm);
                 }
 
                 .user-avatar:hover {
-                    transform: scale(1.1) rotate(10deg);
-                    box-shadow: var(--shadow-glow);
+                    transform: scale(1.05);
+                    box-shadow: var(--shadow);
                 }
 
                 .dropdown-content {
                     background: rgba(255, 255, 255, 0.98);
                     backdrop-filter: blur(20px);
-                    border: 1px solid rgba(212, 165, 116, 0.2);
-                    border-radius: 20px;
-                    box-shadow: var(--shadow-hover);
+                    border: 1px solid rgba(30, 58, 95, 0.1);
+                    border-radius: 16px;
+                    box-shadow: var(--shadow-lg);
                     overflow: hidden;
                     margin-top: 2px;
                 }
@@ -308,56 +245,66 @@ export default function AuthenticatedLayout({ header, children }) {
                 .dropdown-header {
                     background: var(--gradient-soft);
                     padding: 16px;
-                    border-bottom: 1px solid rgba(212, 165, 116, 0.1);
+                    border-bottom: 1px solid rgba(30, 58, 95, 0.08);
                 }
 
                 .dropdown-link {
                     padding: 12px 16px;
-                    transition: all 0.3s ease;
+                    transition: all 0.2s ease;
                     border-radius: 0;
                     margin: 4px 8px;
-                    border-radius: 12px;
+                    border-radius: 10px;
+                    color: var(--text-dark);
                 }
 
                 .dropdown-link:hover {
-                    background: var(--gradient-soft);
+                    background: rgba(30, 58, 95, 0.06);
                     color: var(--primary-color);
-                    transform: translateX(5px);
+                    transform: translateX(4px);
+                }
+
+                .dropdown-link svg {
+                    color: var(--text-light);
+                    transition: color 0.2s ease;
+                }
+
+                .dropdown-link:hover svg {
+                    color: var(--primary-color);
                 }
 
                 .mobile-menu {
                     background: rgba(255, 255, 255, 0.98);
                     backdrop-filter: blur(20px);
-                    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-                    border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-bottom: 1px solid rgba(30, 58, 95, 0.08);
                 }
 
                 .mobile-toggle {
                     background: var(--gradient-soft);
-                    border-radius: 12px;
+                    border-radius: 10px;
                     padding: 6px;
-                    transition: all 0.3s ease;
-                    border: 2px solid transparent;
+                    transition: all 0.2s ease;
+                    border: 1px solid rgba(30, 58, 95, 0.1);
                 }
-                
+
                 @media (min-width: 640px) {
                     .mobile-toggle {
                         padding: 8px;
-                        border-radius: 15px;
+                        border-radius: 12px;
                     }
                 }
 
                 .mobile-toggle:hover {
                     background: var(--gradient);
                     color: white;
-                    transform: scale(1.1);
-                    box-shadow: 0 5px 15px rgba(212, 165, 116, 0.3);
+                    transform: scale(1.05);
+                    box-shadow: var(--shadow);
                 }
 
                 .header-section {
                     background: var(--gradient-soft);
-                    border-bottom: 2px solid var(--primary-color);
-                    box-shadow: var(--shadow);
+                    border-bottom: 1px solid rgba(30, 58, 95, 0.08);
+                    box-shadow: var(--shadow-sm);
                     position: relative;
                     overflow: hidden;
                 }
@@ -369,7 +316,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background: linear-gradient(45deg, rgba(212, 165, 116, 0.05) 0%, rgba(232, 180, 203, 0.05) 100%);
+                    background: linear-gradient(45deg, rgba(30, 58, 95, 0.02) 0%, rgba(212, 165, 116, 0.02) 100%);
                     pointer-events: none;
                 }
 
@@ -379,13 +326,13 @@ export default function AuthenticatedLayout({ header, children }) {
                 }
 
                 .animate-fadeInUp {
-                    animation: fadeInUp 0.8s ease-out forwards;
+                    animation: fadeInUp 0.6s ease-out forwards;
                     opacity: 0;
-                    transform: translateY(30px);
+                    transform: translateY(20px);
                 }
 
                 .animate-fadeInUp.delay-200 {
-                    animation-delay: 0.2s;
+                    animation-delay: 0.15s;
                 }
 
                 @keyframes fadeInUp {
@@ -396,40 +343,29 @@ export default function AuthenticatedLayout({ header, children }) {
                 }
 
                 .icon-hover {
-                    transition: all 0.3s ease;
+                    transition: all 0.2s ease;
                 }
 
                 .icon-hover:hover {
-                    transform: scale(1.2) rotate(10deg);
+                    transform: scale(1.1);
                     color: var(--primary-color);
                 }
 
                 /* Mobile responsive menu animations */
                 .mobile-nav-item {
-                    transition: all 0.3s ease;
+                    transition: all 0.2s ease;
                     margin: 4px 0;
                 }
 
                 .mobile-nav-item:hover {
-                    transform: translateX(10px) scale(1.02);
-                    background: var(--gradient-soft);
-                    border-radius: 15px;
-                }
-
-                /* Scroll indicator */
-                .scroll-indicator {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    height: 4px;
-                    background: var(--gradient);
-                    z-index: 9999;
-                    transition: width 0.3s ease;
+                    transform: translateX(8px);
+                    background: rgba(30, 58, 95, 0.06);
+                    border-radius: 12px;
                 }
 
                 /* Custom scrollbar */
                 ::-webkit-scrollbar {
-                    width: 8px;
+                    width: 6px;
                 }
 
                 ::-webkit-scrollbar-track {
@@ -438,39 +374,27 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 ::-webkit-scrollbar-thumb {
                     background: var(--gradient);
-                    border-radius: 4px;
+                    border-radius: 3px;
                 }
 
                 ::-webkit-scrollbar-thumb:hover {
-                    background: var(--accent-color);
+                    background: var(--primary-color);
                 }
-                
-                /* Enhanced icon styling with better colors */
+
+                /* Enhanced icon styling */
                 .nav-icon {
                     width: 0.875rem;
                     height: 0.875rem;
-                    color: #6b7280; /* Gray-500 for better contrast */
+                    color: var(--text-light);
                     transition: all 0.2s ease;
                 }
 
                 .nav-link:hover .nav-icon {
-                    color: #3b82f6; /* Blue-500 on hover */
-                    transform: scale(1.05);
+                    color: var(--primary-color);
                 }
 
                 .nav-link.active .nav-icon {
                     color: white;
-                    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
-                }
-
-                /* Icon hover effects */
-                .icon-hover {
-                    transition: all 0.3s ease;
-                }
-
-                .nav-link:hover .icon-hover {
-                    color: #3b82f6;
-                    transform: scale(1.1);
                 }
 
                 @media (min-width: 768px) {
@@ -486,7 +410,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         height: 1.125rem;
                     }
                 }
-                
+
                 /* Hide text on smaller screens, show icons only */
                 .nav-text {
                     display: none;
@@ -496,56 +420,6 @@ export default function AuthenticatedLayout({ header, children }) {
                     .nav-text {
                         display: inline;
                     }
-                }
-
-                /* Enhanced navigation link styling */
-                .nav-link {
-                    border-radius: 0.75rem;
-                    padding: 0.5rem 0.75rem;
-                    transition: all 0.2s ease;
-                    color: #374151; /* Gray-700 */
-                    position: relative;
-                }
-
-                .nav-link:hover {
-                    background: rgba(59, 130, 246, 0.08);
-                    transform: translateY(-1px);
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                    color: #1e40af; /* Blue-800 */
-                }
-
-                .nav-link.active {
-                    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-                    color: white;
-                    transform: translateY(-1px);
-                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-                }
-
-                /* Better spacing for dropdown menus with closer positioning */
-                .dropdown-menu {
-                    min-width: 200px;
-                }
-
-                /* Enhanced dropdown styling */
-                .dropdown-link {
-                    transition: all 0.2s ease;
-                    color: #374151;
-                    border-radius: 0.5rem;
-                    margin: 0 0.25rem;
-                }
-
-                .dropdown-link:hover {
-                    background-color: #f3f4f6;
-                    color: #1f2937;
-                }
-
-                .dropdown-link svg {
-                    color: #6b7280;
-                    transition: color 0.2s ease;
-                }
-
-                .dropdown-link:hover svg {
-                    color: #3b82f6;
                 }
 
                 /* Compact navigation for tablets */
@@ -560,45 +434,52 @@ export default function AuthenticatedLayout({ header, children }) {
                         height: 1.125rem;
                     }
                 }
-                
+
                 /* Adjust navbar height */
                 .navbar-height {
                     height: 3rem;
                 }
-                
+
                 @media (min-width: 640px) {
                     .navbar-height {
                         height: 3.5rem;
                     }
                 }
-                
+
                 @media (min-width: 768px) {
                     .navbar-height {
                         height: 3.75rem;
                     }
                 }
-                
+
                 @media (min-width: 1024px) {
                     .navbar-height {
                         height: 4rem;
                     }
                 }
+
+                /* Role badge styling */
+                .role-badge {
+                    color: var(--accent-color);
+                    font-weight: 500;
+                }
             `}</style>
 
             <div className="min-h-screen premium-bg">
-                {/* Floating particles */}
-                <div className="floating-particles">
-                    {Array.from({ length: 25 }, (_, i) => (
+                {/* Floating shapes */}
+                <div className="floating-shapes">
+                    {Array.from({ length: 12 }, (_, i) => (
                         <div
                             key={i}
-                            className="particle"
+                            className="shape"
                             style={{
                                 left: Math.random() * 100 + "%",
-                                width: Math.random() * 10 + 4 + "px",
-                                height: Math.random() * 10 + 4 + "px",
+                                top: Math.random() * 100 + "%",
+                                width: Math.random() * 120 + 40 + "px",
+                                height: Math.random() * 120 + 40 + "px",
                                 animationDelay: Math.random() * 15 + "s",
                                 animationDuration:
-                                    Math.random() * 10 + 15 + "s",
+                                    Math.random() * 15 + 20 + "s",
                             }}
                         />
                     ))}
@@ -617,7 +498,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <img
                                             src="/images/logo.webp"
                                             alt="BBKits Logo"
-                                            className="h-6 sm:h-7 md:h-8 lg:h-9 xl:h-10 w-auto object-contain drop-shadow-xl hover:drop-shadow-2xl transition-all duration-500 hover:scale-110 hover:rotate-3 filter hover:brightness-110 hover:saturate-125 cursor-pointer animate-pulse hover:animate-none rounded-lg sm:rounded-xl bg-white from-white/20 to-transparent backdrop-blur-sm border border-white/30 p-0.5 sm:p-0.75 lg:p-1 shadow-xl hover:shadow-yellow-400/50"
+                                            className="h-6 sm:h-7 md:h-8 lg:h-9 xl:h-10 w-auto object-contain transition-all duration-300 rounded-lg bg-white p-0.5 sm:p-0.75 lg:p-1 shadow-sm"
                                         />
                                     </Link>
                                 </div>
@@ -690,7 +571,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <svg className="nav-icon icon-hover" viewBox="0 0 24 24" fill="currentColor">
                                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/>
                                             </svg>
-                                            <span className="nav-text">Produção</span>
+                                            <span className="nav-text">Producao</span>
                                         </NavLink>
                                     )}
 
@@ -707,7 +588,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z"/>
                                                 <path d="M18 11h-4v2h4v-2zm0 4h-4v2h4v-2z"/>
                                             </svg>
-                                            <span className="nav-text">Gerência</span>
+                                            <span className="nav-text">Gerencia</span>
                                         </NavLink>
                                     )}
 
@@ -729,7 +610,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             <Link
                                                 href="/admin/dashboard"
-                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M13 9V3h8v6h-8ZM3 13V3h8v10H3Zm10 8V11h8v10h-8ZM3 21v-6h8v6H3Z" />
@@ -738,16 +619,16 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </Link>
                                             <Link
                                                 href="/admin/users"
-                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7Z"/>
                                                 </svg>
-                                                Usuários
+                                                Usuarios
                                             </Link>
                                             <Link
                                                 href="/admin/sales"
-                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4Z"/>
@@ -756,7 +637,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </Link>
                                             <Link
                                                 href="/admin/embroidery"
-                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M9.5 16a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM9.5 4a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z"/>
@@ -766,7 +647,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </Link>
                                             <Link
                                                 href="/admin/products"
-                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z"/>
@@ -776,30 +657,30 @@ export default function AuthenticatedLayout({ header, children }) {
                                             {user.role === 'admin' && (
                                                 <Link
                                                     href="/admin/permissions"
-                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                                 >
                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Z"/>
                                                     </svg>
-                                                    Permissões
+                                                    Permissoes
                                                 </Link>
                                             )}
                                             {['admin', 'manager'].includes(user.role) && (
                                                 <Link
                                                     href="/admin/reports"
-                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                                 >
                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M7 18h2V6H7v12Zm4 0h2v-6h-2v6Zm4 0h2V2h-2v16Z"/>
                                                     </svg>
-                                                    Relatórios
+                                                    Relatorios
                                                 </Link>
                                             )}
                                             {user.role === 'admin' && (
                                                 <>
                                                     <Link
                                                         href="/admin/tiny-erp"
-                                                        className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                        className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                                     >
                                                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
@@ -808,7 +689,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     </Link>
                                                     <Link
                                                         href="/admin/wati"
-                                                        className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                        className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                                     >
                                                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/>
@@ -838,7 +719,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             <Link
                                                 href="/admin/materials"
-                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                             >
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M12 2 2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5Z"/>
@@ -848,7 +729,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             {canViewSuppliers() && (
                                                 <Link
                                                     href="/admin/suppliers"
-                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                                 >
                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z"/>
@@ -859,32 +740,32 @@ export default function AuthenticatedLayout({ header, children }) {
                                             {canViewInventory() && (
                                                 <Link
                                                     href="/admin/inventory"
-                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                                 >
                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/>
                                                         <path d="M14 2v6h6M16 13H8m8 4H8m2-8H8" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                                                     </svg>
-                                                    Transações de Estoque
+                                                    Transacoes de Estoque
                                                 </Link>
                                             )}
                                             {isAdmin() && (
                                                 <Link
                                                     href="/admin/bom"
-                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                                 >
                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
                                                         <path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>
                                                         <path d="M9 12h6m-6 4h6" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
                                                     </svg>
-                                                    Fichas Técnicas (BOM)
+                                                    Fichas Tecnicas (BOM)
                                                 </Link>
                                             )}
                                             {isAdmin() && (
                                                 <Link
                                                     href="/admin/color-mapping"
-                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg"
+                                                    className="dropdown-link flex items-center gap-3 px-4 py-2 text-sm rounded-lg"
                                                 >
                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c1.38 0 2.5-1.12 2.5-2.5 0-.61-.23-1.2-.64-1.67-.08-.1-.13-.21-.13-.33 0-.28.22-.5.5-.5H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 8 6.5 8 8 8.67 8 9.5 7.33 11 6.5 11zm3-4C8.67 7 8 6.33 8 5.5S8.67 4 9.5 4s1.5.67 1.5 1.5S10.33 7 9.5 7zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 4 14.5 4s1.5.67 1.5 1.5S15.33 7 14.5 7zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 8 17.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
@@ -917,7 +798,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                             {user.name}
                                                         </span>
                                                         <svg
-                                                            className="-me-0.5 ms-1 lg:ms-2 h-3 w-3 lg:h-4 lg:w-4 transition-transform duration-300 group-hover:rotate-180"
+                                                            className="-me-0.5 ms-1 lg:ms-2 h-3 w-3 lg:h-4 lg:w-4 transition-transform duration-200 group-hover:rotate-180"
                                                             fill="currentColor"
                                                             viewBox="0 0 20 20"
                                                         >
@@ -941,14 +822,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                                             .toUpperCase()}
                                                     </div>
                                                     <div>
-                                                        <div className="font-bold text-gray-800">
+                                                        <div className="font-semibold text-gray-800">
                                                             {user.name}
                                                         </div>
-                                                        <div className="text-sm text-gray-600">
+                                                        <div className="text-sm text-gray-500">
                                                             {user.email}
                                                         </div>
-                                                        <div className="text-xs text-purple-600 font-medium mt-1">
-                                                            ✨{" "}
+                                                        <div className="text-xs role-badge mt-1">
                                                             {user.role ===
                                                             "vendedora"
                                                                 ? "Vendedora BBKits"
@@ -958,7 +838,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                 : user.role === "finance_admin"
                                                                 ? "Financeiro Admin"
                                                                 : user.role === "production_admin"
-                                                                ? "Produção Admin"
+                                                                ? "Producao Admin"
                                                                 : "Financeiro"}
                                                         </div>
                                                     </div>
@@ -981,7 +861,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                                                     />
                                                 </svg>
-                                                👤 Meu Perfil
+                                                Meu Perfil
                                             </Dropdown.Link>
                                             <Dropdown.Link
                                                 href="/logout"
@@ -1002,7 +882,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                                                     />
                                                 </svg>
-                                                🚪 Sair
+                                                Sair
                                             </Dropdown.Link>
                                         </Dropdown.Content>
                                     </Dropdown>
@@ -1020,7 +900,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     <div className="relative w-5 h-5 sm:w-6 sm:h-6">
                                         <div
-                                            className={`absolute inset-0 transition-all duration-300 ${
+                                            className={`absolute inset-0 transition-all duration-200 ${
                                                 showingNavigationDropdown
                                                     ? "opacity-0 rotate-45"
                                                     : "opacity-100 rotate-0"
@@ -1041,7 +921,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </svg>
                                         </div>
                                         <div
-                                            className={`absolute inset-0 transition-all duration-300 ${
+                                            className={`absolute inset-0 transition-all duration-200 ${
                                                 showingNavigationDropdown
                                                     ? "opacity-100 rotate-0"
                                                     : "opacity-0 -rotate-45"
@@ -1068,7 +948,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
 
                     <div
-                        className={`md:hidden mobile-menu transition-all duration-500 ease-in-out overflow-hidden ${
+                        className={`md:hidden mobile-menu transition-all duration-300 ease-in-out overflow-hidden ${
                             showingNavigationDropdown
                                 ? "max-h-screen opacity-100"
                                 : "max-h-0 opacity-0"
@@ -1156,7 +1036,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 7.172V5L8 4z" />
                                     </svg>
-                                    Produção
+                                    Producao
                                 </ResponsiveNavLink>
                             )}
 
@@ -1226,7 +1106,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M19 7.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
                                             />
                                         </svg>
-                                        Gerenciar Usuários
+                                        Gerenciar Usuarios
                                     </ResponsiveNavLink>
 
                                     <ResponsiveNavLink
@@ -1337,7 +1217,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
                                                 />
                                             </svg>
-                                            Transações de Estoque
+                                            Transacoes de Estoque
                                         </ResponsiveNavLink>
                                     )}
 
@@ -1360,7 +1240,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6m-6 4h6"
                                                 />
                                             </svg>
-                                            Fichas Técnicas (BOM)
+                                            Fichas Tecnicas (BOM)
                                         </ResponsiveNavLink>
                                     )}
 
@@ -1401,28 +1281,27 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                                                 />
                                             </svg>
-                                            Gerenciar Permissões
+                                            Gerenciar Permissoes
                                         </ResponsiveNavLink>
                                     )}
                                 </>
                             )}
                         </div>
 
-                        <div className="border-t border-pink-200 mx-4 py-4">
+                        <div className="border-t border-gray-100 mx-4 py-4">
                             <div className="px-4 pb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="user-avatar w-12 h-12 text-sm">
                                         {user.name.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
-                                        <div className="text-base font-bold text-gray-800">
+                                        <div className="text-base font-semibold text-gray-800">
                                             {user.name}
                                         </div>
-                                        <div className="text-sm text-gray-600">
+                                        <div className="text-sm text-gray-500">
                                             {user.email}
                                         </div>
-                                        <div className="text-xs text-purple-600 font-medium mt-1">
-                                            ✨{" "}
+                                        <div className="text-xs role-badge mt-1">
                                             {user.role === "vendedora"
                                                 ? "Vendedora BBKits"
                                                 : user.role === "admin"
@@ -1430,7 +1309,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 : user.role === "finance_admin"
                                                 ? "Financeiro Admin"
                                                 : user.role === "production_admin"
-                                                ? "Produção Admin"
+                                                ? "Producao Admin"
                                                 : "Financeiro"}
                                         </div>
                                     </div>
@@ -1455,7 +1334,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                                         />
                                     </svg>
-                                    👤 Meu Perfil
+                                    Meu Perfil
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
                                     method="post"
@@ -1476,7 +1355,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                                         />
                                     </svg>
-                                    🚪 Sair
+                                    Sair
                                 </ResponsiveNavLink>
                             </div>
                         </div>
@@ -1484,7 +1363,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 </nav>
 
                 {header && (
-                    <header className="header-section mt-12 sm:mt-14 md:mt-15 lg:mt-16 border-b border-pink-100/50 relative z-10">
+                    <header className="header-section mt-12 sm:mt-14 md:mt-15 lg:mt-16 border-b border-gray-100 relative z-10">
                         <div className="mx-auto max-w-7xl px-4 py-4 sm:py-5 md:py-6 sm:px-6 lg:px-8 relative z-10">
                             <div className="animate-fadeInUp">{header}</div>
                         </div>

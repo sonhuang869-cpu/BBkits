@@ -34,32 +34,41 @@ export default function Register() {
         <>
             <Head title="Cadastro - BBKits" />
 
-            {/* Add custom styles matching BBKits design */}
+            {/* Clean & Professional Theme - Navy & Soft Gold */}
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-                
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
                 :root {
-                    --primary-color: #D4A574;
-                    --secondary-color: #F5E6D3;
-                    --accent-color: #E8B4CB;
-                    --accent-dark: #C8869B;
-                    --text-dark: #2C2C2C;
-                    --text-light: #666;
+                    --primary-color: #1E3A5F;
+                    --primary-light: #2D4A6F;
+                    --primary-dark: #152C4A;
+                    --secondary-color: #475569;
+                    --accent-color: #D4A574;
+                    --accent-light: #E8C4A0;
+                    --accent-dark: #B8956A;
+                    --success-color: #0D9488;
+                    --text-dark: #1F2937;
+                    --text-light: #6B7280;
+                    --text-muted: #9CA3AF;
                     --white: #FFFFFF;
-                    --gradient: linear-gradient(135deg, #D4A574 0%, #E8B4CB 100%);
-                    --gradient-soft: linear-gradient(135deg, #F5E6D3 0%, #FFFFFF 100%);
-                    --gradient-hero: linear-gradient(135deg, rgba(212, 165, 116, 0.95) 0%, rgba(232, 180, 203, 0.95) 100%);
-                    --shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-                    --shadow-hover: 0 25px 50px rgba(0, 0, 0, 0.2);
-                    --shadow-glow: 0 0 30px rgba(212, 165, 116, 0.3);
+                    --background: #FAFAFA;
+                    --background-alt: #F8F6F4;
+                    --gradient: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 50%, #475569 100%);
+                    --gradient-accent: linear-gradient(135deg, #D4A574 0%, #E8C4A0 100%);
+                    --gradient-hero: linear-gradient(135deg, rgba(30, 58, 95, 0.95) 0%, rgba(71, 85, 105, 0.90) 100%);
+                    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
                 }
 
                 * {
-                    font-family: 'Poppins', sans-serif;
+                    font-family: 'Inter', sans-serif;
                 }
 
                 .register-bg {
-                    background: var(--gradient),
+                    background: var(--gradient-hero),
                                 url('https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80') center/cover;
                     position: relative;
                     overflow: hidden;
@@ -72,65 +81,148 @@ export default function Register() {
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background: radial-gradient(circle at 30% 50%, rgba(212, 165, 116, 0.3) 0%, transparent 50%),
-                                radial-gradient(circle at 70% 30%, rgba(232, 180, 203, 0.3) 0%, transparent 50%);
-                    animation: gradientShift 8s ease-in-out infinite;
+                    background:
+                        radial-gradient(circle at 20% 80%, rgba(212, 165, 116, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 20%, rgba(13, 148, 136, 0.1) 0%, transparent 40%);
+                    pointer-events: none;
                 }
 
-                @keyframes gradientShift {
-                    0%, 100% { opacity: 0.8; }
-                    50% { opacity: 1; }
+                .floating-shapes {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                    pointer-events: none;
                 }
 
-                .logo-glow {
+                .shape {
+                    position: absolute;
+                    background: rgba(212, 165, 116, 0.08);
+                    border-radius: 50%;
+                    animation: float 20s infinite ease-in-out;
+                }
+
+                @keyframes float {
+                    0%, 100% {
+                        transform: translateY(0) rotate(0deg);
+                        opacity: 0.5;
+                    }
+                    50% {
+                        transform: translateY(-30px) rotate(180deg);
+                        opacity: 0.8;
+                    }
+                }
+
+                .form-card {
+                    background: rgba(255, 255, 255, 0.98);
+                    backdrop-filter: blur(20px);
+                    border-radius: 20px;
+                    box-shadow: var(--shadow-xl);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                }
+
+                .input-field {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 1px solid #E5E7EB;
+                }
+
+                .input-field:focus {
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+                }
+
+                .btn-submit {
                     background: var(--gradient);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    animation: logoGlow 3s ease-in-out infinite alternate;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    position: relative;
+                    overflow: hidden;
                 }
 
-                @keyframes logoGlow {
-                    0% { filter: drop-shadow(0 0 5px rgba(212, 165, 116, 0.3)); }
-                    100% { filter: drop-shadow(0 0 15px rgba(212, 165, 116, 0.6)); }
+                .btn-submit::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                    transition: left 0.5s;
+                }
+
+                .btn-submit:hover::before {
+                    left: 100%;
+                }
+
+                .btn-submit:hover {
+                    transform: translateY(-2px);
+                    box-shadow: var(--shadow-lg);
+                }
+
+                .link-accent {
+                    color: var(--primary-color);
+                    transition: color 0.2s ease;
+                }
+
+                .link-accent:hover {
+                    color: var(--accent-color);
                 }
             `}</style>
 
             <div className="min-h-screen register-bg flex flex-col py-12 px-4">
+                {/* Floating shapes */}
+                <div className="floating-shapes">
+                    {Array.from({ length: 6 }, (_, i) => (
+                        <div
+                            key={i}
+                            className="shape"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${Math.random() * 100}%`,
+                                width: `${Math.random() * 120 + 40}px`,
+                                height: `${Math.random() * 120 + 40}px`,
+                                animationDelay: `${Math.random() * 10}s`,
+                                animationDuration: `${Math.random() * 10 + 15}s`,
+                            }}
+                        />
+                    ))}
+                </div>
+
                 {/* Logo positioned at top-left */}
-                <div className="w-full max-w-6xl mx-auto mb-8">
+                <div className="w-full max-w-6xl mx-auto mb-8 relative z-10">
                     <div className="flex justify-start">
                         <Link href="/">
                             <img
                                 src="/images/logo.webp"
                                 alt="BBKits Logo"
-                                className="object-contain drop-shadow-xl hover:drop-shadow-2xl transition-all duration-500 hover:scale-110 hover:rotate-3 filter hover:brightness-110 hover:saturate-125 cursor-pointer animate-pulse hover:animate-none rounded-xl bg-white from-white/20 to-transparent backdrop-blur-sm border border-white/30 p-1 shadow-xl hover:shadow-yellow-400/50"
+                                className="h-14 w-auto object-contain transition-all duration-300 hover:scale-105 rounded-xl bg-white p-2 shadow-md"
                             />
                         </Link>
                     </div>
                 </div>
 
                 {/* Centered register form */}
-                <div className="flex-1 flex items-center justify-center">
+                <div className="flex-1 flex items-center justify-center relative z-10">
                     <div className="w-full max-w-md">
                         {/* Clean Form Container */}
-                        <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
-                            <h1 className="text-3xl font-bold text-center mb-2" style={{color: '#D4A574'}}>
+                        <div className="form-card p-8">
+                            <h1 className="text-2xl font-bold text-center mb-2" style={{color: '#1E3A5F'}}>
                                 Criar Conta
                             </h1>
-                            <p className="text-center text-gray-600 mb-8">
-                                Junte-se às vendedoras de sucesso da BBkits
+                            <p className="text-center text-gray-500 mb-8 text-sm">
+                                Junte-se as vendedoras de sucesso da BBkits
                             </p>
 
-                            <form onSubmit={submit} className="space-y-6">
+                            <form onSubmit={submit} className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Nome Completo</label>
                                     <input
                                         id="name"
                                         type="text"
                                         name="name"
                                         value={data.name}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all duration-300"
+                                        className="input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900"
                                         autoComplete="name"
                                         autoFocus={true}
                                         onChange={(e) => setData('name', e.target.value)}
@@ -143,13 +235,13 @@ export default function Register() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">E-mail</label>
                                     <input
                                         id="email"
                                         type="email"
                                         name="email"
                                         value={data.email}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all duration-300"
+                                        className="input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900"
                                         autoComplete="username"
                                         onChange={(e) => setData('email', e.target.value)}
                                         placeholder="seu@email.com"
@@ -161,13 +253,13 @@ export default function Register() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
                                     <input
                                         id="password"
                                         type="password"
                                         name="password"
                                         value={data.password}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all duration-300"
+                                        className="input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password', e.target.value)}
                                         placeholder="Crie uma senha forte"
@@ -179,13 +271,13 @@ export default function Register() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Senha</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirmar Senha</label>
                                     <input
                                         id="password_confirmation"
                                         type="password"
                                         name="password_confirmation"
                                         value={data.password_confirmation}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all duration-300"
+                                        className="input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
                                         placeholder="Confirme sua senha"
@@ -199,10 +291,7 @@ export default function Register() {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="w-full py-3 px-4 text-white font-medium rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    style={{
-                                        background: 'linear-gradient(135deg, #D4A574 0%, #E8B4CB 100%)'
-                                    }}
+                                    className="btn-submit w-full py-3 px-4 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {processing ? (
                                         <div className="flex items-center justify-center">
@@ -217,11 +306,11 @@ export default function Register() {
                                     )}
                                 </button>
 
-                                <div className="text-center">
-                                    <span className="text-sm text-gray-600">Já possui uma conta? </span>
+                                <div className="text-center pt-2">
+                                    <span className="text-sm text-gray-500">Ja possui uma conta? </span>
                                     <Link
                                         href="/login"
-                                        className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors duration-200"
+                                        className="link-accent text-sm font-semibold"
                                     >
                                         Fazer Login
                                     </Link>
@@ -229,24 +318,24 @@ export default function Register() {
                             </form>
 
                             {/* Additional Info */}
-                            <div className="mt-6 pt-6 border-t border-gray-200">
-                                <div className="text-center text-xs text-gray-500">
+                            <div className="mt-6 pt-6 border-t border-gray-100">
+                                <div className="text-center text-xs text-gray-400">
                                     <p>
-                                        Ao criar uma conta, você concorda com nossos
+                                        Ao criar uma conta, voce concorda com nossos
                                     </p>
                                     <div className="space-x-2 mt-1">
                                         <a
                                             href="#"
-                                            className="text-orange-600 hover:text-orange-700"
+                                            className="link-accent"
                                         >
                                             Termos de Uso
                                         </a>
                                         <span>e</span>
                                         <a
                                             href="#"
-                                            className="text-orange-600 hover:text-orange-700"
+                                            className="link-accent"
                                         >
-                                            Política de Privacidade
+                                            Politica de Privacidade
                                         </a>
                                     </div>
                                 </div>
