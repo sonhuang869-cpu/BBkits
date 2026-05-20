@@ -1,4 +1,4 @@
-export default function PrimaryButton({
+export default function SuccessButton({
     className = '',
     disabled,
     children,
@@ -13,8 +13,8 @@ export default function PrimaryButton({
                 } ` + className
             }
             style={{
-                background: 'linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 50%, #475569 100%)',
-                '--tw-ring-color': '#1E3A5F',
+                background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #2DD4BF 100%)',
+                '--tw-ring-color': '#0D9488',
             }}
             disabled={disabled}
         >
