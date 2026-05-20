@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\BackupService;
 use App\Services\ActionHistoryService;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
@@ -13,6 +14,7 @@ use Inertia\Inertia;
 
 class BackupController extends Controller
 {
+    use SanitizesErrorMessages;
     protected $backupService;
     protected $actionHistoryService;
 
@@ -90,8 +92,8 @@ class BackupController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('Manual backup creation failed', [
-                'error' => $e->getMessage(),
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Manual backup creation failed', $e, [
                 'user_id' => auth()->id()
             ]);
 
@@ -108,7 +110,25 @@ class BackupController extends Controller
     public function download(Request $request, string $backupName)
     {
         try {
+            // SECURITY FIX: Validate backup name to prevent path traversal attacks
+            if (!$this->isValidBackupName($backupName)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nome de backup inválido'
+                ], 400);
+            }
+
             $backupPath = storage_path("app/backups/{$backupName}");
+
+            // SECURITY FIX: Verify the resolved path is within the backups directory
+            $realPath = realpath($backupPath);
+            $backupsDir = realpath(storage_path("app/backups"));
+            if ($realPath === false || !str_starts_with($realPath, $backupsDir)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Backup não encontrado'
+                ], 404);
+            }
 
             if (!file_exists($backupPath)) {
                 return response()->json([
@@ -133,9 +153,9 @@ class BackupController extends Controller
             return response()->download($backupPath, $backupName);
 
         } catch (\Exception $e) {
-            Log::error('Backup download failed', [
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Backup download failed', $e, [
                 'backup_name' => $backupName,
-                'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
 
@@ -152,6 +172,14 @@ class BackupController extends Controller
     public function destroy(string $backupName)
     {
         try {
+            // SECURITY FIX: Validate backup name to prevent path traversal attacks
+            if (!$this->isValidBackupName($backupName)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nome de backup inválido'
+                ], 400);
+            }
+
             $deleted = $this->backupService->deleteBackup($backupName);
 
             if ($deleted) {
@@ -168,9 +196,9 @@ class BackupController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('Backup deletion failed', [
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Backup deletion failed', $e, [
                 'backup_name' => $backupName,
-                'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
 
@@ -233,8 +261,8 @@ class BackupController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Backup cleanup failed', [
-                'error' => $e->getMessage(),
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Backup cleanup failed', $e, [
                 'user_id' => auth()->id()
             ]);
 
@@ -265,9 +293,8 @@ class BackupController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to get backup stats', [
-                'error' => $e->getMessage()
-            ]);
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to get backup stats', $e);
 
             return response()->json([
                 'success' => false,
@@ -342,9 +369,11 @@ class BackupController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            // SECURITY FIX: Don't expose raw exception messages
+            $this->logErrorSafely('Backup system test failed', $e);
             return response()->json([
                 'success' => false,
-                'message' => 'Erro no teste do sistema de backup: ' . $e->getMessage()
+                'message' => 'Erro no teste do sistema de backup. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -380,5 +409,48 @@ class BackupController extends Controller
             'trend' => $trend,
             'percentage' => round($percentageChange, 1)
         ];
+    }
+
+    /**
+     * SECURITY: Validate backup name to prevent path traversal attacks
+     * Only allows alphanumeric characters, underscores, hyphens, and dots
+     * Must start with valid backup prefix and end with valid extension
+     */
+    private function isValidBackupName(string $backupName): bool
+    {
+        // Check for path traversal attempts
+        if (str_contains($backupName, '..') || str_contains($backupName, '/') || str_contains($backupName, '\\')) {
+            return false;
+        }
+
+        // Only allow safe characters: alphanumeric, underscores, hyphens, dots
+        if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $backupName)) {
+            return false;
+        }
+
+        // Must start with valid backup prefix
+        $validPrefixes = ['bbkits_backup_', 'database_backup_', 'full_backup_', 'backup_'];
+        $hasValidPrefix = false;
+        foreach ($validPrefixes as $prefix) {
+            if (str_starts_with($backupName, $prefix)) {
+                $hasValidPrefix = true;
+                break;
+            }
+        }
+        if (!$hasValidPrefix) {
+            return false;
+        }
+
+        // Must end with valid extension
+        $validExtensions = ['.sql', '.zip', '.sql.gz', '.db', '.json', '.tar.gz'];
+        $hasValidExtension = false;
+        foreach ($validExtensions as $ext) {
+            if (str_ends_with($backupName, $ext)) {
+                $hasValidExtension = true;
+                break;
+            }
+        }
+
+        return $hasValidExtension;
     }
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 
 export default function Index({ auth, products, materials, filters }) {
     const [search, setSearch] = useState(filters?.search || '');
@@ -282,8 +283,9 @@ export default function Index({ auth, products, materials, filters }) {
                                                         ? 'bg-white text-gray-700 hover:bg-gray-100'
                                                         : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                                 }`}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
+                                            >
+                                                <SafePaginationLabel label={link.label} />
+                                            </Link>
                                         ))}
                                     </div>
                                 </div>

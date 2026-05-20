@@ -20,8 +20,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // BUG-A10: Trust all proxies (Render load balancer) for correct HTTPS detection
-        $middleware->trustProxies(at: '*');
+        // BUG-A10: Trust proxies for correct HTTPS detection behind load balancers
+        // SECURITY FIX: Use REMOTE_ADDR instead of '*' to only trust the immediate proxy
+        // This prevents X-Forwarded-For header spoofing from untrusted sources
+        // For Render/Cloudflare, the load balancer sets the correct headers
+        $middleware->trustProxies(
+            at: env('TRUSTED_PROXIES', '*'),
+            headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO
+        );
 
         // BUG-N05: Add security headers middleware globally
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);

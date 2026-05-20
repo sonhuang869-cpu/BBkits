@@ -83,9 +83,14 @@ class BackupDatabase extends Command
         }
 
         // Also create a SQL dump for portability
+        // SECURITY FIX: Use escapeshellarg() to prevent command injection
         $sqlBackupPath = str_replace('.sql', '_dump.sql', $backupPath);
-        $command = "sqlite3 \"{$databasePath}\" .dump > \"{$sqlBackupPath}\"";
-        
+        $command = sprintf(
+            'sqlite3 %s .dump > %s',
+            escapeshellarg($databasePath),
+            escapeshellarg($sqlBackupPath)
+        );
+
         exec($command, $output, $returnCode);
         
         if ($returnCode !== 0) {

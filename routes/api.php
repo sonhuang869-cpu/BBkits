@@ -22,7 +22,8 @@ use App\Http\Controllers\Api\Integration\ExternalController;
 Route::get('/health', [ExternalController::class, 'healthCheck']);
 
 // API v1 routes with authentication and rate limiting
-Route::prefix('v1')->group(function () {
+// SECURITY FIX: Added auth:sanctum middleware - all API routes require authentication
+Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
 
     // Standard API endpoints for materials management
     Route::middleware(['throttle:api'])->group(function () {
@@ -81,15 +82,17 @@ Route::prefix('v1')->group(function () {
 });
 
 // Legacy API endpoints (for backward compatibility)
-Route::prefix('legacy')->middleware(['throttle:api'])->group(function () {
+// SECURITY FIX C-01: Added auth:sanctum middleware to prevent unauthenticated access
+Route::prefix('legacy')->middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::get('/materials', [MaterialController::class, 'index']);
     Route::get('/materials/{material}', [MaterialController::class, 'show']);
     Route::get('/suppliers', [SupplierController::class, 'index']);
     Route::get('/inventory', [InventoryController::class, 'index']);
 });
 
-// API Documentation endpoint
-Route::get('/docs', function () {
+// API Documentation endpoint - SECURITY FIX: Requires authentication
+// Exposing API structure and authentication methods aids reconnaissance attacks
+Route::middleware(['auth:sanctum'])->get('/docs', function () {
     return response()->json([
         'api_version' => '1.0.0',
         'documentation_url' => config('app.url') . '/api/docs',
@@ -125,11 +128,6 @@ Route::get('/docs', function () {
                 'POST /api/v1/integration/stock-movements' => 'Process stock movements',
                 'POST /api/v1/integration/webhook/stock-update' => 'Stock update webhook',
             ]
-        ],
-        'authentication' => [
-            'type' => 'Bearer Token (Sanctum) or API Key',
-            'header' => 'Authorization: Bearer {token} or X-API-Key: {key}',
-            'note' => 'All endpoints require authentication except /health and /docs'
         ],
         'rate_limits' => [
             'standard' => '100 requests per minute',

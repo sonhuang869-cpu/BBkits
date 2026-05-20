@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 
 export default function ReorderConfig({ materials, suppliers, categories, filters }) {
     const [search, setSearch] = useState(filters.search || '');
@@ -318,8 +319,9 @@ export default function ReorderConfig({ materials, suppliers, categories, filter
                                                     ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                     : 'bg-gray-50 text-gray-400 cursor-not-allowed'
                                             }`}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
+                                        >
+                                            <SafePaginationLabel label={link.label} />
+                                        </button>
                                     ))}
                                 </div>
                             </div>

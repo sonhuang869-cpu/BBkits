@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderComment;
 use App\Models\Sale;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderCommentController extends Controller
 {
+    use SanitizesErrorMessages;
     public function store(Request $request, Sale $sale)
     {
         // BUG-V07 & BUG-V09: Verify user has access to add comments to this sale
@@ -43,10 +45,9 @@ class OrderCommentController extends Controller
                     $notificationService = app(\App\Services\NotificationService::class);
                     $notificationService->notifyUserMentioned($comment);
                 } catch (\Exception $e) {
-                    // Log notification error but don't fail the comment creation
-                    \Log::warning('Failed to send comment mention notification', [
-                        'comment_id' => $comment->id,
-                        'error' => $e->getMessage()
+                    // SECURITY FIX: Use sanitized logging
+                    $this->logErrorSafely('Failed to send comment mention notification', $e, [
+                        'comment_id' => $comment->id
                     ]);
                 }
             }
@@ -54,10 +55,10 @@ class OrderCommentController extends Controller
             return back()->with('success', 'Comentário adicionado com sucesso!');
 
         } catch (\Exception $e) {
-            \Log::error('Failed to create comment', [
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to create comment', $e, [
                 'sale_id' => $sale->id,
-                'user_id' => Auth::id(),
-                'error' => $e->getMessage()
+                'user_id' => Auth::id()
             ]);
 
             return back()->withErrors(['error' => 'Erro ao adicionar comentário. Tente novamente.']);

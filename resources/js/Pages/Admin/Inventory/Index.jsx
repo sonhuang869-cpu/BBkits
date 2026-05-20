@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 
 export default function Index({ transactions, materials, users, filters, stats }) {
     const { auth } = usePage().props;
@@ -365,8 +366,9 @@ export default function Index({ transactions, materials, users, filters, stats }
                                                             ? 'bg-purple-500 text-white'
                                                             : 'bg-white text-gray-700 hover:bg-gray-50'
                                                     } border border-gray-300 rounded`}
-                                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                                />
+                                                >
+                                                    <SafePaginationLabel label={link.label} />
+                                                </Link>
                                             ) : (
                                                 <span
                                                     key={index}
@@ -375,8 +377,9 @@ export default function Index({ transactions, materials, users, filters, stats }
                                                             ? 'bg-purple-500 text-white'
                                                             : 'bg-gray-300 text-gray-500'
                                                     } border border-gray-300 rounded cursor-not-allowed`}
-                                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                                />
+                                                >
+                                                    <SafePaginationLabel label={link.label} />
+                                                </span>
                                             )
                                         ))}
                                     </div>

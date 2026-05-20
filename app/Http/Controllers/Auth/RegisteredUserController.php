@@ -37,13 +37,17 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // SECURITY FIX H-02: Role removed from $fillable, set explicitly
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'vendedora', // Default role for new registrations
             'approved' => false, // Requires admin approval
         ]);
+
+        // Explicitly set default role for new registrations
+        $user->setRole('vendedora');
+        $user->save();
 
         event(new Registered($user));
 

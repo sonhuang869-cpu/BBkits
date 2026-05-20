@@ -73,19 +73,28 @@ class StockReservationService
                     $quantity = $materialData['quantity'];
                     $unit = $materialData['unit'];
 
-                    // Check if enough stock is available
-                    $availableStock = StockReservation::getAvailableStock($material);
+                    // SECURITY FIX C-02: Use pessimistic locking to prevent race conditions
+                    // Lock the material row to prevent concurrent reservations from overselling
+                    $lockedMaterial = Material::lockForUpdate()->find($material->id);
+
+                    if (!$lockedMaterial) {
+                        $warnings[] = "Material '{$material->name}' não encontrado durante reserva.";
+                        continue;
+                    }
+
+                    // Check if enough stock is available (with locked material)
+                    $availableStock = StockReservation::getAvailableStock($lockedMaterial);
 
                     if ($availableStock < $quantity) {
                         $shortage = $quantity - $availableStock;
-                        $warnings[] = "Estoque insuficiente para '{$material->name}': necessário {$quantity} {$unit}, disponível {$availableStock} {$unit} (faltam {$shortage} {$unit})";
+                        $warnings[] = "Estoque insuficiente para '{$lockedMaterial->name}': necessário {$quantity} {$unit}, disponível {$availableStock} {$unit} (faltam {$shortage} {$unit})";
                     }
 
                     // Create reservation regardless (to track what's needed)
                     $reservation = StockReservation::create([
                         'sale_id' => $sale->id,
                         'sale_product_id' => $saleProduct->id,
-                        'material_id' => $material->id,
+                        'material_id' => $lockedMaterial->id,
                         'quantity_reserved' => $quantity,
                         'unit' => $unit,
                         'status' => StockReservation::STATUS_RESERVED,
@@ -260,8 +269,10 @@ class StockReservationService
             }
 
             foreach ($deductedReservations as $reservation) {
-                $material = $reservation->material;
                 $quantity = (float) $reservation->quantity_reserved;
+
+                // SECURITY FIX C-02: Use pessimistic locking for consistent stock restoration
+                $material = Material::lockForUpdate()->find($reservation->material_id);
 
                 if (!$material) {
                     $errors[] = "Material não encontrado para reserva #{$reservation->id}";
@@ -428,10 +439,18 @@ class StockReservationService
             }
 
             foreach ($reservations as $reservation) {
-                $material = $reservation->material;
                 $quantity = (float) $reservation->quantity_reserved;
 
-                // Check if we have enough stock
+                // SECURITY FIX C-02: Use pessimistic locking to prevent race conditions
+                // Lock the material row to prevent concurrent deductions from overselling
+                $material = Material::lockForUpdate()->find($reservation->material_id);
+
+                if (!$material) {
+                    $errors[] = "Material não encontrado para reserva #{$reservation->id}";
+                    continue;
+                }
+
+                // Check if we have enough stock (with locked material)
                 if ($material->current_stock < $quantity) {
                     $errors[] = "Estoque insuficiente para '{$material->name}': necessário {$quantity}, disponível {$material->current_stock}";
                     continue;

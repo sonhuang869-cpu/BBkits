@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\TinyERPService;
 use App\Services\WATIService;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Log;
  */
 class WebhookController extends Controller
 {
+    use SanitizesErrorMessages;
     /**
      * Handle Tiny ERP webhook
      * Public endpoint - validates using X-TinyERP-Token header or webhook_secret parameter
@@ -41,8 +43,8 @@ class WebhookController extends Controller
             return response()->json(['status' => 'processed', 'result' => $result]);
 
         } catch (\Exception $e) {
-            Log::error('Tiny ERP webhook processing failed', [
-                'error' => $e->getMessage(),
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Tiny ERP webhook processing failed', $e, [
                 'ip' => $request->ip(),
             ]);
 
@@ -78,8 +80,8 @@ class WebhookController extends Controller
             return response()->json(['status' => 'processed', 'result' => $result]);
 
         } catch (\Exception $e) {
-            Log::error('WATI webhook processing failed', [
-                'error' => $e->getMessage(),
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('WATI webhook processing failed', $e, [
                 'ip' => $request->ip(),
             ]);
 
@@ -89,28 +91,24 @@ class WebhookController extends Controller
 
     /**
      * Validate Tiny ERP webhook signature
-     * Checks X-TinyERP-Token header or webhook_secret parameter against configured secret
+     * SECURITY: Only checks X-TinyERP-Token header against configured secret
+     * Never accepts secrets from request body (could be logged by proxies)
      */
     private function validateTinyErpSignature(Request $request): bool
     {
         $configuredSecret = config('services.tiny_erp.webhook_secret');
 
-        // If no secret is configured, allow all requests (for development/testing)
-        // In production, you should always configure a secret
+        // SECURITY FIX: Require webhook secret to be configured
+        // Never accept all requests - this is a critical security vulnerability
         if (empty($configuredSecret)) {
-            Log::warning('Tiny ERP webhook: No secret configured, accepting all requests');
-            return true;
+            Log::error('Tiny ERP webhook: No secret configured - REJECTING request for security');
+            return false;
         }
 
-        // Check header first
+        // SECURITY FIX: Only check header, never request body
+        // Request body content may be logged by proxies, load balancers, or WAFs
         $headerToken = $request->header('X-TinyERP-Token');
-        if ($headerToken === $configuredSecret) {
-            return true;
-        }
-
-        // Check request body parameter
-        $bodyToken = $request->input('webhook_secret');
-        if ($bodyToken === $configuredSecret) {
+        if ($headerToken && hash_equals($configuredSecret, $headerToken)) {
             return true;
         }
 
@@ -119,28 +117,24 @@ class WebhookController extends Controller
 
     /**
      * Validate WATI webhook signature
-     * Checks X-WATI-Token header or webhook_secret parameter against configured secret
+     * SECURITY: Only checks X-WATI-Token header against configured secret
+     * Never accepts secrets from request body (could be logged by proxies)
      */
     private function validateWatiSignature(Request $request): bool
     {
         $configuredSecret = config('services.wati.webhook_secret');
 
-        // If no secret is configured, allow all requests (for development/testing)
-        // In production, you should always configure a secret
+        // SECURITY FIX: Require webhook secret to be configured
+        // Never accept all requests - this is a critical security vulnerability
         if (empty($configuredSecret)) {
-            Log::warning('WATI webhook: No secret configured, accepting all requests');
-            return true;
+            Log::error('WATI webhook: No secret configured - REJECTING request for security');
+            return false;
         }
 
-        // Check header first
+        // SECURITY FIX: Only check header, never request body
+        // Request body content may be logged by proxies, load balancers, or WAFs
         $headerToken = $request->header('X-WATI-Token');
-        if ($headerToken === $configuredSecret) {
-            return true;
-        }
-
-        // Check request body parameter
-        $bodyToken = $request->input('webhook_secret');
-        if ($bodyToken === $configuredSecret) {
+        if ($headerToken && hash_equals($configuredSecret, $headerToken)) {
             return true;
         }
 

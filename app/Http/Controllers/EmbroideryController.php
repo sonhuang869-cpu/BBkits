@@ -7,11 +7,13 @@ use App\Models\EmbroideryFont;
 use App\Models\EmbroideryColor;
 use App\Models\EmbroideryPosition;
 use App\Models\EmbroideryDesign;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class EmbroideryController extends Controller
 {
+    use SanitizesErrorMessages;
     public function dashboard()
     {
         if (!auth()->user()->isAdmin()) {
@@ -506,13 +508,12 @@ class EmbroideryController extends Controller
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('Embroidery price calculation error', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            // SECURITY FIX: Use sanitized logging (don't expose stack trace)
+            $this->logErrorSafely('Embroidery price calculation error', $e);
             return response()->json([
                 'message' => 'Erro ao calcular preço do bordado.',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                // SECURITY FIX: Don't expose raw exception message even in debug mode
+                'error' => config('app.debug') ? $this->getSafeErrorMessage($e, 'Internal error') : null
             ], 500);
         }
     }

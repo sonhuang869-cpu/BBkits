@@ -8,6 +8,7 @@ use App\Models\SaleProduct;
 use App\Models\SalePayment;
 use App\Models\EmbroideryFont;
 use App\Models\EmbroideryColor;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ use App\Events\SalePaymentApproved;
 
 class SaleController extends Controller
 {
+    use SanitizesErrorMessages;
     protected $notificationService;
     protected $commissionService;
     protected $actionHistoryService;
@@ -114,7 +116,8 @@ class SaleController extends Controller
 
     public function index()
     {
-        $sales = Sale::with('user')
+        // N+1 FIX: Eager load 'payments' to prevent extra queries in transform
+        $sales = Sale::with(['user', 'payments'])
             ->where('user_id', auth()->id())
             ->latest()
             ->paginate(10);
@@ -414,9 +417,9 @@ class SaleController extends Controller
                     ]);
                 }
             } catch (\Exception $e) {
-                Log::error('WhatsApp service error during order creation', [
-                    'sale_id' => $sale->id,
-                    'error' => $e->getMessage()
+                // SECURITY FIX: Use sanitized logging
+                $this->logErrorSafely('WhatsApp service error during order creation', $e, [
+                    'sale_id' => $sale->id
                 ]);
             }
         }
@@ -633,9 +636,9 @@ class SaleController extends Controller
                         ]);
                     }
                 } catch (\Exception $e) {
-                    Log::error('WhatsApp service error during order creation', [
-                        'sale_id' => $sale->id,
-                        'error' => $e->getMessage()
+                    // SECURITY FIX: Use sanitized logging
+                    $this->logErrorSafely('WhatsApp service error during order creation', $e, [
+                        'sale_id' => $sale->id
                     ]);
                 }
             }
@@ -649,14 +652,13 @@ class SaleController extends Controller
             }
 
             return redirect()->route('sales.index')->with('message', 'Venda com produtos registrada com sucesso!');
-            
+
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-            Log::error('Database error creating sale with products', [
+            // SECURITY FIX: Use sanitized logging (don't expose SQL details)
+            $this->logErrorSafely('Database error creating sale with products', $e, [
                 'user_id' => auth()->id(),
                 'user_role' => auth()->user()->role,
-                'error' => $e->getMessage(),
-                'code' => $e->getCode(),
             ]);
 
             // BUG-V03: User-friendly error message, don't expose SQL details
@@ -665,11 +667,10 @@ class SaleController extends Controller
                 ->withErrors(['error' => 'Erro ao salvar no banco de dados. Verifique os dados e tente novamente.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating sale with products', [
+            // SECURITY FIX: Use sanitized logging (don't expose stack trace)
+            $this->logErrorSafely('Error creating sale with products', $e, [
                 'user_id' => auth()->id(),
                 'user_role' => auth()->user()->role,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
             ]);
 
             // BUG-V03: User-friendly error message, don't expose technical details
@@ -897,13 +898,13 @@ class SaleController extends Controller
             
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error('Failed to approve sale', [
+
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to approve sale', $e, [
                 'sale_id' => $sale->id,
-                'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
-            
+
             return back()->withErrors(['error' => 'Erro ao aprovar venda. Tente novamente.']);
         }
     }
@@ -969,17 +970,17 @@ class SaleController extends Controller
             
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error('Failed to reject sale', [
+
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to reject sale', $e, [
                 'sale_id' => $sale->id,
-                'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
-            
+
             return back()->withErrors(['error' => 'Erro ao recusar venda. Tente novamente.']);
         }
     }
-    
+
     // Queued payment processing methods with fallback
     public function approveWithQueue(Sale $sale)
     {
@@ -999,16 +1000,16 @@ class SaleController extends Controller
             return back()->with('message', 'Venda está sendo processada para aprovação...');
             
         } catch (\Exception $e) {
-            Log::warning('Queue failed, falling back to synchronous processing', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage()
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Queue failed, falling back to synchronous processing', $e, [
+                'sale_id' => $sale->id
             ]);
-            
+
             // Fallback to synchronous processing
             return $this->approve($sale);
         }
     }
-    
+
     public function rejectWithQueue(Request $request, Sale $sale)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
@@ -1036,16 +1037,16 @@ class SaleController extends Controller
             return back()->with('message', 'Venda está sendo processada para recusa...');
             
         } catch (\Exception $e) {
-            Log::warning('Queue failed, falling back to synchronous processing', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage()
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Queue failed, falling back to synchronous processing', $e, [
+                'sale_id' => $sale->id
             ]);
-            
+
             // Fallback to synchronous processing
             return $this->reject($request, $sale);
         }
     }
-    
+
     // PDF Report methods
     public function generateSalesReport(Request $request)
     {
@@ -1219,9 +1220,9 @@ class SaleController extends Controller
             return redirect()->route('sales.index')->with('message', 'Venda cancelada com sucesso.');
 
         } catch (\Exception $e) {
-            Log::error('Error cancelling sale', [
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Error cancelling sale', $e, [
                 'sale_id' => $sale->id,
-                'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
 
@@ -1370,9 +1371,9 @@ class SaleController extends Controller
             return redirect()->route('sales.index')->with('message', 'Venda cancelada com sucesso.');
 
         } catch (\Exception $e) {
-            Log::error('Error cancelling sale', [
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Error cancelling sale', $e, [
                 'sale_id' => $sale->id,
-                'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
 

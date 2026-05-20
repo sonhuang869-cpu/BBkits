@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\TinyERPService;
 use App\Models\Sale;
 use App\Models\Invoice;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -14,9 +15,11 @@ use Carbon\Carbon;
 
 class TinyERPIntegrationController extends Controller
 {
+    use SanitizesErrorMessages;
     public function __construct()
     {
-        $this->middleware(['auth', 'approved']);
+        // SECURITY FIX: Added admin role check - integration settings are admin-only
+        $this->middleware(['auth', 'approved', 'admin']);
     }
 
     private function getTinyERPService(): TinyERPService
@@ -165,14 +168,11 @@ class TinyERPIntegrationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Invoice generation failed', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            // SECURITY FIX: Sanitize error logs and responses
+            $this->logErrorSafely('Invoice generation failed', $e, ['sale_id' => $sale->id]);
 
             return response()->json([
-                'error' => 'Falha ao gerar nota fiscal: ' . $e->getMessage()
+                'error' => 'Falha ao gerar nota fiscal. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -251,13 +251,11 @@ class TinyERPIntegrationController extends Controller
             throw new \Exception('Falha ao gerar etiqueta de envio: ' . json_encode($result));
 
         } catch (\Exception $e) {
-            Log::error('Shipping label generation failed', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage(),
-            ]);
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Shipping label generation failed', $e, ['sale_id' => $sale->id]);
 
             return response()->json([
-                'error' => 'Falha ao gerar etiqueta de envio: ' . $e->getMessage()
+                'error' => 'Falha ao gerar etiqueta de envio. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -299,13 +297,11 @@ class TinyERPIntegrationController extends Controller
             throw new \Exception('Falha ao atualizar rastreamento: ' . json_encode($result));
 
         } catch (\Exception $e) {
-            Log::error('Tracking update failed', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage(),
-            ]);
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Tracking update failed', $e, ['sale_id' => $sale->id]);
 
             return response()->json([
-                'error' => 'Falha ao atualizar rastreamento: ' . $e->getMessage()
+                'error' => 'Falha ao atualizar rastreamento. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -325,13 +321,11 @@ class TinyERPIntegrationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Sale sync failed', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage(),
-            ]);
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Sale sync failed', $e, ['sale_id' => $sale->id]);
 
             return response()->json([
-                'error' => 'Falha ao sincronizar venda: ' . $e->getMessage()
+                'error' => 'Falha ao sincronizar venda. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -355,7 +349,9 @@ class TinyERPIntegrationController extends Controller
                 $this->syncSaleToTinyERP($sale);
                 $successCount++;
             } catch (\Exception $e) {
-                $errors[] = "Sale {$saleId}: " . $e->getMessage();
+                // SECURITY FIX: Don't expose raw exception messages
+                $this->logErrorSafely("Bulk sync failed for sale {$saleId}", $e);
+                $errors[] = "Venda {$saleId}: Falha na sincronização";
             }
         }
 
@@ -380,10 +376,8 @@ class TinyERPIntegrationController extends Controller
             return response()->json(['status' => 'processed']);
 
         } catch (\Exception $e) {
-            Log::error('Webhook processing failed', [
-                'error' => $e->getMessage(),
-                'data' => $request->all(),
-            ]);
+            // SECURITY FIX: Don't log raw request data which may contain sensitive info
+            $this->logErrorSafely('Webhook processing failed', $e);
 
             return response()->json(['error' => 'Falha no processamento do webhook'], 500);
         }
@@ -407,11 +401,8 @@ class TinyERPIntegrationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            // BUG-A12: Log detailed error server-side only
-            \Log::error('TinyERP connection test failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            // SECURITY FIX: Use sanitized logging (don't expose stack trace)
+            $this->logErrorSafely('TinyERP connection test failed', $e);
 
             // Return generic error message to client
             return response()->json([

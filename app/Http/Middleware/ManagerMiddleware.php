@@ -15,10 +15,22 @@ class ManagerMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->role !== 'manager' && auth()->user()->role !== 'admin') {
-            abort(403, 'Acesso negado.');
+        // SECURITY FIX: Check authentication first before accessing user properties
+        if (!auth()->check()) {
+            if ($request->expectsJson() || $request->header('X-Inertia')) {
+                return response()->json(['message' => 'Não autenticado.'], 401);
+            }
+            return redirect()->route('login');
         }
-        
+
+        $user = auth()->user();
+        if ($user->role !== 'manager' && $user->role !== 'admin') {
+            if ($request->expectsJson() || $request->header('X-Inertia')) {
+                return response()->json(['message' => 'Acesso negado. Apenas gerentes podem acessar esta área.'], 403);
+            }
+            abort(403, 'Acesso negado. Apenas gerentes podem acessar esta área.');
+        }
+
         return $next($request);
     }
 }

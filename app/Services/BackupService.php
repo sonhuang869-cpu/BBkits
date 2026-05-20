@@ -302,7 +302,27 @@ class BackupService
     public function deleteBackup(string $backupName): bool
     {
         try {
+            // SECURITY FIX: Validate backup name to prevent path traversal attacks
+            if (!$this->isValidBackupName($backupName)) {
+                Log::warning('Invalid backup name attempted for deletion', [
+                    'backup_name' => $backupName,
+                    'user_id' => auth()->id()
+                ]);
+                return false;
+            }
+
             $backupFile = storage_path("app/{$this->backupPath}/{$backupName}");
+
+            // SECURITY FIX: Verify the resolved path is within the backups directory
+            $realPath = realpath($backupFile);
+            $backupsDir = realpath(storage_path("app/{$this->backupPath}"));
+            if ($realPath === false || $backupsDir === false || !str_starts_with($realPath, $backupsDir)) {
+                Log::warning('Path traversal attempt in backup deletion', [
+                    'backup_name' => $backupName,
+                    'user_id' => auth()->id()
+                ]);
+                return false;
+            }
 
             if (file_exists($backupFile)) {
                 unlink($backupFile);
@@ -326,6 +346,47 @@ class BackupService
 
             return false;
         }
+    }
+
+    /**
+     * SECURITY: Validate backup name to prevent path traversal attacks
+     */
+    private function isValidBackupName(string $backupName): bool
+    {
+        // Check for path traversal attempts
+        if (str_contains($backupName, '..') || str_contains($backupName, '/') || str_contains($backupName, '\\')) {
+            return false;
+        }
+
+        // Only allow safe characters
+        if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $backupName)) {
+            return false;
+        }
+
+        // Must start with valid backup prefix
+        $validPrefixes = ['bbkits_backup_', 'database_backup_', 'full_backup_', 'backup_'];
+        $hasValidPrefix = false;
+        foreach ($validPrefixes as $prefix) {
+            if (str_starts_with($backupName, $prefix)) {
+                $hasValidPrefix = true;
+                break;
+            }
+        }
+        if (!$hasValidPrefix) {
+            return false;
+        }
+
+        // Must end with valid extension
+        $validExtensions = ['.sql', '.zip', '.sql.gz', '.db', '.json', '.tar.gz'];
+        $hasValidExtension = false;
+        foreach ($validExtensions as $ext) {
+            if (str_ends_with($backupName, $ext)) {
+                $hasValidExtension = true;
+                break;
+            }
+        }
+
+        return $hasValidExtension;
     }
 
     public function cleanupOldBackups(): int

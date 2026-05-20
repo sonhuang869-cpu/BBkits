@@ -127,7 +127,9 @@ class PermissionController extends Controller
 
     public function rolePermissions($role)
     {
-        $user = new User(['role' => $role]);
+        // SECURITY FIX H-02: Role removed from $fillable, set explicitly
+        $user = new User();
+        $user->role = $role; // Direct assignment for temporary permission check
 
         return response()->json([
             'role' => $role,

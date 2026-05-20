@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\InventoryTransaction;
 use App\Models\Material;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class InventoryController extends Controller
 {
+    use SanitizesErrorMessages;
     public function __construct()
     {
         $this->middleware(['auth:sanctum', 'inventory.access:view'])->only(['index', 'show', 'stats']);
@@ -207,9 +209,11 @@ class InventoryController extends Controller
 
         } catch (\Exception $e) {
             \DB::rollBack();
+            // SECURITY FIX: Don't expose raw exception messages
+            $this->logErrorSafely('Bulk adjustment failed', $e);
             return response()->json([
                 'success' => false,
-                'message' => 'Falha no ajuste em lote: ' . $e->getMessage()
+                'message' => 'Falha no ajuste em lote. Verifique os logs do servidor.'
             ], 500);
         }
     }

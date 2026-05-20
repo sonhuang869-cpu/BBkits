@@ -6,6 +6,7 @@ use App\Models\Sale;
 use App\Events\SalePaymentApproved;
 use App\Events\SalePaymentRejected;
 use App\Services\ActionHistoryService;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,6 +14,7 @@ use Inertia\Inertia;
 
 class FinanceController extends Controller
 {
+    use SanitizesErrorMessages;
     protected $actionHistoryService;
 
     public function __construct(ActionHistoryService $actionHistoryService)
@@ -31,7 +33,8 @@ class FinanceController extends Controller
     {
         $statusFilter = $request->get('status', 'all');
         
-        $query = Sale::with(['user', 'financeAdmin', 'productionAdmin']);
+        // N+1 FIX: Eager load 'payments' to prevent extra queries in transform
+        $query = Sale::with(['user', 'financeAdmin', 'productionAdmin', 'payments']);
         
         // Filter based on status
         switch ($statusFilter) {
@@ -72,6 +75,15 @@ class FinanceController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            // SECURITY FIX H-04: Use pessimistic locking to prevent race conditions
+            // Lock the sale record to prevent concurrent payment approvals
+            $sale = Sale::lockForUpdate()->find($sale->id);
+
+            if (!$sale) {
+                DB::rollBack();
+                return back()->withErrors(['error' => 'Pedido não encontrado.']);
+            }
 
             if ($sale->order_status === 'pending_payment') {
                 // Validate minimum payment requirement (50% rule)
@@ -184,16 +196,16 @@ class FinanceController extends Controller
             }
             
             return back()->with('message', 'Pagamento aprovado com sucesso!');
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error('Failed to approve order payment', [
+
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to approve order payment', $e, [
                 'order_id' => $sale->id,
-                'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
-            
+
             return back()->withErrors(['error' => 'Erro ao aprovar pagamento. Tente novamente.']);
         }
     }
@@ -203,10 +215,18 @@ class FinanceController extends Controller
         $validated = $request->validate([
             'rejection_reason' => 'required|string|max:500'
         ]);
-        
+
         try {
             DB::beginTransaction();
-            
+
+            // SECURITY FIX H-04: Use pessimistic locking to prevent race conditions
+            $sale = Sale::lockForUpdate()->find($sale->id);
+
+            if (!$sale) {
+                DB::rollBack();
+                return back()->withErrors(['error' => 'Pedido não encontrado.']);
+            }
+
             if ($sale->order_status === 'pending_payment') {
                 $sale->update([
                     'status' => 'recusado',
@@ -241,16 +261,16 @@ class FinanceController extends Controller
             $notificationService->notifyPaymentRejected($sale, $validated['rejection_reason']);
             
             return back()->with('message', 'Pagamento rejeitado.');
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error('Failed to reject order payment', [
+
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to reject order payment', $e, [
                 'order_id' => $sale->id,
-                'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
-            
+
             return back()->withErrors(['error' => 'Erro ao rejeitar pagamento. Tente novamente.']);
         }
     }

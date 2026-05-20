@@ -16,17 +16,38 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * The attributes that are mass assignable.
      *
+     * SECURITY FIX H-02: Removed 'role' from $fillable to prevent mass assignment attacks.
+     * Role must be set explicitly using setRole() or direct assignment after validation.
+     *
      * @var list<string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
         'approved',
         'approved_at',
         'approved_by',
     ];
+
+    /**
+     * SECURITY FIX H-02: Explicitly set role with validation.
+     * Only allows valid role values to be set.
+     *
+     * @param string $role
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    public function setRole(string $role): void
+    {
+        $validRoles = ['vendedora', 'admin', 'manager', 'financeiro', 'finance_admin', 'production_admin'];
+
+        if (!in_array($role, $validRoles, true)) {
+            throw new \InvalidArgumentException("Invalid role: {$role}");
+        }
+
+        $this->role = $role;
+    }
 
     /**
      * The attributes that should be hidden for serialization.

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\User;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -13,6 +14,7 @@ use App\Services\CommissionService;
 
 class AdminController extends Controller
 {
+    use SanitizesErrorMessages;
     public function dashboard(Request $request)
     {
         if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'financeiro') {
@@ -22,9 +24,8 @@ class AdminController extends Controller
         try {
             return $this->buildDashboard($request);
         } catch (\Exception $e) {
-            \Log::error('Admin Dashboard Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);
+            // SECURITY FIX: Use sanitized logging (don't expose stack trace)
+            $this->logErrorSafely('Admin Dashboard Error', $e);
 
             // Return minimal dashboard data on error
             return Inertia::render('Admin/EnhancedDashboard', [
@@ -43,7 +44,7 @@ class AdminController extends Controller
                     'statusFilter' => 'all',
                     'currentMonth' => now()->month,
                     'currentYear' => now()->year,
-                    'error' => 'Erro ao carregar dashboard: ' . $e->getMessage(),
+                    'error' => 'Erro ao carregar dashboard. Verifique os logs do servidor.',
                 ],
                 'topPerformers' => [],
                 'recentSales' => [],
@@ -329,15 +330,19 @@ class AdminController extends Controller
             'role' => 'required|string|in:vendedora,manager,financeiro,finance_admin,production_admin,admin'
         ]);
 
-        User::create([
+        // SECURITY FIX H-02: Role removed from $fillable, set explicitly after validation
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
-            'role' => $validated['role'],
             'approved' => true, // Auto-approve admin-created users
             'approved_by' => auth()->id(),
             'approved_at' => now()
         ]);
+
+        // Explicitly set role using validated input
+        $user->setRole($validated['role']);
+        $user->save();
 
         return redirect()->route('admin.users.index')->with('success', 'Usuário criado com sucesso!');
     }

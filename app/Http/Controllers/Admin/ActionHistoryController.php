@@ -16,7 +16,8 @@ class ActionHistoryController extends Controller
 
     public function __construct(ActionHistoryService $actionHistoryService)
     {
-        $this->middleware(['auth', 'approved']);
+        // SECURITY FIX: Added admin role check - audit logs are admin-only
+        $this->middleware(['auth', 'approved', 'admin']);
         $this->actionHistoryService = $actionHistoryService;
     }
 
@@ -278,6 +279,22 @@ class ActionHistoryController extends Controller
     private function getResourceInfo(string $resourceType, int $resourceId): ?array
     {
         try {
+            // SECURITY FIX: Whitelist allowed resource types to prevent unauthorized model access
+            $allowedResourceTypes = [
+                'Sale',
+                'User',
+                'Product',
+                'Material',
+                'Supplier',
+                'SalePayment',
+                'InventoryTransaction',
+                'CommissionRange',
+            ];
+
+            if (!in_array($resourceType, $allowedResourceTypes, true)) {
+                return ['status' => 'error', 'name' => 'Tipo de recurso inválido'];
+            }
+
             $modelClass = "App\\Models\\{$resourceType}";
 
             if (!class_exists($modelClass)) {

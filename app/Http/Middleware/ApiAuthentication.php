@@ -59,23 +59,41 @@ class ApiAuthentication
 
     /**
      * Validate dynamic API keys (stored in database)
+     * SECURITY FIX: Removed regex-only validation which accepted ANY matching key
+     * API keys must be explicitly configured in config/api.php or stored securely
      */
     private function validateDynamicApiKey(string $apiKey): bool
     {
-        // For production, you might want to store API keys in database
-        // with expiration dates, usage limits, etc.
+        // SECURITY: Only accept API keys that are explicitly configured
+        // The regex-only validation was a critical vulnerability - it accepted
+        // ANY key matching the format, allowing attackers to forge valid keys
+        //
+        // For production with database-stored keys, implement:
+        // return \App\Models\ApiKey::where('key', hash('sha256', $apiKey))
+        //     ->where('is_active', true)
+        //     ->where('expires_at', '>', now())
+        //     ->exists();
 
-        // Simple validation for now - check if it matches expected format
-        return preg_match('/^bbkits_[a-zA-Z0-9]{32}$/', $apiKey);
+        // For now, reject all dynamic keys - only configured keys are valid
+        return false;
     }
 
     /**
      * Get system user for API operations
+     * SECURITY FIX H-02: Role removed from $fillable, set explicitly
      */
     private function getApiUser()
     {
         // Return a system user or find an admin user for API operations
-        return \App\Models\User::where('role', 'admin')->first() ?:
-               new \App\Models\User(['role' => 'admin', 'name' => 'API System']);
+        $existingAdmin = \App\Models\User::where('role', 'admin')->first();
+        if ($existingAdmin) {
+            return $existingAdmin;
+        }
+
+        // Create a temporary user object for API operations (not saved)
+        $apiUser = new \App\Models\User();
+        $apiUser->name = 'API System';
+        $apiUser->role = 'admin'; // Direct assignment allowed for temp objects
+        return $apiUser;
     }
 }

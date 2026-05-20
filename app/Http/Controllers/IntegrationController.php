@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Sale;
 use App\Services\TinyERPService;
 use App\Services\WhatsAppService;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class IntegrationController extends Controller
 {
+    use SanitizesErrorMessages;
     public function __construct()
     {
         $this->middleware('admin');
@@ -74,11 +76,12 @@ class IntegrationController extends Controller
                 'data' => $result['data'] ?? null
             ]);
         } catch (\Exception $e) {
-            Log::error('Tiny ERP test failed', ['error' => $e->getMessage()]);
-            
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Tiny ERP test failed', $e);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao testar conexão: ' . $e->getMessage()
+                'message' => 'Erro ao testar conexão. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -97,11 +100,12 @@ class IntegrationController extends Controller
                 'data' => $result['data'] ?? null
             ]);
         } catch (\Exception $e) {
-            Log::error('WhatsApp test failed', ['error' => $e->getMessage()]);
-            
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('WhatsApp test failed', $e);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao testar conexão: ' . $e->getMessage()
+                'message' => 'Erro ao testar conexão. Verifique os logs do servidor.'
             ], 500);
         }
     }
@@ -120,12 +124,12 @@ class IntegrationController extends Controller
                 return back()->withErrors(['error' => $result['message']]);
             }
         } catch (\Exception $e) {
-            Log::error('Manual invoice generation failed', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage()
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Manual invoice generation failed', $e, [
+                'sale_id' => $sale->id
             ]);
-            
-            return back()->withErrors(['error' => 'Erro ao gerar nota fiscal: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Erro ao gerar nota fiscal. Verifique os logs do servidor.']);
         }
     }
 
@@ -143,12 +147,12 @@ class IntegrationController extends Controller
                 return back()->withErrors(['error' => $result['message']]);
             }
         } catch (\Exception $e) {
-            Log::error('Manual shipping label generation failed', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage()
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Manual shipping label generation failed', $e, [
+                'sale_id' => $sale->id
             ]);
-            
-            return back()->withErrors(['error' => 'Erro ao gerar etiqueta: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Erro ao gerar etiqueta. Verifique os logs do servidor.']);
         }
     }
 
@@ -201,13 +205,13 @@ class IntegrationController extends Controller
                 return back()->withErrors(['error' => $result['message'] ?? 'Erro ao enviar mensagem']);
             }
         } catch (\Exception $e) {
-            Log::error('Manual WhatsApp message failed', [
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Manual WhatsApp message failed', $e, [
                 'sale_id' => $sale->id,
                 'message_type' => $validated['message_type'],
-                'error' => $e->getMessage()
             ]);
-            
-            return back()->withErrors(['error' => 'Erro ao enviar mensagem: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Erro ao enviar mensagem. Verifique os logs do servidor.']);
         }
     }
 
@@ -225,12 +229,12 @@ class IntegrationController extends Controller
                 return back()->withErrors(['error' => $result['message']]);
             }
         } catch (\Exception $e) {
-            Log::error('Order status sync failed', [
-                'sale_id' => $sale->id,
-                'error' => $e->getMessage()
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Order status sync failed', $e, [
+                'sale_id' => $sale->id
             ]);
-            
-            return back()->withErrors(['error' => 'Erro ao sincronizar status: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Erro ao sincronizar status. Verifique os logs do servidor.']);
         }
     }
 
@@ -260,9 +264,10 @@ class IntegrationController extends Controller
 
             return back()->with('message', "Sincronização concluída: {$synced} pedidos sincronizados, {$errors} erros.");
         } catch (\Exception $e) {
-            Log::error('Bulk sync failed', ['error' => $e->getMessage()]);
-            
-            return back()->withErrors(['error' => 'Erro na sincronização em lote: ' . $e->getMessage()]);
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Bulk sync failed', $e);
+
+            return back()->withErrors(['error' => 'Erro na sincronização em lote. Verifique os logs do servidor.']);
         }
     }
 

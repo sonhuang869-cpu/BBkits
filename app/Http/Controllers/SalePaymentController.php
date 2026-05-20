@@ -137,8 +137,10 @@ class SalePaymentController extends Controller
 
     public function approve(SalePayment $payment)
     {
-        if (!auth()->user()->isAdmin()) {
-            return back()->withErrors(['error' => 'Apenas administradores podem aprovar pagamentos.']);
+        // SECURITY FIX H-01: Use canApprovePayments() instead of isAdmin()
+        // Allows admin, financeiro, and finance_admin to approve payments
+        if (!auth()->user()->canApprovePayments()) {
+            return back()->withErrors(['error' => 'Você não tem permissão para aprovar pagamentos.']);
         }
 
         $payment->update([
@@ -168,8 +170,10 @@ class SalePaymentController extends Controller
 
     public function reject(Request $request, SalePayment $payment)
     {
-        if (!auth()->user()->isAdmin()) {
-            return back()->withErrors(['error' => 'Apenas administradores podem rejeitar pagamentos.']);
+        // SECURITY FIX H-01: Use canApprovePayments() instead of isAdmin()
+        // Allows admin, financeiro, and finance_admin to reject payments
+        if (!auth()->user()->canApprovePayments()) {
+            return back()->withErrors(['error' => 'Você não tem permissão para rejeitar pagamentos.']);
         }
 
         $request->validate([

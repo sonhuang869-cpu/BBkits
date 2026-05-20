@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import DangerButton from '@/Components/DangerButton';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 import toast from 'react-hot-toast';
 
 export default function Index({ auth, users }) {
@@ -206,8 +207,9 @@ export default function Index({ auth, users }) {
                                                 } ${!link.url ? 'cursor-not-allowed opacity-50' : ''} ${
                                                     index === 0 ? 'rounded-l-md' : ''
                                                 } ${index === users.links.length - 1 ? 'rounded-r-md' : ''} border`}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
+                                            >
+                                                <SafePaginationLabel label={link.label} />
+                                            </button>
                                         ))}
                                     </nav>
                                 </div>

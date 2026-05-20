@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 
 export default function Index({ simulations }) {
     const formatCurrency = (value) => {
@@ -210,8 +211,9 @@ export default function Index({ simulations }) {
                                                         ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                         : 'bg-gray-50 text-gray-400 cursor-not-allowed'
                                                 }`}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
+                                            >
+                                                <SafePaginationLabel label={link.label} />
+                                            </Link>
                                         ))}
                                     </div>
                                 </div>

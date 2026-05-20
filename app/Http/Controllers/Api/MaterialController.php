@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Material;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
 
 class MaterialController extends Controller
 {
+    use SanitizesErrorMessages;
     public function __construct()
     {
         // BUG-N01: Added 'stats' to middleware - was missing authentication
@@ -34,14 +36,15 @@ class MaterialController extends Controller
         if ($request->has('status')) {
             switch ($request->get('status')) {
                 case 'low_stock':
-                    $query->whereRaw('current_stock <= minimum_stock');
+                    // SECURITY FIX: Use whereColumn instead of whereRaw to avoid SQL anti-patterns
+                    $query->whereColumn('current_stock', '<=', 'minimum_stock');
                     break;
                 case 'out_of_stock':
                     $query->where('current_stock', '<=', 0);
                     break;
                 case 'active':
                     $query->where('current_stock', '>', 0)
-                          ->whereRaw('current_stock > minimum_stock');
+                          ->whereColumn('current_stock', '>', 'minimum_stock');
                     break;
             }
         }
@@ -216,10 +219,8 @@ class MaterialController extends Controller
                 'data' => $stats
             ]);
         } catch (\Exception $e) {
-            \Log::error('Material stats error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            // SECURITY FIX: Use sanitized logging (don't expose stack trace)
+            $this->logErrorSafely('Material stats error', $e);
 
             return response()->json([
                 'success' => false,

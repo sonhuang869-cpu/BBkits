@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 import { formatBRL } from '@/utils/currency';
 import toast from 'react-hot-toast';
 import { Info } from 'lucide-react';
@@ -356,8 +357,9 @@ export default function ManagerOrdersIndex({ auth, orders, filters, statusOption
                                                             ? 'bg-white text-gray-700 hover:bg-gray-50 border'
                                                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                                     }`}
-                                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                                />
+                                                >
+                                                    <SafePaginationLabel label={link.label} />
+                                                </button>
                                             ))}
                                         </div>
                                     </div>

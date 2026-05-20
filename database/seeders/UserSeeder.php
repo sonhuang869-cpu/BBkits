@@ -14,27 +14,30 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // SECURITY FIX H-02: Role removed from $fillable, must be set explicitly
         // Create Admin User
-        User::updateOrCreate(
+        $admin = User::updateOrCreate(
             ['email' => 'admin@bbkits.com'],
             [
                 'name' => 'Administrador BBKits',
                 'email_verified_at' => now(),
                 'password' => Hash::make('admin123'),
-                'role' => 'admin',
             ]
         );
+        $admin->setRole('admin');
+        $admin->save();
 
         // Create Finance User
-        User::updateOrCreate(
+        $financeiro = User::updateOrCreate(
             ['email' => 'financeiro@bbkits.com'],
             [
                 'name' => 'Financeiro BBKits',
                 'email_verified_at' => now(),
                 'password' => Hash::make('financeiro123'),
-                'role' => 'financeiro',
             ]
         );
+        $financeiro->setRole('financeiro');
+        $financeiro->save();
 
         // Create Sales Users (Vendedoras)
         $vendedoras = [
@@ -46,15 +49,16 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($vendedoras as $vendedora) {
-            User::updateOrCreate(
+            $user = User::updateOrCreate(
                 ['email' => $vendedora['email']],
                 [
                     'name' => $vendedora['name'],
                     'email_verified_at' => now(),
                     'password' => Hash::make('vendedora123'),
-                    'role' => 'vendedora',
                 ]
             );
+            $user->setRole('vendedora');
+            $user->save();
         }
 
         $this->command->info('Users created or updated successfully!');

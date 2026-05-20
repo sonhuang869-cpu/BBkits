@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SaleCancellationModal from '@/Components/SaleCancellationModal';
 import ResponsiveTable from '@/Components/ResponsiveTable';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { formatBRL } from '@/utils/currency';
@@ -548,18 +549,20 @@ export default function Index({ sales, auth }) {
                                                                         key={index}
                                                                         href={link.url}
                                                                         className={`pagination-btn px-4 py-2 text-sm ${
-                                                                            link.active 
-                                                                                ? 'pagination-active' 
+                                                                            link.active
+                                                                                ? 'pagination-active'
                                                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                                         }`}
-                                                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                                                    />
+                                                                    >
+                                                                        <SafePaginationLabel label={link.label} />
+                                                                    </Link>
                                                                 ) : (
                                                                     <span
                                                                         key={index}
                                                                         className="pagination-btn px-4 py-2 text-sm bg-gray-50 text-gray-400 cursor-not-allowed"
-                                                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                                                    />
+                                                                    >
+                                                                        <SafePaginationLabel label={link.label} />
+                                                                    </span>
                                                                 )
                                                             ))}
                                                         </div>

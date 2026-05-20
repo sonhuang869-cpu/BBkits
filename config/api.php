@@ -27,11 +27,14 @@ return [
     | kept secure and rotated regularly.
     |
     */
-    'keys' => [
-        env('API_KEY_ERP', 'bbkits_erp_integration_key_12345'),
-        env('API_KEY_WAREHOUSE', 'bbkits_warehouse_system_key_67890'),
-        env('API_KEY_MOBILE', 'bbkits_mobile_app_key_abcdef'),
-    ],
+    // SECURITY FIX: Removed hardcoded default API keys
+    // API keys MUST be configured via environment variables - no fallback defaults
+    // Having default keys allows attackers to authenticate if env vars are not set
+    'keys' => array_filter([
+        env('API_KEY_ERP'),
+        env('API_KEY_WAREHOUSE'),
+        env('API_KEY_MOBILE'),
+    ]),
 
     /*
     |--------------------------------------------------------------------------
@@ -96,7 +99,9 @@ return [
         ],
         'webhook_verification' => [
             'enabled' => true,
-            'secret' => env('WEBHOOK_SECRET', 'bbkits_webhook_secret'),
+            // SECURITY FIX: Removed hardcoded default webhook secret
+            // Webhook secret MUST be configured via environment variable
+            'secret' => env('WEBHOOK_SECRET'),
         ],
         'sync_batch_size' => 100,
     ],

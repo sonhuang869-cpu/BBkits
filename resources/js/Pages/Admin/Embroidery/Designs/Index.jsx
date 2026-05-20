@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 import { Head, Link, router } from '@inertiajs/react';
 
 export default function Index({ auth, designs, categories, filters }) {
@@ -335,8 +336,9 @@ export default function Index({ auth, designs, categories, filters }) {
                                                         ? 'bg-blue-500 text-white'
                                                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
+                                            >
+                                                <SafePaginationLabel label={link.label} />
+                                            </Link>
                                         ))}
                                     </div>
                                 </div>

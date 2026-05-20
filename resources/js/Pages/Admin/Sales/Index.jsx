@@ -2,6 +2,7 @@ import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import PrimaryButton from '@/Components/PrimaryButton';
+import SafePaginationLabel from '@/Components/SafePaginationLabel';
 import { formatBRL } from '@/utils/currency';
 import toast from 'react-hot-toast';
 
@@ -738,31 +739,48 @@ export default function Index({ sales }) {
                                                                             sale.receipt_data ? (
                                                                                 <button
                                                                                     onClick={() => {
-                                                                                        // Create a more secure way to view base64 images
+                                                                                        // SECURITY FIX M-13: Escape user input to prevent XSS
+                                                                                        const escapeHtml = (text) => {
+                                                                                            if (!text) return '';
+                                                                                            return String(text)
+                                                                                                .replace(/&/g, '&amp;')
+                                                                                                .replace(/</g, '&lt;')
+                                                                                                .replace(/>/g, '&gt;')
+                                                                                                .replace(/"/g, '&quot;')
+                                                                                                .replace(/'/g, '&#039;');
+                                                                                        };
                                                                                         try {
                                                                                             const newWindow = window.open('', '_blank');
                                                                                             if (newWindow) {
+                                                                                                // Escape user-controlled data
+                                                                                                const safeClientName = escapeHtml(sale.client_name);
+                                                                                                const safeAmount = escapeHtml(formatBRL(sale.total_amount_with_shipping));
+                                                                                                // Only allow data: URLs for base64 images
+                                                                                                const safeReceiptData = sale.receipt_data?.startsWith('data:image/')
+                                                                                                    ? sale.receipt_data
+                                                                                                    : '';
+
                                                                                                 newWindow.document.open();
                                                                                                 newWindow.document.write(`
                                                                                                     <!DOCTYPE html>
                                                                                                     <html>
                                                                                                         <head>
-                                                                                                            <title>Comprovante de Pagamento - ${sale.client_name}</title>
+                                                                                                            <title>Comprovante de Pagamento - ${safeClientName}</title>
                                                                                                             <meta charset="UTF-8">
                                                                                                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
                                                                                                             <style>
-                                                                                                                body { 
-                                                                                                                    margin: 0; 
-                                                                                                                    padding: 20px; 
-                                                                                                                    text-align: center; 
-                                                                                                                    background: #f5f5f5; 
+                                                                                                                body {
+                                                                                                                    margin: 0;
+                                                                                                                    padding: 20px;
+                                                                                                                    text-align: center;
+                                                                                                                    background: #f5f5f5;
                                                                                                                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                                                                                                                 }
                                                                                                                 h2 { color: #374151; margin-bottom: 20px; }
-                                                                                                                img { 
-                                                                                                                    max-width: 100%; 
-                                                                                                                    height: auto; 
-                                                                                                                    border-radius: 8px; 
+                                                                                                                img {
+                                                                                                                    max-width: 100%;
+                                                                                                                    height: auto;
+                                                                                                                    border-radius: 8px;
                                                                                                                     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
                                                                                                                     background: white;
                                                                                                                     padding: 10px;
@@ -771,10 +789,10 @@ export default function Index({ sales }) {
                                                                                                             </style>
                                                                                                         </head>
                                                                                                         <body>
-                                                                                                            <h2>💰 Comprovante de Pagamento</h2>
-                                                                                                            <div class="info"><strong>Cliente:</strong> ${sale.client_name}</div>
-                                                                                                            <div class="info"><strong>Valor:</strong> ${formatBRL(sale.total_amount_with_shipping)}</div>
-                                                                                                            <img src="${sale.receipt_data}" alt="Comprovante de Pagamento" />
+                                                                                                            <h2>Comprovante de Pagamento</h2>
+                                                                                                            <div class="info"><strong>Cliente:</strong> ${safeClientName}</div>
+                                                                                                            <div class="info"><strong>Valor:</strong> ${safeAmount}</div>
+                                                                                                            ${safeReceiptData ? `<img src="${safeReceiptData}" alt="Comprovante de Pagamento" />` : '<p>Comprovante não disponível</p>'}
                                                                                                         </body>
                                                                                                     </html>
                                                                                                 `);
@@ -826,18 +844,20 @@ export default function Index({ sales }) {
                                                                         key={index}
                                                                         href={link.url}
                                                                         className={`pagination-btn px-4 py-2 text-sm ${
-                                                                            link.active 
-                                                                                ? 'pagination-active' 
+                                                                            link.active
+                                                                                ? 'pagination-active'
                                                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                                         }`}
-                                                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                                                    />
+                                                                    >
+                                                                        <SafePaginationLabel label={link.label} />
+                                                                    </Link>
                                                                 ) : (
                                                                     <span
                                                                         key={index}
                                                                         className="pagination-btn px-4 py-2 text-sm bg-gray-50 text-gray-400 cursor-not-allowed"
-                                                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                                                    />
+                                                                    >
+                                                                        <SafePaginationLabel label={link.label} />
+                                                                    </span>
                                                                 )
                                                             ))}
                                                         </div>

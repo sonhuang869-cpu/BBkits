@@ -667,7 +667,12 @@ Route::middleware(['auth', 'approved'])->group(function () {
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 
+    // SECURITY FIX M-10: Test PDF route restricted to admin only
+    // This route should only be used for development/testing purposes
     Route::get('/test-pdf', function () {
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Não autorizado.');
+        }
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('test-pdf');
         return $pdf->download('test-bbkits.pdf');
     })->name('test.pdf');
@@ -708,14 +713,28 @@ Route::middleware(['auth', 'approved'])->group(function () {
 require __DIR__.'/auth.php';
 
 // BUG-D11: Handle non-existent storage files - return proper 404 instead of Inertia shell
+// SECURITY FIX: Added path traversal protection
 Route::get('/storage/{path}', function ($path) {
+    // SECURITY: Prevent path traversal attacks
+    if (str_contains($path, '..') || str_contains($path, "\0")) {
+        abort(404);
+    }
+
     $fullPath = storage_path('app/public/' . $path);
+
+    // SECURITY: Verify resolved path is within public storage directory
+    $realPath = realpath($fullPath);
+    $publicStorageDir = realpath(storage_path('app/public'));
+    if ($realPath === false || $publicStorageDir === false || !str_starts_with($realPath, $publicStorageDir)) {
+        abort(404);
+    }
+
     if (!file_exists($fullPath)) {
         abort(404);
     }
     // If file exists, let the web server handle it (this route is only hit if symlink is not working)
     return response()->file($fullPath);
-})->where('path', '.*');
+})->where('path', '[a-zA-Z0-9\-_./]+');
 
 // BUG-D11: Fallback route for any unmatched routes - return proper 404
 Route::fallback(function () {

@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\NotificationPreference;
 use App\Models\SystemNotification;
 use App\Services\MaterialNotificationService;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
+    use SanitizesErrorMessages;
     public function __construct()
     {
         $this->middleware(['auth', 'approved']);
@@ -180,7 +182,9 @@ class NotificationController extends Controller
 
             return response()->json(['success' => true, 'message' => 'Teste de notificação executado com sucesso!']);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Erro ao executar teste: ' . $e->getMessage()]);
+            // SECURITY FIX: Don't expose raw exception messages
+            $this->logErrorSafely('Notification test failed', $e);
+            return response()->json(['success' => false, 'message' => 'Erro ao executar teste. Verifique os logs do servidor.']);
         }
     }
 }

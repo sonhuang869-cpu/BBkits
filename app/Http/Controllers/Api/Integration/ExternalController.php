@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Material;
 use App\Models\Supplier;
 use App\Models\InventoryTransaction;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class ExternalController extends Controller
 {
+    use SanitizesErrorMessages;
     public function __construct()
     {
         $this->middleware(['auth:sanctum', 'throttle:external']);
@@ -80,11 +82,10 @@ class ExternalController extends Controller
                     }
 
                 } catch (\Exception $e) {
-                    // Log the actual error server-side for debugging
-                    \Log::warning('Material sync item error', [
+                    // SECURITY FIX: Use sanitized logging
+                    $this->logErrorSafely('Material sync item error', $e, [
                         'index' => $index,
                         'external_id' => $materialData['external_id'] ?? null,
-                        'error' => $e->getMessage()
                     ]);
                     $results['errors'][] = [
                         'index' => $index,
@@ -104,8 +105,8 @@ class ExternalController extends Controller
 
         } catch (\Exception $e) {
             \DB::rollBack();
-            // Log the actual error server-side
-            \Log::error('Material sync failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            // SECURITY FIX: Use sanitized logging (don't expose stack trace)
+            $this->logErrorSafely('Material sync failed', $e);
             return response()->json([
                 'success' => false,
                 'message' => 'Falha na sincronização de materiais. Verifique os logs do servidor.'
@@ -162,11 +163,10 @@ class ExternalController extends Controller
                     }
 
                 } catch (\Exception $e) {
-                    // Log the actual error server-side for debugging
-                    \Log::warning('Supplier sync item error', [
+                    // SECURITY FIX: Use sanitized logging
+                    $this->logErrorSafely('Supplier sync item error', $e, [
                         'index' => $index,
                         'external_id' => $supplierData['external_id'] ?? null,
-                        'error' => $e->getMessage()
                     ]);
                     $results['errors'][] = [
                         'index' => $index,
@@ -186,8 +186,8 @@ class ExternalController extends Controller
 
         } catch (\Exception $e) {
             \DB::rollBack();
-            // Log the actual error server-side
-            \Log::error('Supplier sync failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            // SECURITY FIX: Use sanitized logging (don't expose stack trace)
+            $this->logErrorSafely('Supplier sync failed', $e);
             return response()->json([
                 'success' => false,
                 'message' => 'Falha na sincronização de fornecedores. Verifique os logs do servidor.'
@@ -213,7 +213,8 @@ class ExternalController extends Controller
         }
 
         if ($request->has('low_stock_only') && $request->boolean('low_stock_only')) {
-            $query->whereRaw('current_stock <= minimum_stock');
+            // SECURITY FIX: Use whereColumn instead of whereRaw to avoid SQL anti-patterns
+            $query->whereColumn('current_stock', '<=', 'minimum_stock');
         }
 
         $materials = $query->get();
@@ -290,11 +291,10 @@ class ExternalController extends Controller
                     $results['processed']++;
 
                 } catch (\Exception $e) {
-                    // Log the actual error server-side for debugging
-                    \Log::warning('Stock movement item error', [
+                    // SECURITY FIX: Use sanitized logging
+                    $this->logErrorSafely('Stock movement item error', $e, [
                         'index' => $index,
                         'external_id' => $movement['material_external_id'] ?? null,
-                        'error' => $e->getMessage()
                     ]);
                     $results['errors'][] = [
                         'index' => $index,
@@ -314,8 +314,8 @@ class ExternalController extends Controller
 
         } catch (\Exception $e) {
             \DB::rollBack();
-            // Log the actual error server-side
-            \Log::error('Stock movement processing failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            // SECURITY FIX: Use sanitized logging (don't expose stack trace)
+            $this->logErrorSafely('Stock movement processing failed', $e);
             return response()->json([
                 'success' => false,
                 'message' => 'Falha no processamento das movimentações de estoque. Verifique os logs do servidor.'
@@ -377,14 +377,17 @@ class ExternalController extends Controller
 
     /**
      * Health check endpoint for external systems
+     * SECURITY FIX: Removed database status - exposes internal state to unauthenticated users
+     * Internal health checks should use a separate authenticated endpoint
      */
     public function healthCheck(): JsonResponse
     {
+        // SECURITY: Only return minimal information for public health checks
+        // Database status and other internal details should NOT be exposed
+        // to unauthenticated users as this aids reconnaissance attacks
         return response()->json([
-            'status' => 'healthy',
+            'status' => 'ok',
             'timestamp' => now()->toISOString(),
-            'version' => '1.0.0',
-            'database' => \DB::connection()->getPdo() ? 'connected' : 'disconnected',
         ]);
     }
 }

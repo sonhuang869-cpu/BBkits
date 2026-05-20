@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sale;
+use App\Traits\SanitizesErrorMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,7 @@ use App\Services\StockReservationService;
 
 class ProductionController extends Controller
 {
+    use SanitizesErrorMessages;
     protected $actionHistoryService;
     protected $stockReservationService;
 
@@ -163,13 +165,13 @@ class ProductionController extends Controller
             $notificationService->notifyProductionStarted($sale);
 
             return back()->with('message', 'Produção iniciada com sucesso!');
-            
+
         } catch (\Exception $e) {
-            Log::error('Failed to start production', [
-                'order_id' => $sale->id,
-                'error' => $e->getMessage()
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to start production', $e, [
+                'order_id' => $sale->id
             ]);
-            
+
             return back()->withErrors(['error' => 'Erro ao iniciar produção']);
         }
     }
@@ -226,15 +228,15 @@ class ProductionController extends Controller
             $notificationService->notifyPhotoSent($sale);
             
             return back()->with('message', 'Foto enviada para aprovação da cliente!');
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error('Failed to upload product photo', [
-                'order_id' => $sale->id,
-                'error' => $e->getMessage()
+
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to upload product photo', $e, [
+                'order_id' => $sale->id
             ]);
-            
+
             return back()->withErrors(['error' => 'Erro ao enviar foto']);
         }
     }
@@ -282,13 +284,13 @@ class ProductionController extends Controller
             $notificationService->notifyOrderShipped($sale);
             
             return back()->with('message', 'Etiqueta de envio gerada! Código: ' . $trackingCode);
-            
+
         } catch (\Exception $e) {
-            Log::error('Failed to generate shipping label', [
-                'order_id' => $sale->id,
-                'error' => $e->getMessage()
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to generate shipping label', $e, [
+                'order_id' => $sale->id
             ]);
-            
+
             return back()->withErrors(['error' => 'Erro ao gerar etiqueta de envio']);
         }
     }
@@ -328,9 +330,9 @@ class ProductionController extends Controller
             return back()->with('message', $message);
 
         } catch (\Exception $e) {
-            Log::error('Failed to process photo approved order', [
-                'order_id' => $sale->id,
-                'error' => $e->getMessage()
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to process photo approved order', $e, [
+                'order_id' => $sale->id
             ]);
 
             return back()->withErrors(['error' => 'Erro ao processar pedido aprovado']);

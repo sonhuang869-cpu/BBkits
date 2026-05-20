@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\WATIService;
 use App\Models\Sale;
+use App\Traits\SanitizesErrorMessages;
 use App\Events\SaleOrderConfirmed;
 use App\Events\SalePaymentApproved;
 use App\Events\SaleProductionStarted;
@@ -19,11 +20,14 @@ use Carbon\Carbon;
 
 class WATIIntegrationController extends Controller
 {
+    use SanitizesErrorMessages;
+
     private WATIService $watiService;
 
     public function __construct(WATIService $watiService)
     {
-        $this->middleware(['auth', 'approved']);
+        // SECURITY FIX: Added admin role check - integration settings are admin-only
+        $this->middleware(['auth', 'approved', 'admin']);
         $this->watiService = $watiService;
     }
 
@@ -186,11 +190,12 @@ class WATIIntegrationController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('WATI connection test failed', ['error' => $e->getMessage()]);
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('WATI connection test failed', $e);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erro de conexão WATI: ' . $e->getMessage(),
+                'message' => 'Erro de conexão WATI. Verifique as configurações e tente novamente.',
             ], 500);
         }
     }
@@ -220,15 +225,14 @@ class WATIIntegrationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('WATI test message failed', [
-                'phone' => $request->phone_number,
+            // SECURITY FIX: Use sanitized logging - don't log phone numbers
+            $this->logErrorSafely('WATI test message failed', $e, [
                 'template' => $request->template_name,
-                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Falha ao enviar mensagem de teste: ' . $e->getMessage(),
+                'message' => 'Falha ao enviar mensagem de teste. Verifique os logs do servidor.',
             ], 500);
         }
     }
@@ -264,15 +268,15 @@ class WATIIntegrationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Manual WhatsApp notification failed', [
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Manual WhatsApp notification failed', $e, [
                 'sale_id' => $sale->id,
                 'event_type' => $request->event_type,
-                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Falha ao enviar notificação: ' . $e->getMessage(),
+                'message' => 'Falha ao enviar notificação. Verifique os logs do servidor.',
             ], 500);
         }
     }
@@ -369,14 +373,12 @@ class WATIIntegrationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to retry notification', [
-                'log_id' => $logId,
-                'error' => $e->getMessage(),
-            ]);
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to retry notification', $e, ['log_id' => $logId]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Falha ao reenviar notificação: ' . $e->getMessage(),
+                'message' => 'Falha ao reenviar notificação. Verifique os logs do servidor.',
             ], 500);
         }
     }
@@ -409,7 +411,9 @@ class WATIIntegrationController extends Controller
                 $successCount++;
 
             } catch (\Exception $e) {
-                $errors[] = "Sale {$saleId}: " . $e->getMessage();
+                // SECURITY FIX: Don't expose raw exception messages
+                $this->logErrorSafely("Bulk notification failed for sale {$saleId}", $e);
+                $errors[] = "Venda {$saleId}: Falha no envio";
             }
         }
 
@@ -434,10 +438,8 @@ class WATIIntegrationController extends Controller
             return response()->json(['status' => 'processed']);
 
         } catch (\Exception $e) {
-            Log::error('WATI webhook processing failed', [
-                'error' => $e->getMessage(),
-                'data' => $request->all(),
-            ]);
+            // SECURITY FIX: Don't log raw request data which may contain sensitive info
+            $this->logErrorSafely('WATI webhook processing failed', $e);
 
             return response()->json(['error' => 'Falha no processamento do webhook'], 500);
         }
@@ -457,11 +459,12 @@ class WATIIntegrationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to get WATI templates', ['error' => $e->getMessage()]);
+            // SECURITY FIX: Use sanitized logging
+            $this->logErrorSafely('Failed to get WATI templates', $e);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Falha ao obter templates: ' . $e->getMessage(),
+                'message' => 'Falha ao obter templates. Verifique os logs do servidor.',
             ], 500);
         }
     }
@@ -484,14 +487,12 @@ class WATIIntegrationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to get WATI contact', [
-                'phone' => $request->phone_number,
-                'error' => $e->getMessage(),
-            ]);
+            // SECURITY FIX: Don't log phone numbers
+            $this->logErrorSafely('Failed to get WATI contact', $e);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Falha ao obter contato: ' . $e->getMessage(),
+                'message' => 'Falha ao obter contato. Verifique os logs do servidor.',
             ], 500);
         }
     }
