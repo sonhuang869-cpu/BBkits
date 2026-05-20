@@ -306,12 +306,32 @@ export default function AuthenticatedLayout({ header, children }) {
                 }
 
                 .logo-container {
+                    background: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 100%);
+                    padding: 6px 12px;
+                    border-radius: 10px;
+                    box-shadow: 0 3px 10px rgba(30, 58, 95, 0.2);
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    position: relative;
+                    border: 2px solid transparent;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
                 }
 
                 .logo-container:hover {
-                    transform: scale(1.05);
+                    transform: translateY(-1px);
+                    box-shadow: 0 5px 15px rgba(30, 58, 95, 0.3);
+                    border-color: var(--accent-color);
+                }
+
+                .logo-container img {
+                    filter: brightness(0) invert(1);
+                }
+
+                .logo-text {
+                    color: white;
+                    font-weight: 700;
+                    font-size: 0.9rem;
+                    letter-spacing: 0.025em;
                 }
 
                 .nav-link {
@@ -709,7 +729,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <img
                                             src="/images/logo.webp"
                                             alt="BBKits Logo"
-                                            className="h-6 sm:h-7 md:h-8 lg:h-9 xl:h-10 w-auto object-contain transition-all duration-300 rounded-lg bg-white p-0.5 sm:p-0.75 lg:p-1 shadow-sm"
+                                            className="h-6 sm:h-7 md:h-8 w-auto object-contain"
                                         />
                                     </Link>
                                 </div>

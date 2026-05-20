@@ -78,17 +78,24 @@ export default function VerifyEmail({ status }) {
                     50% { opacity: 1; }
                 }
 
-                .logo-glow {
-                    background: var(--gradient);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    animation: logoGlow 3s ease-in-out infinite alternate;
+                .logo-container {
+                    background: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 100%);
+                    padding: 10px 16px;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+                    border: 2px solid transparent;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    transition: all 0.3s ease;
                 }
-
-                @keyframes logoGlow {
-                    0% { filter: drop-shadow(0 0 5px rgba(212, 165, 116, 0.3)); }
-                    100% { filter: drop-shadow(0 0 15px rgba(212, 165, 116, 0.6)); }
+                .logo-container:hover {
+                    border-color: #D4A574;
+                    box-shadow: 0 6px 20px rgba(30, 58, 95, 0.35);
+                    transform: translateY(-2px);
+                }
+                .logo-container img {
+                    filter: brightness(0) invert(1);
                 }
             `}</style>
 
@@ -96,12 +103,8 @@ export default function VerifyEmail({ status }) {
                 {/* Logo positioned at top-left */}
                 <div className="w-full max-w-6xl mx-auto mb-8">
                     <div className="flex justify-start">
-                        <Link href="/" >
-                            <img
-                                src="/images/logo.webp"
-                                alt="BBKits Logo"
-                                className="object-contain drop-shadow-xl hover:drop-shadow-2xl transition-all duration-500 hover:scale-110 hover:rotate-3 filter hover:brightness-110 hover:saturate-125 cursor-pointer animate-pulse hover:animate-none rounded-xl bg-white from-white/20 to-transparent backdrop-blur-sm border border-white/30 p-1 shadow-xl hover:shadow-yellow-400/50"
-                            />
+                        <Link href="/" className="logo-container">
+                            <img src="/images/logo.webp" alt="BBKits Logo" className="h-10 w-auto object-contain" />
                         </Link>
                     </div>
                 </div>

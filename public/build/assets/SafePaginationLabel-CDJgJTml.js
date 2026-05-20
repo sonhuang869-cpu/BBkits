@@ -1,1 +1,0 @@
-import{j as r}from"./app-Dn4eOBGE.js";function l({label:t}){const n=i(t);return r.jsx(r.Fragment,{children:n})}function i(t){if(!t)return"";const n={"&laquo;":"«","&raquo;":"»","&lt;":"<","&gt;":">","&amp;":"&","&nbsp;":" ","&#8230;":"…","&hellip;":"…"};let e=t;for(const[o,a]of Object.entries(n))e=e.replace(new RegExp(o,"g"),a);return e=e.replace(/<[^>]*>/g,""),e}export{l as S};

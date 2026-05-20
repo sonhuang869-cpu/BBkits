@@ -379,30 +379,54 @@ export default function Welcome({ auth }) {
                 }
 
                 .navbar-clean {
-                    background: rgba(255, 255, 255, 0.98);
+                    background: linear-gradient(135deg, rgba(30, 58, 95, 0.95) 0%, rgba(45, 74, 111, 0.92) 100%);
                     backdrop-filter: blur(20px);
-                    border-radius: 16px;
-                    box-shadow: var(--shadow-md);
-                    border: 1px solid rgba(30, 58, 95, 0.08);
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(30, 58, 95, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1);
+                    border: 1px solid rgba(212, 165, 116, 0.2);
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .navbar-clean::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 1px;
+                    background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.5), transparent);
+                }
+
+                .navbar-clean::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 10%;
+                    right: 10%;
+                    height: 2px;
+                    background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.3), transparent);
+                    border-radius: 2px;
                 }
 
                 .logo-container {
-                    background: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 100%);
+                    background: rgba(255, 255, 255, 0.12);
                     padding: 10px 16px;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+                    border-radius: 14px;
+                    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    border: 2px solid transparent;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
                 }
 
                 .logo-container:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(30, 58, 95, 0.35);
-                    border-color: var(--accent-color);
+                    background: rgba(255, 255, 255, 0.18);
+                    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.15);
+                    border-color: rgba(212, 165, 116, 0.4);
                 }
 
                 .logo-container img {
-                    filter: brightness(0) invert(1);
+                    filter: brightness(1.1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
                 }
 
                 .btn-login {
@@ -544,15 +568,14 @@ export default function Welcome({ auth }) {
 
                 <div className="container mx-auto px-4 py-8 relative z-10">
                     {/* Navigation */}
-                    <nav className="navbar-clean flex items-center justify-between mb-16 px-6 py-4">
-                        <div className="flex items-center space-x-3">
-                            <Link href="/" className="logo-container flex items-center space-x-3">
+                    <nav className="navbar-clean flex items-center justify-between mb-16 px-8 py-5">
+                        <div className="flex items-center">
+                            <Link href="/" className="logo-container">
                                 <img
                                     src="/images/logo.webp"
                                     alt="BBKits Logo"
                                     className="h-10 w-auto object-contain"
                                 />
-                                <span className="text-white font-bold text-xl tracking-wide hidden sm:block">BBKits</span>
                             </Link>
                         </div>
 

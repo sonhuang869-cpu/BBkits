@@ -306,6 +306,28 @@ export default function Login({ status, canResetPassword }) {
                 .link-accent:hover {
                     color: var(--accent-color);
                 }
+
+                .logo-container {
+                    background: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 100%);
+                    padding: 10px 16px;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 2px solid transparent;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .logo-container:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(30, 58, 95, 0.35);
+                    border-color: var(--accent-color);
+                }
+
+                .logo-container img {
+                    filter: brightness(0) invert(1);
+                }
             `}</style>
 
             <div className="min-h-screen login-bg flex flex-col py-12 px-4">
@@ -356,11 +378,11 @@ export default function Login({ status, canResetPassword }) {
                 {/* Logo positioned at top-left */}
                 <div className="w-full max-w-6xl mx-auto mb-8 relative z-10">
                     <div className="flex justify-start">
-                        <Link href="/" >
+                        <Link href="/" className="logo-container">
                             <img
                                 src="/images/logo.webp"
                                 alt="BBKits Logo"
-                                className="h-14 w-auto object-contain transition-all duration-300 hover:scale-105 rounded-xl bg-white p-2 shadow-md"
+                                className="h-10 w-auto object-contain"
                             />
                         </Link>
                     </div>
