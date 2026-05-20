@@ -41,13 +41,15 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
-        // BUG-D12: CSP - Content Security Policy with nonces (no unsafe-inline/unsafe-eval)
-        // The nonce allows only scripts/styles that have the matching nonce attribute
+        // BUG-D12: CSP - Content Security Policy with nonces
+        // Note: 'unsafe-inline' is required for style-src because React applies inline styles
+        // dynamically (e.g., style={{ backgroundColor: color }}) which cannot use nonces.
+        // Script security is maintained via nonce-only policy.
         $csp = implode('; ', [
             "default-src 'self'",
             "script-src 'self' 'nonce-{$nonce}'",
-            "style-src 'self' 'nonce-{$nonce}' https://fonts.bunny.net https://fonts.googleapis.com",
-            "font-src 'self' https://fonts.bunny.net https://fonts.gstatic.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.bunny.net https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+            "font-src 'self' https://fonts.bunny.net https://fonts.gstatic.com https://cdnjs.cloudflare.com",
             "img-src 'self' data: blob: https:",
             "connect-src 'self'",
             "frame-ancestors 'none'",
