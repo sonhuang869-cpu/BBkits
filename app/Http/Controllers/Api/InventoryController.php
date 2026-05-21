@@ -162,7 +162,7 @@ class InventoryController extends Controller
                         'index' => $index,
                         'material_id' => $adjustment['material_id'],
                         'material_name' => $material->name,
-                        'error' => 'Insufficient stock for this operation'
+                        'error' => 'Estoque insuficiente para esta operação.'
                     ];
                     continue;
                 }

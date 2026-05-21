@@ -42,13 +42,14 @@ class SecurityHeaders
         }
 
         // BUG-D12: CSP - Content Security Policy with nonces
-        // Note: 'unsafe-inline' is required for style-src because React applies inline styles
-        // dynamically (e.g., style={{ backgroundColor: color }}) which cannot use nonces.
-        // Script security is maintained via nonce-only policy.
+        // Removed unsafe-inline from style-src - using nonce instead
+        // style-src-attr 'unsafe-inline' is for inline style attributes (React style={{}})
+        // This is more secure than blanket unsafe-inline
         $csp = implode('; ', [
             "default-src 'self'",
             "script-src 'self' 'nonce-{$nonce}'",
-            "style-src 'self' 'unsafe-inline' https://fonts.bunny.net https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+            "style-src 'self' 'nonce-{$nonce}' https://fonts.bunny.net https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+            "style-src-attr 'unsafe-inline'",
             "font-src 'self' https://fonts.bunny.net https://fonts.gstatic.com https://cdnjs.cloudflare.com",
             "img-src 'self' data: blob: https:",
             "connect-src 'self'",

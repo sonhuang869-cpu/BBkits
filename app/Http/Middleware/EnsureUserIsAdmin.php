@@ -20,8 +20,10 @@ class EnsureUserIsAdmin
         }
         
         $user = auth()->user();
-        if ($user->role !== 'admin' && $user->role !== 'financeiro') {
-            abort(403, 'Acesso negado. Apenas administradores e equipe financeira podem acessar esta área.');
+        // BUG-D09: Removed 'financeiro' - only admin and finance_admin can access admin areas
+        // 'financeiro' role is view-only and should access via /finance/* routes instead
+        if ($user->role !== 'admin' && $user->role !== 'finance_admin') {
+            abort(403, 'Acesso negado. Apenas administradores podem acessar esta área.');
         }
         
         return $next($request);

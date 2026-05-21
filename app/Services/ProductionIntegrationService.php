@@ -125,11 +125,11 @@ class ProductionIntegrationService
 
                 $material = Material::find($materialId);
                 if (!$material) {
-                    throw new Exception("Material with ID {$materialId} not found");
+                    throw new Exception("Material com ID {$materialId} não encontrado.");
                 }
 
                 if ($material->current_stock < $requiredQuantity) {
-                    throw new Exception("Insufficient stock for material {$material->name}. Required: {$requiredQuantity}, Available: {$material->current_stock}");
+                    throw new Exception("Estoque insuficiente para o material {$material->name}. Necessário: {$requiredQuantity}, Disponível: {$material->current_stock}");
                 }
 
                 // Reserve the materials by reducing current stock

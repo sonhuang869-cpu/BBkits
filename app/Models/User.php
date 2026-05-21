@@ -109,9 +109,17 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === $role;
     }
 
+    // BUG-D09: Removed financeiro - only finance_admin and admin can APPROVE payments
+    // financeiro role is view-only for financial data
     public function canApprovePayments(): bool
     {
-        return $this->isAdmin() || $this->isFinanceiro() || $this->isFinanceAdmin();
+        return $this->isAdmin() || $this->isFinanceAdmin();
+    }
+
+    // BUG-D09: New method for view-only financial access (includes financeiro)
+    public function canViewFinancialData(): bool
+    {
+        return $this->isAdmin() || $this->isFinanceAdmin() || $this->isFinanceiro();
     }
 
     public function canManageProduction(): bool
@@ -224,13 +232,13 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // Materials Management Permissions
+    // BUG-D09: Removed financeiro - materials are production concerns, not finance
     public function canViewMaterials(): bool
     {
         return $this->isAdmin() ||
                $this->isManager() ||
                $this->isProductionAdmin() ||
-               $this->isFinanceAdmin() ||
-               $this->isFinanceiro();
+               $this->isFinanceAdmin();
     }
 
     public function canEditMaterials(): bool
@@ -245,13 +253,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->isAdmin() || $this->isManager();
     }
 
+    // BUG-D09: Removed financeiro - suppliers are production concerns, not finance
     public function canViewSuppliers(): bool
     {
         return $this->isAdmin() ||
                $this->isManager() ||
                $this->isProductionAdmin() ||
-               $this->isFinanceAdmin() ||
-               $this->isFinanceiro();
+               $this->isFinanceAdmin();
     }
 
     public function canEditSuppliers(): bool
@@ -266,13 +274,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->isAdmin() || $this->isManager();
     }
 
+    // BUG-D09: Removed financeiro - inventory is production concerns, not finance
     public function canViewInventoryTransactions(): bool
     {
         return $this->isAdmin() ||
                $this->isManager() ||
                $this->isProductionAdmin() ||
-               $this->isFinanceAdmin() ||
-               $this->isFinanceiro();
+               $this->isFinanceAdmin();
     }
 
     public function canCreateInventoryTransactions(): bool

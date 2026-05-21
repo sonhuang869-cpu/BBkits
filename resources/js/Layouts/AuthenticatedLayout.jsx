@@ -13,16 +13,17 @@ export default function AuthenticatedLayout({ header, children }) {
     const [isScrolled, setIsScrolled] = useState(false);
 
     // Permission helpers
+    // BUG-D09: Removed 'financeiro' - materials/suppliers/inventory are production concerns
     const canViewMaterials = () => {
-        return ['admin', 'manager', 'production_admin', 'finance_admin', 'financeiro'].includes(user.role);
+        return ['admin', 'manager', 'production_admin', 'finance_admin'].includes(user.role);
     };
 
     const canViewSuppliers = () => {
-        return ['admin', 'manager', 'production_admin', 'finance_admin', 'financeiro'].includes(user.role);
+        return ['admin', 'manager', 'production_admin', 'finance_admin'].includes(user.role);
     };
 
     const canViewInventory = () => {
-        return ['admin', 'manager', 'production_admin', 'finance_admin', 'financeiro'].includes(user.role);
+        return ['admin', 'manager', 'production_admin', 'finance_admin'].includes(user.role);
     };
 
     const isAdmin = () => {
@@ -824,7 +825,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     )}
 
                                     {/* Admin Dropdown Menu */}
-                                    {(user.role === "admin" || user.role === "financeiro") && (
+                                    {/* BUG-D09: Removed financeiro - only admin can see Admin menu */}
+                                    {(user.role === "admin") && (
                                         <DropdownMenu
                                             trigger={
                                                 <>
@@ -1271,8 +1273,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </ResponsiveNavLink>
                             )}
 
-                            {(user.role === "admin" ||
-                                user.role === "financeiro") && (
+                            {/* BUG-D09: Removed financeiro - only admin can see Admin section */}
+                            {(user.role === "admin") && (
                                 <>
                                     <ResponsiveNavLink
                                         href="/admin/dashboard"

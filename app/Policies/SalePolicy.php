@@ -16,9 +16,12 @@ class SalePolicy
         return true;
     }
 
+    /**
+     * BUG-D09: financeiro can view (read-only), finance_admin can view and act
+     */
     public function view(User $user, Sale $sale): bool
     {
-        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceAdmin() || $user->isFinanceiro();
     }
 
     public function create(User $user): bool
@@ -29,29 +32,29 @@ class SalePolicy
 
     /**
      * Determine whether the user can view comments for a sale.
+     * BUG-D09: financeiro can view (read-only), finance_admin can view and act
      */
     public function viewComments(User $user, Sale $sale): bool
     {
-        // Owner, admin, or financeiro can view comments
-        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceAdmin() || $user->isFinanceiro();
     }
 
     /**
      * Determine whether the user can add comments to a sale.
+     * BUG-D09: Removed financeiro - only owner, admin, or finance_admin can add comments
      */
     public function addComment(User $user, Sale $sale): bool
     {
-        // Owner, admin, or financeiro can add comments
-        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceAdmin();
     }
 
     /**
      * Determine whether the user can add payments to a sale.
+     * BUG-D09: Removed financeiro - only owner, admin, or finance_admin can add payments
      */
     public function addPayment(User $user, Sale $sale): bool
     {
-        // Owner, admin, or financeiro can add payments
-        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceAdmin();
     }
 
     public function update(User $user, Sale $sale): bool
@@ -72,25 +75,38 @@ class SalePolicy
         return $user->isAdmin();
     }
 
+    /**
+     * BUG-D09: Removed financeiro - only owner, admin, or finance_admin can cancel
+     */
     public function cancel(User $user, Sale $sale): bool
     {
-        // BUG-V05: Only owner, admin, or financeiro can cancel
-        // Admin password will be verified in controller for non-owner/non-admin
-        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceiro();
-    }
-
-    public function approve(User $user): bool
-    {
-        return $user->isFinanceiro() || $user->isAdmin();
+        return $user->id === $sale->user_id || $user->isAdmin() || $user->isFinanceAdmin();
     }
 
     /**
-     * BUG-D06: Determine whether the user can update the status of a sale.
-     * Only admin or financeiro can update status (not regular vendedoras).
+     * BUG-D09: Removed financeiro - only admin or finance_admin can approve
+     */
+    public function approve(User $user): bool
+    {
+        return $user->isAdmin() || $user->isFinanceAdmin();
+    }
+
+    /**
+     * BUG-D06/D09: Determine whether the user can update the status of a sale.
+     * Only admin or finance_admin can update status (not financeiro).
      */
     public function updateStatus(User $user, Sale $sale): bool
     {
-        return $user->isAdmin() || $user->isFinanceiro();
+        return $user->isAdmin() || $user->isFinanceAdmin();
+    }
+
+    /**
+     * BUG-D08: Determine whether the user can correct a sale.
+     * Only admin can correct sales (financial corrections).
+     */
+    public function correct(User $user, Sale $sale): bool
+    {
+        return $user->isAdmin();
     }
 
     /**

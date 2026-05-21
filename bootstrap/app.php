@@ -88,12 +88,19 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // BUG-D11: Handle NotFoundHttpException for both API and web requests
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            // BUG-D11: For /storage/* paths, always return plain 404 (not Inertia shell)
+            // This prevents returning HTTP 200 with Inertia shell for non-existent files
+            if ($request->is('storage/*') || $request->is('storage')) {
+                return response('Arquivo não encontrado.', 404)
+                    ->header('Content-Type', 'text/plain');
+            }
+
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'message' => 'Recurso não encontrado.'
                 ], 404);
             }
-            // For web requests (including /storage/* paths), return 404 error page
+            // For web requests, return 404 error page
             return response()->view('errors.404', [], 404);
         });
 

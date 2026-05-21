@@ -1068,6 +1068,9 @@ class SaleController extends Controller
 
     public function correct(Request $request, Sale $sale)
     {
+        // BUG-D08: Authorization FIRST, before validation
+        $this->authorize('correct', $sale);
+
         $validated = $request->validate([
             'total_amount' => 'required|numeric|min:0.01', // BUG-18: Must be > 0
             'shipping_amount' => 'required|numeric|min:0',
