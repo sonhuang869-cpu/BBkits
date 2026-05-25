@@ -1,54 +1,4 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
-
-export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false,
-    });
-
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-        if (status) {
-            toast.success(status);
-        }
-    }, [status]);
-
-    const submit = (e) => {
-        e.preventDefault();
-
-        post('/login', {
-            onFinish: () => reset('password'),
-            onSuccess: () => {
-                toast.success('Login realizado com sucesso!');
-            },
-            onError: (errors) => {
-                if (errors.email) {
-                    toast.error(errors.email);
-                }
-                if (errors.password) {
-                    toast.error(errors.password);
-                }
-            },
-        });
-    };
-
-    return (
-        <>
-            <Head title="Entrar - BBKits" />
-
-            {/* Premium Exclusive Animation Theme - Navy & Soft Gold */}
-            <style>{`
+import{x as g,r as n,j as a,Q as x,d as l,V as d}from"./app-De5o7I41.js";import"./TextInput-D_NKmAM2.js";/* empty css            */function v(){const{data:e,setData:i,post:c,processing:s,errors:o,reset:p}=g({name:"",email:"",password:"",password_confirmation:""}),[f,m]=n.useState(!1);n.useEffect(()=>{m(!0)},[]);const h=r=>{r.preventDefault(),c("/register",{onFinish:()=>p("password","password_confirmation"),onSuccess:()=>{d.success("Conta criada com sucesso!")},onError:t=>{Object.keys(t).forEach(u=>{d.error(t[u])})}})};return a.jsxs(a.Fragment,{children:[a.jsx(x,{title:"Cadastro - BBKits"}),a.jsx("style",{children:`
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
                 :root {
@@ -81,7 +31,7 @@ export default function Login({ status, canResetPassword }) {
                     font-family: 'Inter', sans-serif;
                 }
 
-                .login-bg {
+                .register-bg {
                     background: var(--gradient-hero),
                                 url('https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80') center/cover;
                     position: relative;
@@ -267,6 +217,23 @@ export default function Login({ status, canResetPassword }) {
                     }
                 }
 
+                /* Hexagon Pattern Background */
+                .hexagon-pattern {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    opacity: 0.03;
+                    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-opacity='0.4' fill='%23D4A574'/%3E%3C/svg%3E");
+                    animation: hexScroll 60s linear infinite;
+                }
+
+                @keyframes hexScroll {
+                    0% { transform: translate(0, 0); }
+                    100% { transform: translate(-60px, -60px); }
+                }
+
                 /* ========== FORM CARD ANIMATIONS ========== */
                 .form-card {
                     background: rgba(255, 255, 255, 0.98);
@@ -279,16 +246,16 @@ export default function Login({ status, canResetPassword }) {
                     border: 1px solid rgba(212, 165, 116, 0.15);
                     position: relative;
                     overflow: hidden;
-                    transform: translateY(60px) rotateX(10deg);
+                    transform: translateY(60px) rotateX(10deg) scale(0.95);
                     opacity: 0;
-                    animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                    animation: cardEntrance 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
                     animation-delay: 0.2s;
                     perspective: 1000px;
                 }
 
                 @keyframes cardEntrance {
                     to {
-                        transform: translateY(0) rotateX(0);
+                        transform: translateY(0) rotateX(0) scale(1);
                         opacity: 1;
                     }
                 }
@@ -306,8 +273,8 @@ export default function Login({ status, canResetPassword }) {
                         rgba(212, 165, 116, 0.08),
                         transparent
                     );
-                    animation: cardShimmer 4s ease-in-out infinite;
-                    animation-delay: 1s;
+                    animation: cardShimmer 5s ease-in-out infinite;
+                    animation-delay: 1.2s;
                 }
 
                 @keyframes cardShimmer {
@@ -322,7 +289,7 @@ export default function Login({ status, canResetPassword }) {
                     top: 0;
                     left: 50%;
                     transform: translateX(-50%);
-                    width: 60%;
+                    width: 50%;
                     height: 3px;
                     background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
                     border-radius: 0 0 4px 4px;
@@ -335,11 +302,10 @@ export default function Login({ status, canResetPassword }) {
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                     background-size: 200% auto;
-                    animation: titleShimmer 4s ease-in-out infinite;
                     transform: translateY(20px);
                     opacity: 0;
                     animation: titleReveal 0.6s ease-out forwards, titleShimmer 4s ease-in-out infinite;
-                    animation-delay: 0.5s, 1.1s;
+                    animation-delay: 0.5s, 1.3s;
                 }
 
                 @keyframes titleReveal {
@@ -368,6 +334,21 @@ export default function Login({ status, canResetPassword }) {
                     }
                 }
 
+                /* Animated underline for subtitle */
+                .subtitle-underline {
+                    display: block;
+                    width: 0;
+                    height: 2px;
+                    margin: 8px auto 0;
+                    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+                    animation: underlineExpand 0.8s ease-out forwards;
+                    animation-delay: 0.9s;
+                }
+
+                @keyframes underlineExpand {
+                    to { width: 120px; }
+                }
+
                 /* ========== INPUT FIELD ANIMATIONS ========== */
                 .input-group {
                     position: relative;
@@ -376,9 +357,10 @@ export default function Login({ status, canResetPassword }) {
                     animation: inputSlideIn 0.5s ease-out forwards;
                 }
 
-                .input-group:nth-child(1) { animation-delay: 0.8s; }
-                .input-group:nth-child(2) { animation-delay: 0.95s; }
+                .input-group:nth-child(1) { animation-delay: 0.9s; }
+                .input-group:nth-child(2) { animation-delay: 1.0s; }
                 .input-group:nth-child(3) { animation-delay: 1.1s; }
+                .input-group:nth-child(4) { animation-delay: 1.2s; }
 
                 @keyframes inputSlideIn {
                     to {
@@ -411,6 +393,7 @@ export default function Login({ status, canResetPassword }) {
                 .input-label {
                     transition: all 0.3s ease;
                     position: relative;
+                    display: inline-block;
                 }
 
                 .input-label::after {
@@ -432,6 +415,22 @@ export default function Login({ status, canResetPassword }) {
                     color: var(--primary-color);
                 }
 
+                /* Input icon indicator */
+                .input-icon {
+                    position: absolute;
+                    right: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: var(--text-muted);
+                    transition: all 0.3s ease;
+                    opacity: 0;
+                }
+
+                .input-wrapper:focus-within .input-icon {
+                    opacity: 1;
+                    color: var(--accent-color);
+                }
+
                 /* ========== BUTTON ANIMATIONS ========== */
                 .btn-submit {
                     background: var(--gradient);
@@ -441,7 +440,7 @@ export default function Login({ status, canResetPassword }) {
                     transform: translateY(30px);
                     opacity: 0;
                     animation: buttonReveal 0.6s ease-out forwards;
-                    animation-delay: 1.2s;
+                    animation-delay: 1.4s;
                 }
 
                 @keyframes buttonReveal {
@@ -477,7 +476,7 @@ export default function Login({ status, canResetPassword }) {
                     transform: translateY(-1px) scale(0.98);
                 }
 
-                /* Ripple effect on click */
+                /* Button pulse animation */
                 .btn-submit::after {
                     content: '';
                     position: absolute;
@@ -492,8 +491,8 @@ export default function Login({ status, canResetPassword }) {
                 }
 
                 .btn-submit:active::after {
-                    width: 300px;
-                    height: 300px;
+                    width: 400px;
+                    height: 400px;
                     opacity: 0;
                 }
 
@@ -528,10 +527,25 @@ export default function Login({ status, canResetPassword }) {
                     opacity: 0;
                     transform: translateY(20px);
                     animation: footerReveal 0.5s ease-out forwards;
-                    animation-delay: 1.4s;
+                    animation-delay: 1.6s;
                 }
 
                 @keyframes footerReveal {
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+
+                /* Terms section animation */
+                .terms-section {
+                    opacity: 0;
+                    transform: translateY(15px);
+                    animation: termsReveal 0.5s ease-out forwards;
+                    animation-delay: 1.8s;
+                }
+
+                @keyframes termsReveal {
                     to {
                         transform: translateY(0);
                         opacity: 1;
@@ -603,79 +617,40 @@ export default function Login({ status, canResetPassword }) {
                     transform: scale(1.05);
                 }
 
-                /* ========== CHECKBOX ANIMATION ========== */
-                .checkbox-wrapper {
+                /* ========== PASSWORD STRENGTH INDICATOR ========== */
+                .password-strength {
+                    height: 3px;
+                    border-radius: 2px;
+                    margin-top: 8px;
+                    background: #E5E7EB;
+                    overflow: hidden;
                     opacity: 0;
-                    animation: checkboxReveal 0.4s ease-out forwards;
-                    animation-delay: 1.05s;
+                    transition: opacity 0.3s ease;
                 }
 
-                @keyframes checkboxReveal {
-                    to { opacity: 1; }
+                .password-strength.visible {
+                    opacity: 1;
                 }
 
-                .custom-checkbox {
-                    position: relative;
-                    display: inline-block;
-                    width: 20px;
-                    height: 20px;
+                .password-strength-bar {
+                    height: 100%;
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-radius: 2px;
                 }
 
-                .custom-checkbox input {
-                    opacity: 0;
-                    width: 0;
-                    height: 0;
+                .password-strength-bar.weak {
+                    width: 33%;
+                    background: linear-gradient(90deg, #EF4444, #F87171);
                 }
 
-                .custom-checkbox .checkmark {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 20px;
-                    height: 20px;
-                    background: white;
-                    border: 2px solid #E5E7EB;
-                    border-radius: 6px;
-                    transition: all 0.3s ease;
+                .password-strength-bar.medium {
+                    width: 66%;
+                    background: linear-gradient(90deg, #F59E0B, #FBBF24);
                 }
 
-                .custom-checkbox:hover .checkmark {
-                    border-color: var(--accent-color);
-                }
-
-                .custom-checkbox input:checked ~ .checkmark {
-                    background: var(--gradient);
-                    border-color: var(--primary-color);
-                    animation: checkPop 0.4s ease;
-                }
-
-                @keyframes checkPop {
-                    0% { transform: scale(1); }
-                    50% { transform: scale(1.2); }
-                    100% { transform: scale(1); }
-                }
-
-                .custom-checkbox .checkmark::after {
-                    content: '';
-                    position: absolute;
-                    display: none;
-                    left: 6px;
-                    top: 2px;
-                    width: 5px;
-                    height: 10px;
-                    border: solid white;
-                    border-width: 0 2px 2px 0;
-                    transform: rotate(45deg);
-                }
-
-                .custom-checkbox input:checked ~ .checkmark::after {
-                    display: block;
-                    animation: checkmarkDraw 0.3s ease-out;
-                }
-
-                @keyframes checkmarkDraw {
-                    from { height: 0; }
-                    to { height: 10px; }
+                .password-strength-bar.strong {
+                    width: 100%;
+                    background: linear-gradient(90deg, var(--success-color), #10B981);
                 }
 
                 /* ========== LOADING SPINNER ENHANCEMENT ========== */
@@ -688,193 +663,28 @@ export default function Login({ status, canResetPassword }) {
                     50% { transform: rotate(180deg) scale(1.1); }
                     100% { transform: rotate(360deg) scale(1); }
                 }
-            `}</style>
 
-            <div className="min-h-screen login-bg flex flex-col py-12 px-4">
-                {/* Premium Animated Background */}
-                <div className="animated-bg">
-                    {/* Aurora Effect */}
-                    <div className="aurora" />
+                /* ========== SUCCESS CHECKMARK ANIMATION ========== */
+                .success-icon {
+                    opacity: 0;
+                    transform: scale(0);
+                    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                }
 
-                    {/* Morphing Blobs */}
-                    <div className="morph-blob morph-blob-1" />
-                    <div className="morph-blob morph-blob-2" />
-                    <div className="morph-blob morph-blob-3" />
+                .success-icon.visible {
+                    opacity: 1;
+                    transform: scale(1);
+                }
 
-                    {/* Floating Diamonds */}
-                    <div className="diamond-container">
-                        {Array.from({ length: 8 }, (_, i) => (
-                            <div
-                                key={`diamond-${i}`}
-                                className="diamond"
-                                style={{
-                                    left: `${10 + i * 12}%`,
-                                    top: `${100 + Math.random() * 20}%`,
-                                    animationDelay: `${i * 2.5}s`,
-                                    animationDuration: `${18 + Math.random() * 8}s`,
-                                    width: `${8 + Math.random() * 8}px`,
-                                    height: `${8 + Math.random() * 8}px`,
-                                }}
-                            />
-                        ))}
-                    </div>
+                /* ========== MOBILE RESPONSIVE ========== */
+                @media (max-width: 640px) {
+                    .form-card {
+                        border-radius: 20px;
+                        margin: 0 8px;
+                    }
 
-                    {/* Gold Sparkles */}
-                    <div className="sparkle-container">
-                        {Array.from({ length: 25 }, (_, i) => (
-                            <div
-                                key={`sparkle-${i}`}
-                                className="sparkle"
-                                style={{
-                                    left: `${Math.random() * 100}%`,
-                                    top: `${Math.random() * 100}%`,
-                                    animationDelay: `${Math.random() * 3}s`,
-                                    animationDuration: `${2 + Math.random() * 2}s`,
-                                    width: `${2 + Math.random() * 4}px`,
-                                    height: `${2 + Math.random() * 4}px`,
-                                }}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Flowing Lines */}
-                    <div className="flow-lines">
-                        {Array.from({ length: 5 }, (_, i) => (
-                            <div
-                                key={`flow-${i}`}
-                                className="flow-line"
-                                style={{
-                                    top: `${20 + i * 18}%`,
-                                    animationDelay: `${i * 3}s`,
-                                    animationDuration: `${10 + i * 2}s`,
-                                    width: `${150 + Math.random() * 100}px`,
-                                }}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Logo positioned at top-left */}
-                <div className="w-full max-w-6xl mx-auto mb-8 relative z-10">
-                    <div className="flex justify-start">
-                        <Link href="/" className="logo-container">
-                            <img
-                                src="/images/logo.webp"
-                                alt="BBKits Logo"
-                                className="h-10 w-auto object-contain"
-                            />
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Centered login form */}
-                <div className="flex-1 flex items-center justify-center relative z-10">
-                    <div className="w-full max-w-md">
-                        {/* Clean Form Container */}
-                        <div className="form-card p-8">
-                            <h1 className="form-title text-2xl font-bold text-center mb-2">
-                                Bem-vinda de Volta!
-                            </h1>
-                            <p className="form-subtitle text-center text-gray-500 mb-8 text-sm">
-                                Acesse sua conta e continue vendendo
-                            </p>
-
-                            <form onSubmit={submit} method="POST" action="/login" className="space-y-5">
-                                <div className="input-group">
-                                    <label className="input-label block text-sm font-medium text-gray-700 mb-1.5">E-mail</label>
-                                    <input
-                                        id="email"
-                                        type="email"
-                                        name="email"
-                                        value={data.email}
-                                        className="input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900"
-                                        autoComplete="username"
-                                        autoFocus={true}
-                                        onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="seu@email.com"
-                                    />
-                                    {errors.email && (
-                                        <p className="mt-2 text-sm text-red-600">{errors.email}</p>
-                                    )}
-                                </div>
-
-                                <div className="input-group">
-                                    <label className="input-label block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
-                                    <input
-                                        id="password"
-                                        type="password"
-                                        name="password"
-                                        value={data.password}
-                                        className="input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900"
-                                        autoComplete="current-password"
-                                        onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="Digite sua senha"
-                                    />
-                                    {errors.password && (
-                                        <p className="mt-2 text-sm text-red-600">{errors.password}</p>
-                                    )}
-                                </div>
-
-                                <div className="checkbox-wrapper flex items-center justify-between">
-                                    <label className="flex items-center cursor-pointer group">
-                                        <input
-                                            type="checkbox"
-                                            name="remember"
-                                            checked={data.remember}
-                                            onChange={(e) => setData('remember', e.target.checked)}
-                                            className="w-4 h-4 rounded border-gray-300 text-blue-900 focus:ring-blue-900 focus:ring-2 transition-all duration-300"
-                                            style={{accentColor: '#1E3A5F'}}
-                                        />
-                                        <span className="ml-2 text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
-                                            Lembrar-me
-                                        </span>
-                                    </label>
-
-                                    {canResetPassword && (
-                                        <Link
-                                            href="/forgot-password"
-                                            className="link-accent text-sm font-medium"
-                                        >
-                                            Esqueceu a senha?
-                                        </Link>
-                                    )}
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="btn-submit w-full py-3.5 px-4 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {processing ? (
-                                        <div className="flex items-center justify-center">
-                                            <svg className="spinner-enhanced -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Entrando...
-                                        </div>
-                                    ) : (
-                                        'Entrar'
-                                    )}
-                                </button>
-
-                                <div className="footer-links text-center pt-2">
-                                    <span className="text-sm text-gray-500">Ainda nao tem uma conta? </span>
-                                    <Link
-                                        href="/register"
-                                        className="link-accent text-sm font-semibold"
-                                    >
-                                        Criar Conta
-                                    </Link>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Font Awesome Icons */}
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-        </>
-    );
-}
+                    .form-title {
+                        font-size: 1.5rem;
+                    }
+                }
+            `}),a.jsxs("div",{className:"min-h-screen register-bg flex flex-col py-8 px-4",children:[a.jsxs("div",{className:"animated-bg",children:[a.jsx("div",{className:"aurora"}),a.jsx("div",{className:"hexagon-pattern"}),a.jsx("div",{className:"morph-blob morph-blob-1"}),a.jsx("div",{className:"morph-blob morph-blob-2"}),a.jsx("div",{className:"morph-blob morph-blob-3"}),a.jsx("div",{className:"diamond-container",children:Array.from({length:10},(r,t)=>a.jsx("div",{className:"diamond",style:{left:`${8+t*10}%`,top:`${100+Math.random()*20}%`,animationDelay:`${t*2}s`,animationDuration:`${16+Math.random()*8}s`,width:`${6+Math.random()*10}px`,height:`${6+Math.random()*10}px`}},`diamond-${t}`))}),a.jsx("div",{className:"sparkle-container",children:Array.from({length:30},(r,t)=>a.jsx("div",{className:"sparkle",style:{left:`${Math.random()*100}%`,top:`${Math.random()*100}%`,animationDelay:`${Math.random()*3}s`,animationDuration:`${2+Math.random()*2}s`,width:`${2+Math.random()*4}px`,height:`${2+Math.random()*4}px`}},`sparkle-${t}`))}),a.jsx("div",{className:"flow-lines",children:Array.from({length:6},(r,t)=>a.jsx("div",{className:"flow-line",style:{top:`${15+t*15}%`,animationDelay:`${t*2.5}s`,animationDuration:`${10+t*2}s`,width:`${150+Math.random()*100}px`}},`flow-${t}`))})]}),a.jsx("div",{className:"w-full max-w-6xl mx-auto mb-6 relative z-10",children:a.jsx("div",{className:"flex justify-start",children:a.jsx(l,{href:"/",className:"logo-container",children:a.jsx("img",{src:"/images/logo.webp",alt:"BBKits Logo",className:"h-10 w-auto object-contain"})})})}),a.jsx("div",{className:"flex-1 flex items-center justify-center relative z-10",children:a.jsx("div",{className:"w-full max-w-md",children:a.jsxs("div",{className:"form-card p-8",children:[a.jsx("h1",{className:"form-title text-2xl font-bold text-center mb-2",children:"Criar Conta"}),a.jsx("p",{className:"form-subtitle text-center text-gray-500 mb-1 text-sm",children:"Junte-se as vendedoras de sucesso da BBkits"}),a.jsx("span",{className:"subtitle-underline"}),a.jsxs("form",{onSubmit:h,className:"space-y-4 mt-6",children:[a.jsxs("div",{className:"input-group",children:[a.jsx("label",{className:"input-label block text-sm font-medium text-gray-700 mb-1.5",children:"Nome Completo"}),a.jsx("div",{className:"input-wrapper relative",children:a.jsx("input",{id:"name",type:"text",name:"name",value:e.name,className:"input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900",autoComplete:"name",autoFocus:!0,onChange:r=>i("name",r.target.value),placeholder:"Digite seu nome completo",required:!0})}),o.name&&a.jsx("p",{className:"mt-2 text-sm text-red-600",children:o.name})]}),a.jsxs("div",{className:"input-group",children:[a.jsx("label",{className:"input-label block text-sm font-medium text-gray-700 mb-1.5",children:"E-mail"}),a.jsx("div",{className:"input-wrapper relative",children:a.jsx("input",{id:"email",type:"email",name:"email",value:e.email,className:"input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900",autoComplete:"username",onChange:r=>i("email",r.target.value),placeholder:"seu@email.com",required:!0})}),o.email&&a.jsx("p",{className:"mt-2 text-sm text-red-600",children:o.email})]}),a.jsxs("div",{className:"input-group",children:[a.jsx("label",{className:"input-label block text-sm font-medium text-gray-700 mb-1.5",children:"Senha"}),a.jsx("div",{className:"input-wrapper relative",children:a.jsx("input",{id:"password",type:"password",name:"password",value:e.password,className:"input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900",autoComplete:"new-password",onChange:r=>i("password",r.target.value),placeholder:"Crie uma senha forte",required:!0})}),e.password&&a.jsx("div",{className:`password-strength ${e.password?"visible":""}`,children:a.jsx("div",{className:`password-strength-bar ${e.password.length>=8&&/[A-Z]/.test(e.password)&&/[0-9]/.test(e.password)?"strong":e.password.length>=6?"medium":"weak"}`})}),o.password&&a.jsx("p",{className:"mt-2 text-sm text-red-600",children:o.password})]}),a.jsxs("div",{className:"input-group",children:[a.jsx("label",{className:"input-label block text-sm font-medium text-gray-700 mb-1.5",children:"Confirmar Senha"}),a.jsxs("div",{className:"input-wrapper relative",children:[a.jsx("input",{id:"password_confirmation",type:"password",name:"password_confirmation",value:e.password_confirmation,className:"input-field w-full px-4 py-3 rounded-xl focus:outline-none text-gray-900",autoComplete:"new-password",onChange:r=>i("password_confirmation",r.target.value),placeholder:"Confirme sua senha",required:!0}),e.password_confirmation&&e.password===e.password_confirmation&&a.jsx("svg",{className:"success-icon visible absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500",fill:"none",stroke:"currentColor",viewBox:"0 0 24 24",children:a.jsx("path",{strokeLinecap:"round",strokeLinejoin:"round",strokeWidth:2,d:"M5 13l4 4L19 7"})})]}),o.password_confirmation&&a.jsx("p",{className:"mt-2 text-sm text-red-600",children:o.password_confirmation})]}),a.jsx("button",{type:"submit",disabled:s,className:"btn-submit w-full py-3.5 px-4 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed mt-6",children:s?a.jsxs("div",{className:"flex items-center justify-center",children:[a.jsxs("svg",{className:"spinner-enhanced -ml-1 mr-3 h-5 w-5 text-white",xmlns:"http://www.w3.org/2000/svg",fill:"none",viewBox:"0 0 24 24",children:[a.jsx("circle",{className:"opacity-25",cx:"12",cy:"12",r:"10",stroke:"currentColor",strokeWidth:"4"}),a.jsx("path",{className:"opacity-75",fill:"currentColor",d:"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"})]}),"Criando conta..."]}):"Criar Minha Conta"}),a.jsxs("div",{className:"footer-links text-center pt-2",children:[a.jsx("span",{className:"text-sm text-gray-500",children:"Ja possui uma conta? "}),a.jsx(l,{href:"/login",className:"link-accent text-sm font-semibold",children:"Fazer Login"})]})]}),a.jsx("div",{className:"terms-section mt-6 pt-6 border-t border-gray-100",children:a.jsxs("div",{className:"text-center text-xs text-gray-400",children:[a.jsx("p",{children:"Ao criar uma conta, voce concorda com nossos"}),a.jsxs("div",{className:"space-x-2 mt-1",children:[a.jsx("a",{href:"#",className:"link-accent",children:"Termos de Uso"}),a.jsx("span",{children:"e"}),a.jsx("a",{href:"#",className:"link-accent",children:"Politica de Privacidade"})]})]})})]})})})]}),a.jsx("link",{rel:"stylesheet",href:"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"})]})}export{v as default};
